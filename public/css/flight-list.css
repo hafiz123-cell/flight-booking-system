@@ -1,0 +1,107 @@
+
+
+    .tooltip-hover {
+        text-decoration: underline dotted;
+        cursor: pointer;
+    }
+    .stopover-item {
+        text-align: left;
+        font-size: 13px;
+    }
+    #route-details::-webkit-scrollbar {
+    height: 6px;
+}
+#route-details::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+#route-details::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+    
+    .segment-tabs {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+        border-bottom: 2px solid #eee;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .segment-tabs li {
+      border-right:1px solid #ccc;
+        display: inline-block;
+        cursor: pointer;
+        padding: 0px 10px;
+        margin-right: 10px;
+        border-bottom: 1px solid #ccc; /* prevent bottom border from interfering */
+        background-color: #f9f9f9;
+        color: #333;
+        transition: all 0.3s ease-in-out;
+        min-width: 140px;
+        text-align: center;
+        position: relative;
+        top: 2px; /* visually lift the tab to appear connected */
+    }
+.flight-details-content {
+    transition: all 0.3s ease;
+}
+    .segment-tabs li.active {
+        background-color: #fff;
+        
+        border-bottom: 2px solid #ffa500; /* remove bottom to blend into content box */
+        color: #ff8000;
+        z-index: 1;
+    }
+
+    .segment-tabs li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .segment-tabs li small {
+        display: block;
+        font-size: 12px;
+        color: #888;
+        margin-top: 5px;
+    }
+
+    .segment-tabs::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .segment-tabs::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+.segment-tabs li {
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: border 0.2s;
+}
+
+.segment-tabs li.active {
+    border-bottom: 3px solid orange;
+    font-weight: bold;
+}
+.segment-subtabs .tab-items {
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-right: 1rem;
+    color: #333;
+    transition: all 0.2s ease-in-out;
+}
+
+.segment-subtabs .tab-items.active {
+    border-bottom: 3px solid #ff8a05;
+    color: #ff8a05;
+    font-weight: 600;
+}
+
+.tab-subcontent {
+    margin-top: 1rem;
+}
+
+.d-none {
+    display: none !important;
+}
