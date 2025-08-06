@@ -225,7 +225,6 @@
 
       <!-- Scripts -->
     <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
-     <script src="{{ asset('js/flight-list.js') }}"></script>
     <script src="{{ asset('js/color-switcher.js') }}"></script>
     <script src="{{ asset('js/plugin.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>

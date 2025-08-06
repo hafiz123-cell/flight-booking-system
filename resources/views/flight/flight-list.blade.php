@@ -967,7 +967,7 @@
     $priceData = $result['price']['fd'] ?? [];
 @endphp
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 m-0 p-0">
       @if(isset($resultsRound['searchResult']['tripInfos']['ONWARD']) && count($resultsRound['searchResult']['tripInfos']['ONWARD']) > 0)
     @foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $index => $segment)
         @php
@@ -1076,7 +1076,7 @@
                 </div>
 
                 <!-- Book Button -->
-                <div class="col-md-2 text-center">
+                {{-- <div class="col-md-2 text-center">
                     @php
                         $itineraryId = $priceItem['id'] ?? '';
                         $fareIdentifier = $priceItem['fareIdentifier'] ?? '';
@@ -1086,7 +1086,7 @@
                         ]);
                     @endphp
                     <a href="{{ $bookUrl }}" class="btn btn-sm w-100 text-white" style="background-color: orange;">Book</a>
-                </div>
+                </div> --}}
             </div>
 
             <!-- View Details Button -->
@@ -1116,7 +1116,7 @@
     @endforeach
 @endif
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 m-0 p-0 ">
         
 @if(isset($resultsRound['searchResult']['tripInfos']['RETURN']) && count($resultsRound['searchResult']['tripInfos']['RETURN']) > 0)
     @foreach($resultsRound['searchResult']['tripInfos']['RETURN'] as $index => $segment)
@@ -1222,7 +1222,7 @@
                     @endif
                 </div>
 
-                <div class="col-md-2 text-center">
+                {{-- <div class="col-md-2 text-center">
                     @php
                         $itineraryId = $priceItem['id'] ?? '';
                         $fareIdentifier = $priceItem['fareIdentifier'] ?? '';
@@ -1232,7 +1232,7 @@
                         ]);
                     @endphp
                     <a href="{{ $bookUrl }}" class="btn btn-sm w-100 text-white" style="background-color: orange;">Book</a>
-                </div>
+                </div> --}}
             </div>
 
             <div class="mt-3">
@@ -2086,6 +2086,7 @@
       </div>
     </section>
     <!-- flight-list ends -->
+     <script src="{{ asset('js/flight-list.js') }}"></script>
 <script>
 function toggleDetails(button) {
     const content = button.nextElementSibling;
