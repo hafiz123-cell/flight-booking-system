@@ -10,6 +10,10 @@
   <div style="display:flex; justify-content:center;"></div>
 </div>
 
+<div id="roundtrip-summary-display" style="display: none;">
+  <div style="display:flex; justify-content:center;"></div>
+</div>
+
  <!-- Breadcrumb -->
     <section class="breadcrumb-outer text-center">
       <div class="container">
@@ -293,7 +297,6 @@
                   <option value="First">First</option>
                 </select>
               </div>
-
             </div>
           </div>
         </div>
@@ -498,7 +501,7 @@
 
     <section class="list flight-list">
       <div class="container">
-        <div class="row">
+        <div class="row p-0">
           <div class="col-lg-8">
             <div class="content">
              
@@ -522,7 +525,7 @@
 
         $departureTime = \Carbon\Carbon::parse($firstFlight['dt']);
         $arrivalTime = \Carbon\Carbon::parse($lastFlight['at']);
-        $durationMinutes = $arrivalTime->diffInMinutes($departureTime);
+        $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
         $hours = intdiv($durationMinutes, 60);
         $minutes = $durationMinutes % 60;
 
@@ -609,7 +612,13 @@
                
             {{-- Fare info --}} 
             <div class="d-flex">
-             <input class="form-check-input" type="radio">
+             <input class="form-check-input fare-radio"
+       type="radio"
+       name="fare_option_{{ $index }}"
+       value="{{ $priceItem['id'] ?? '' }}"
+       data-fare="{{ $priceItem['fareIdentifier'] ?? '' }}"
+       @if($index === 0 && $loopIndex === 0) checked @endif>
+
             <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
             </div>
             {{-- Tag and Cabin class --}}
@@ -627,19 +636,14 @@
     @endif
 </div>
 
-
-
             <div class="col-md-2 text-center">
-            @php
-    $itineraryId = $priceItem['id'] ?? '';
-    $fareIdentifier = $priceItem['fareIdentifier'] ?? '';
-    $bookUrl = route('redirect.booking', [
-        'itineraryId' => $itineraryId,
-        'fareIdentifier' => $fareIdentifier
-    ]);
-@endphp
+           <button type="button"
+        class="btn btn-sm w-100 text-white book-btn"
+        style="background-color: orange;"
+        data-flight="{{ $index }}">
+    Book
+</button>
 
-<a href="{{ $bookUrl }}" class="btn btn-sm w-100 text-white" style="background-color: orange;">Book</a>
 
             </div>
         </div>
@@ -965,9 +969,18 @@
     $maxPairs = min(count($onwardFlights), count($returnFlights)); // Pair onward & return flights
     $segments = $result['segments'] ?? [];
     $priceData = $result['price']['fd'] ?? [];
+   $firstOnwardFlight = $onwardFlights[0]['sI'][0] ?? null;
+  
+    $depCity = $firstOnwardFlight['da']['city'] ?? '';
+    $arrCity = $firstOnwardFlight['aa']['city'] ?? '';
+     $departureDate = isset($firstOnwardFlight['dt']) ? Carbon::parse($firstOnwardFlight['dt'])->format('D, d M y') : '';
 @endphp
 <div class="row">
-    <div class="col-md-6 m-0 p-0">
+    <div class="col-md-6 m-0 p-0" style="max-height:auto; overflow-y: auto; padding-right: 10px;">
+           <div class="d-flex">
+              <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5> <p class="ms-2"> {{ $departureDate }}</p>
+
+           </div>
       @if(isset($resultsRound['searchResult']['tripInfos']['ONWARD']) && count($resultsRound['searchResult']['tripInfos']['ONWARD']) > 0)
     @foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $index => $segment)
         @php
@@ -977,7 +990,7 @@
 
             $departureTime = Carbon::parse($firstFlight['dt']);
             $arrivalTime = Carbon::parse($lastFlight['at']);
-            $durationMinutes = $arrivalTime->diffInMinutes($departureTime);
+            $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
             $hours = intdiv($durationMinutes, 60);
             $minutes = $durationMinutes % 60;
 
@@ -1060,10 +1073,21 @@
 
                         <div class="mb-2 p-2 more-fare {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
                             <div class="d-flex">
-                                <input class="form-check-input" type="radio">
+                              <!-- Onward Fare Radio Button -->
+<input type="radio" 
+       name="onward_fare" 
+       value="onward_{{ $index }}_{{ $loopIndex }}" 
+       data-price-id="{{ $priceItem['id'] }}" 
+       data-fare-identifier="{{ $priceItem['fareIdentifier'] }}"
+       {{ $index === 0 && $loopIndex === 0 ? 'checked' : '' }}>
+
+<!-- Hidden inputs for Onward Fare -->
+<input type="hidden" id="onward_fare_id" name="onward_fare_id" value="">
+<input type="hidden" id="onward_fare_detail" name="onward_fare_detail" value="">
+
                                 <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between">
+                            <div class="">
                                 <span class="badge bg-warning text-white text-uppercase">{{ $tag }}</span>
                                 <small class="text-muted">{{ $cabinClass }}</small>
                             </div>
@@ -1116,8 +1140,16 @@
     @endforeach
 @endif
     </div>
-    <div class="col-md-6 m-0 p-0 ">
-        
+    <div class="col-md-6 m-0 p-0" style="max-height: auto; overflow-y: auto; padding-right: 10px;">
+     @php
+      $lastOnwardFlight = $returnFlights[0]['sI'][0] ?? null;
+    $depCity = $lastOnwardFlight['da']['city'] ?? '';
+    $arrCity = $lastOnwardFlight['aa']['city'] ?? '';
+     $arrivalDate = isset($lastOnwardFlight['at']) ? Carbon::parse($lastOnwardFlight['at'])->format('D, d M y') : '';
+@endphp
+           <div class="d-flex">
+               <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5> <p class="ms-2"> {{ $arrivalDate }}</p>
+           </div> 
 @if(isset($resultsRound['searchResult']['tripInfos']['RETURN']) && count($resultsRound['searchResult']['tripInfos']['RETURN']) > 0)
     @foreach($resultsRound['searchResult']['tripInfos']['RETURN'] as $index => $segment)
         @php
@@ -1127,7 +1159,7 @@
 
             $departureTime = \Carbon\Carbon::parse($firstFlight['dt']);
             $arrivalTime = \Carbon\Carbon::parse($lastFlight['at']);
-            $durationMinutes = $arrivalTime->diffInMinutes($departureTime);
+            $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
             $hours = intdiv($durationMinutes, 60);
             $minutes = $durationMinutes % 60;
 
@@ -1205,10 +1237,22 @@
 
                         <div class="mb-2 p-2 more-fare {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
                             <div class="d-flex">
-                                <input class="form-check-input" type="radio">
+                            <!-- Return Fare Radio Button -->
+<!-- Return Fare Radio Button -->
+<input type="radio" 
+       name="return_fare" 
+       value="return_{{ $index }}_{{ $loopIndex }}" 
+       data-price-id="{{ $priceItem['id'] }}" 
+       data-fare-identifier="{{ $priceItem['fareIdentifier'] }}"
+       {{ $index === 0 && $loopIndex === 0 ? 'checked' : '' }}>
+
+<!-- Hidden inputs for Return Fare -->
+<input type="hidden" id="return_fare_id" name="return_fare_id" value="">
+<input type="hidden" id="return_fare_detail" name="return_fare_detail" value="">
+
                                 <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
                             </div>
-                            <div class="d-flex align-items-center justify-content-between">
+                            <div class="">
                                 <span class="badge bg-warning text-white text-uppercase">{{ $tag }}</span>
                                 <small class="text-muted">{{ $cabinClass }}</small>
                             </div>
@@ -1254,6 +1298,20 @@
     @endforeach
 @endif
     </div>
+</div>
+<div id="bottom-itinerary-bar" class="d-none"
+     style="position: fixed; left: 0; bottom: 0;  width: 100%; height:auto; min-height:90px; background-color: #1a1a1a; color: white; z-index: 9999; padding: 10px 20px; box-shadow: 0 -2px 8px rgba(0,0,0,0.3); font-size: 13px; display:flex; align-items:center; justify-content:center;">
+    
+    <div id="onward-summary" class="d-flex align-items-center me-4" style="margin-left:30px;"></div>
+    <div id="return-summary" class="d-flex align-items-center me-4"></div>
+
+    <div id="total-fare" class="fw-bold text-white me-4"></div>
+
+    <button type="button" class="btn btn-sm text-white fw-bold  book-btn-round"
+            style="background-color:orange; padding:10px 20px; border-radius:4px;">
+        BOOK
+    </button>
+
 </div>
 
 {{-- multicity --}}
@@ -2088,6 +2146,134 @@
     <!-- flight-list ends -->
      <script src="{{ asset('js/flight-list.js') }}"></script>
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const onwardFlights = @json($onwardFlights);
+    const returnFlights = @json($returnFlights);
+
+    const itineraryBar = document.getElementById("bottom-itinerary-bar");
+    const onwardSummary = document.getElementById("onward-summary");
+    const returnSummary = document.getElementById("return-summary");
+    const totalFareDiv = document.getElementById("total-fare");
+ console.log(onward_fare_id);
+    let onwardFareValue = null;
+    let returnFareValue = null;
+
+   function formatSegment(segment, totalFare) {
+    const first = segment.sI[0];
+    const last = segment.sI.slice(-1)[0];
+    const airlineName = first.fD.aI.name;
+    const airlineCode = first.fD.aI.code;
+    const flightNumber = first.fD.fN;
+    const logoUrl = `/AirlinesLogo/${airlineCode}.png`;
+
+    const depTime = new Date(first.dt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const arrTime = new Date(last.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const depCity = first.da.city ?? first.da.code;
+    const arrCity = last.aa.city ?? last.aa.code;
+
+    return `
+        <div class="d-flex align-items-center">
+            <!-- Airline Info -->
+            <div class="pe-3 text-center">
+                <div class="d-flex align-items-center">
+                    <img src="${logoUrl}" onerror="this.src='/AirlinesLogo/default.png'" alt="${airlineName}" style="height:24px;">
+                    <div class="fw-bold ps-2">${airlineName}</div>
+                </div>
+                <div>${airlineCode}-${flightNumber}</div>
+            </div>
+
+            <!-- Flight Times + Cities -->
+            <div class="pe-3">
+                <div>${depTime} → ${arrTime}</div>
+                <div>${depCity} → ${arrCity}</div>
+            </div>
+
+
+            <!-- Price -->
+            <div class="fw-bold">₹${totalFare.toLocaleString('en-IN')}</div>
+             <!-- Vertical Separator -->
+            <div class="border-start mx-3" style="height:40px;"></div>
+        </div>
+       
+    `;
+}
+
+
+    function updateBar() {
+        if (!onwardFareValue || !returnFareValue) {
+            itineraryBar.classList.add("d-none");
+            return;
+        }
+
+        // Parse onward
+        const [_, oIndex, oFareIndex] = onwardFareValue.split("_");
+        const onwardSegment = onwardFlights[oIndex];
+        const onwardFare = onwardSegment.totalPriceList[oFareIndex];
+        const onwardPrice = onwardFare.fd.ADULT.fC.TF ?? 0;
+
+        // Parse return
+        const [__, rIndex, rFareIndex] = returnFareValue.split("_");
+        const returnSegment = returnFlights[rIndex];
+        const returnFare = returnSegment.totalPriceList[rFareIndex];
+        const returnPrice = returnFare.fd.ADULT.fC.TF ?? 0;
+
+        const totalPrice = onwardPrice + returnPrice;
+
+        // Onward Flight
+        onwardSummary.innerHTML = `
+            <div class="pb-2 border-bottom">
+                <h6 class="fw-bold mb-1">Onward Flight</h6>
+                ${formatSegment(onwardSegment, onwardPrice)}
+            </div>
+        `;
+
+        // Return Flight
+        returnSummary.innerHTML = `
+            <div class="pt-2 pb-2 border-bottom">
+                <h6 class="fw-bold mb-1">Return Flight</h6>
+                ${formatSegment(returnSegment, returnPrice)}
+            </div>
+        `;
+
+        // Total + Book Button
+        totalFareDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="fw-bold fs-5">Total: ₹${totalPrice.toLocaleString('en-IN')}</span>
+            </div>
+        `;
+
+        itineraryBar.classList.remove("d-none");
+    }
+
+    // Onward fare selection
+    document.querySelectorAll('input[name="onward_fare"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            onwardFareValue = this.value;
+            updateBar();
+        });
+    });
+
+    // Return fare selection
+    document.querySelectorAll('input[name="return_fare"]').forEach(radio => {
+        radio.addEventListener("change", function () {
+            returnFareValue = this.value;
+            updateBar();
+        });
+    });
+    // ✅ Auto-select already checked options (so bar shows immediately)
+    const defaultOnward = document.querySelector('input[name="onward_fare"]:checked');
+    const defaultReturn = document.querySelector('input[name="return_fare"]:checked');
+
+    if (defaultOnward) onwardFareValue = defaultOnward.value;
+    if (defaultReturn) returnFareValue = defaultReturn.value;
+
+    // Always call once on load
+    updateBar();
+});
+</script>
+
+<script>
 function toggleDetails(button) {
     const content = button.nextElementSibling;
     const isVisible = content.style.display === 'block';
@@ -2183,7 +2369,6 @@ function switchFlightTab(tabElement, tabContentId) {
     if (activeContent) activeContent.classList.remove('d-none');
 }
 </script>
-
 <script>
 window.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
@@ -2200,17 +2385,30 @@ window.addEventListener("DOMContentLoaded", function () {
 
   const mcDiv = document.getElementById("multicity-summary-display");
   const owDiv = document.getElementById("oneway-summary-display");
+  const rtDiv = document.getElementById("roundtrip-summary-display");
 
-  // Hide both by default
+  // Hide all by default
   if (mcDiv) mcDiv.style.display = "none";
   if (owDiv) owDiv.style.display = "none";
+  if (rtDiv) rtDiv.style.display = "none";
 
-  // Detect multicity (by checking for at least one matching param)
+  // Detect multicity (same as your existing code)
   const isMulticity = getAllParamsByPrefix("from_where_multicity_unique").length > 0;
+
+  // Detect oneway
   const isOneway = urlParams.get("from_where_oneway[]") !== null;
 
-  // Render Multicity
+  // Detect roundtrip based on your URL params
+  // Adjust this to match your actual URL keys:
+  const isRoundtrip =
+    urlParams.get("from_where[]") !== null &&
+    urlParams.get("to_where[]") !== null &&
+    urlParams.get("depart_date") !== null &&
+    urlParams.get("return_date") !== null;
+
+  // Render Multicity summary (unchanged)
   if (isMulticity && mcDiv) {
+    // Your existing multicity code here (no change)
     const fromCodes  = getAllParamsByPrefix("from_where_multicity_unique");
     const toCodes    = getAllParamsByPrefix("to_where_multicity_unique");
     const fromCities = getAllParamsByPrefix("from_where_text_multicity");
@@ -2263,7 +2461,7 @@ window.addEventListener("DOMContentLoaded", function () {
     mcDiv.style.display = "block";
   }
 
-  // Render Oneway
+  // Render Oneway summary (unchanged)
   else if (isOneway && owDiv) {
     const fromText = urlParams.get("from_where_text") || "";
     const fromCode = urlParams.get("from_where_oneway[]") || "";
@@ -2314,6 +2512,70 @@ window.addEventListener("DOMContentLoaded", function () {
     owDiv.innerHTML = outputHtml;
     owDiv.style.display = "block";
   }
+
+  // Render Roundtrip summary (UPDATED keys to your params)
+else if (isRoundtrip && rtDiv) {
+  const fromCodes = urlParams.getAll("from_where[]") || [];
+  const toCodes = urlParams.getAll("to_where[]") || [];
+  const depDate = urlParams.get("depart_date") || "";
+  const retDate = urlParams.get("return_date") || "";
+  const travelClass = urlParams.get("travel_class") || "Economy";
+  const adult = urlParams.get("adults") || "1";
+  const child = urlParams.get("children") || "0";
+  const infant = urlParams.get("infants") || "0";
+  const preferredAirline = "None";
+
+  const passengerSummary = `${adult} Adult${child > 0 ? `, ${child} Child` : ""}${infant > 0 ? `, ${infant} Infant` : ""} | ${travelClass}`;
+
+  let flightsHtml = "";
+  for (let i = 0; i < fromCodes.length; i++) {
+    flightsHtml += `
+      <div class="d-flex align-items-center me-4">
+        <div class="text-center me-2">
+          <div><strong>${fromCodes[i]}</strong></div>
+        </div>
+        <div class="mx-2">✈</div>
+        <div class="text-center me-2">
+          <div><strong>${toCodes[i]}</strong></div>
+        </div>
+      </div>
+      ${i < fromCodes.length - 1 ? `<div class="vr mx-2" style="height: 40px;"></div>` : ""}
+    `;
+  }
+
+  const outputHtml = `
+    <div class="multicity-summary-container px-4 d-flex flex-wrap align-items-center justify-content-center px-3 py-2 text-white" style="background-color:#2f2f2f;">
+      ${flightsHtml}
+      <div class="vr mx-2" style="height: 40px;"></div>
+      <div class="me-4">
+        <strong>Departure Date</strong><br>
+        <small>${depDate}</small>
+      </div>
+      <div class="vr mx-2" style="height: 40px;"></div>
+      <div class="me-4">
+        <strong>Return Date</strong><br>
+        <small>${retDate}</small>
+      </div>
+      <div class="vr mx-2" style="height: 40px;"></div>
+      <div class="me-4">
+        <strong>Passengers & Class</strong><br>
+        <small>${passengerSummary}</small>
+      </div>
+      <div class="vr mx-2" style="height: 40px;"></div>
+      <div class="me-4">
+        <strong>Preferred Airline</strong><br>
+        <small>${preferredAirline}</small>
+      </div>
+      <div class="vr mx-2" style="height: 40px;"></div>
+      <div class="ms-4">
+        <button class="btn btn-outline-light btn-sm" onclick="toggleSearchTab('rt')">MODIFY SEARCH</button>
+      </div>
+    </div>`;
+
+  rtDiv.innerHTML = outputHtml;
+  rtDiv.style.display = "block";
+}
+
 });
 </script>
 
@@ -2466,6 +2728,137 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 })
 </script>
+<script>
+document.querySelectorAll('.book-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        let flightIndex = this.dataset.flight;
+        let selectedRadio = document.querySelector(`input[name="fare_option_${flightIndex}"]:checked`);
+
+        if (!selectedRadio) {
+            alert("Please select a fare option first.");
+            return;
+        }
+
+        let priceId = selectedRadio.value; // itineraryId goes into {priceId}
+
+       let fareIdentifier = selectedRadio.dataset.fare;
+let url = `{{ route('review', ['priceId' => '__PRICE_ID__']) }}?fareIdentifier=${encodeURIComponent(fareIdentifier)}`;
+url = url.replace('__PRICE_ID__', encodeURIComponent(priceId));
+
+
+        window.location.href = url;
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    function updateHiddenInputs() {
+        let onwardFare = document.querySelector("input[name='onward_fare']:checked");
+        let returnFare = document.querySelector("input[name='return_fare']:checked");
+
+        if (onwardFare) {
+            document.getElementById("onward_fare_id").value = onwardFare.dataset.priceId;
+            document.getElementById("onward_fare_detail").value = onwardFare.dataset.fareIdentifier;
+        }
+
+        if (returnFare) {
+            document.getElementById("return_fare_id").value = returnFare.dataset.priceId;
+            document.getElementById("return_fare_detail").value = returnFare.dataset.fareIdentifier;
+        }
+    }
+
+    // Run on page load
+    updateHiddenInputs();
+
+    // Update when user changes selection
+    document.querySelectorAll("input[name='onward_fare'], input[name='return_fare']").forEach(el => {
+        el.addEventListener("change", updateHiddenInputs);
+    });
+
+    // Book button click
+    document.querySelector(".book-btn-round").addEventListener("click", function() {
+        let onwardPriceId = document.getElementById("onward_fare_id").value;
+        let returnPriceId = document.getElementById("return_fare_id").value;
+        let onwardFareIdentifier = document.getElementById("onward_fare_detail").value;
+        let returnFareIdentifier = document.getElementById("return_fare_detail").value;
+
+        if (!onwardPriceId || !returnPriceId) {
+            alert("Please select both onward and return flights.");
+            return;
+        }
+
+        let url = `{{ route('review.round') }}?` +
+                  `onwardPriceId=${encodeURIComponent(onwardPriceId)}` +
+                  `&returnPriceId=${encodeURIComponent(returnPriceId)}` +
+                  `&onwardFareIdentifier=${encodeURIComponent(onwardFareIdentifier)}` +
+                  `&returnFareIdentifier=${encodeURIComponent(returnFareIdentifier)}`;
+
+        window.location.href = url;
+    });
+});
+</script>
+
+
+<script>
+// Update hidden input when an onward fare is selected
+document.querySelectorAll('input[name="onward_fare"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Set the hidden input value
+        document.getElementById('onward_fare_id').value = this.value;
+        console.log('Updated Onward Fare ID:', this.value);
+    });
+});
+
+// Update hidden input when a return fare is selected
+document.querySelectorAll('input[name="return_fare"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('return_fare_id').value = this.value;
+        console.log('Updated Return Fare ID:', this.value);
+    });
+});
+
+
+</script>
+<script>
+document.querySelectorAll('input[name="return_fare"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Copy price_id and fare_identifier into hidden inputs
+        document.getElementById('return_fare_id').value = this.dataset.priceId;
+        document.getElementById('return_fare_detail').value = this.dataset.fareIdentifier;
+
+        console.log('Selected Return Fare:', this.value);
+        console.log('Price ID:', this.dataset.priceId);
+        console.log('Fare Identifier:', this.dataset.fareIdentifier);
+    });
+});
+
+// Also trigger once on page load to set default selection
+const checkedReturn = document.querySelector('input[name="return_fare"]:checked');
+if (checkedReturn) {
+    document.getElementById('return_fare_id').value = checkedReturn.dataset.priceId;
+    document.getElementById('return_fare_detail').value = checkedReturn.dataset.fareIdentifier;
+}
+// Update hidden inputs when onward fare is selected
+document.querySelectorAll('input[name="onward_fare"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('onward_fare_id').value = this.dataset.priceId;
+        document.getElementById('onward_fare_detail').value = this.dataset.fareIdentifier;
+
+        console.log('Selected Onward Fare:', this.value);
+        console.log('Price ID:', this.dataset.priceId);
+        console.log('Fare Identifier:', this.dataset.fareIdentifier);
+    });
+});
+
+// Also set hidden inputs on page load (default checked radio)
+const checkedOnward = document.querySelector('input[name="onward_fare"]:checked');
+if (checkedOnward) {
+    document.getElementById('onward_fare_id').value = checkedOnward.dataset.priceId;
+    document.getElementById('onward_fare_detail').value = checkedOnward.dataset.fareIdentifier;
+}
+
+</script>
+
 {{-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

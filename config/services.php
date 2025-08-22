@@ -18,7 +18,28 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
     
-'tripjack_token' => env('TRIPJACK_API_TOKEN'),
+
+'easebuzz' => [
+    'key'      => env('TRIPJACK_EASEBUZZ_KEY'),
+    'salt_key' => env('TRIPJACK_EASEBUZZ_SALT_KEY'),
+    'mode'     => env('TRIPJACK_EASEBUZZ_MODE', 'test'), // default test
+],
+
+'tripjack_token'=>[
+  
+    'mode' => env('TRIPJACK_API_MODE', 'test'),
+
+    'live' => [
+        'token' => env('TRIPJACK_API_TOKEN'),
+        'url' => env('TRIPJACK_URL'),
+    ],
+
+    'test' => [
+        'token' => env('TRIPJACK_API_TOKEN_TEST'),
+        'url' => env('TRIPJACK_URL_TEST'),
+    ],
+],
+
 
 
     'resend' => [

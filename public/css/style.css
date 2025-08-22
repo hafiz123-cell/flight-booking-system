@@ -558,7 +558,7 @@ Change the following styles to modify the appearance of the menu.
   opacity: 0.6;
 }
 .main_header_area.white_menu .header_top .header_top_inner .pull-right .header_social li:hover a {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .main_header_area.white_menu .header_menu {
   background: #fff;
@@ -838,7 +838,7 @@ Change the following styles to modify the appearance of the menu.
   color: rgba(255, 255, 255, 0.7);
 }
 .header_menu .navbar.navbar-default .nav.navbar-nav.navbar-right .book_btn .book_now_btn {
-  background: #ef2853;
+  background: #ec7b34;
   color: #000;
   line-height: 34px;
   display: inline-block;
@@ -1060,7 +1060,7 @@ header.main_header_area.headerstyle-2 .navbar-flex .navbar-collapse {
 
 .menu-ham {
   cursor: pointer;
-  background: #ef2853;
+  background: #ec7b34;
   padding: 5px 10px;
   border-radius: 5px;
 }
@@ -1143,7 +1143,7 @@ header.main_header_area.headerstyle-2 .navbar-flex .navbar-collapse {
   left: 50%;
   right: 0;
   margin: 0 auto;
-  background: #ef2853;
+  background: #ec7b34;
   padding: 10px 30px;
   border: none;
   border-radius: 10px;
@@ -1154,8 +1154,8 @@ header.main_header_area.headerstyle-2 .navbar-flex .navbar-collapse {
   top: 15px;
   right: 15px;
   color: #fff;
-  background-color: #ef2853;
-  border-color: #ef2853;
+  background-color: #ec7b34;
+  border-color:#ec7b34;
   opacity: 1;
   line-height: 1;
   font-size: 27px;
@@ -1173,7 +1173,7 @@ header.main_header_area.headerstyle-2 .navbar-flex .navbar-collapse {
   line-height: 17px;
   font-size: 9px;
   display: block;
-  background-color: #ef2853;
+  background-color: #ec7b34;
   color: #fff;
   border-radius: 50%;
 }
@@ -1559,6 +1559,8 @@ section.banner-form .nav-tabs > li > a {
 section.banner-form .nav-tabs {
   border: none;
   padding-left: 20px;
+ padding-top :26px;
+ 
 }
 .filter-box,
 .filter-box1 {
@@ -1577,7 +1579,7 @@ section.banner-form .nav-tabs {
   background: transparent;
 }
 section.banner-form .filter-box1 h3.form-title {
-  background: #ee2654;
+  background: #ec7b34;
   padding: 15px 0;
   color: #fff;
   border-radius: 10px 10px 0 0;
@@ -1597,7 +1599,7 @@ section.banner-form .nav-tabs > li i {
 }
 section.banner-form .nav-tabs > li > a.active,
 section.banner-form .nav-tabs > li:hover > a {
-  background: #ef2853;
+  background: #ec7b34;
   color: #fff;
   border: none;
   transition: all 0.5s;
@@ -1628,7 +1630,7 @@ section.banner-form .nav-tabs > li:hover > a i {
   z-index: 1;
 }
 .input-box [class^="flaticon-"]:before {
-  color: #ef2853;
+  color: #ec7b34;
   font-weight: 600;
 }
 .input-box input::placeholder {
@@ -1641,11 +1643,11 @@ section.banner-form .nav-tabs > li:hover > a i {
 .filter-box a.biz-btn:focus {
   color: #fff;
   outline: none;
-  background: #ef2853;
+  background: #ec7b34;
 }
 
 .filter-box a.biz-btn:hover {
-  color: #ef2853;
+  color: #ec7b34;
 }
 
 /*banner form style 1*/
@@ -1762,7 +1764,7 @@ section.banner-form.form-style3 {
 }
 .why-us-icon [class^="flaticon-"]:before,
 .why-us-icon i {
-  color: #ef2853;
+  color: #ec7b34;
   font-size: 58px;
 }
 .why-about-image {
@@ -1831,7 +1833,7 @@ section.banner-form.form-style3 {
 }
 .attraction-icon [class^="flaticon-"]:before,
 .attraction-icon i {
-  color: #ef2853;
+  color: #ec7b34;
   font-size: 48px;
   margin-bottom: 15px;
   transition: all 0.5s;
@@ -1853,7 +1855,7 @@ section.banner-form.form-style3 {
 /* ======================================== */
 
 .top-desti {
-  background: #ef2853;
+  background: #ec7b34;
   overflow: hidden;
 }
 
@@ -1881,7 +1883,7 @@ section.banner-form.form-style3 {
   top: 0;
   height: 100%;
   width: 100%;
-  background: #ee2654;
+  background: #ec7b34;
   text-align: center;
 }
 
@@ -2016,7 +2018,7 @@ section.banner-form.form-style3 {
 .destination1:before,
 .destination1:after {
   content: "";
-  background: url(../images/calltoaction2.jpg) no-repeat;
+  background: url('{{ asset("images/calltoaction2.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -2132,10 +2134,10 @@ section.banner-form.form-style3 {
   font-weight: 700;
 }
 .trend-tags li.feat {
-  background: #ef2853;
+  background: #ec7b34;
 }
 .trend-tags li.discount {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .trend-tags [class^="flaticon-"]:before {
   color: #fff;
@@ -2150,7 +2152,7 @@ section.banner-form.form-style3 {
   transition: all 0.5s;
 }
 .trend-tags [class^="flaticon-"]:hover:before {
-  background: #ef2853;
+  background: #ec7b34;
   transition: all 0.5s;
 }
 .trend-price {
@@ -2182,7 +2184,7 @@ section.banner-form.form-style3 {
   border-width: 1px 0 1px;
 }
 .trend-content > span {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .rating {
   display: inline-block;
@@ -2236,7 +2238,8 @@ section.trending.trending2 {
 /* ======================================== */
 
 section.call-to-action {
-  background: url(../images/calltoaction.jpg) no-repeat;
+  
+  background: url('{{ asset("images/calltoaction.jpg") }}')  no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -2317,7 +2320,7 @@ button.play-btn i {
   line-height: 2.5;
   text-align: center;
   color: #fff;
-  background: #ef2853;
+  background: #ec7b34;
   transition: all ease-in-out 0.5s;
   animation: zoom-fade 5s infinite;
   padding: 0 0 0 5px;
@@ -2327,7 +2330,8 @@ button.play-btn i {
   -moz-border-radius: 50%;
 }
 .discount-action .call-banner {
-  background: url(../images/hometype1.jpg) no-repeat;
+    
+  background:url('{{ asset("images/hometype1.jpg") }}') no-repeat;
   background-position: right;
   background-size: contain;
   position: relative;
@@ -2367,7 +2371,8 @@ section.call-to-action.action1:before {
   z-index: 2;
 }
 section.call-to-action.action1:after {
-  background: url(../images/calltoaction.jpg) no-repeat;
+  
+  background:url('{{ asset("images/calltoaction.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -2478,7 +2483,7 @@ section.top-deals .slider-content h4 {
   padding: 11px 0 0;
 }
 .deal-price p {
-  color: #ef2853;
+  color: #ec7b34;
   margin-bottom: 0;
 }
 @media (max-width: 991px) {
@@ -2566,7 +2571,7 @@ section.top-deals .slider-content h4 {
 }
 .agent-social ul li a:hover i {
   transition: all ease 0.5s;
-  background: #ef2853;
+  background: #ec7b34;
 }
 .agent-social ul li {
   margin: 0 2px;
@@ -2579,7 +2584,8 @@ section.tour-agent1 {
   overflow: hidden;
 }
 section.tour-agent1:before {
-  background: url(../images/calltoaction3.jpg) no-repeat;
+  
+  background:url('{{ asset("images/calltoaction3.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -2697,7 +2703,7 @@ section.customer-reviews .review-image img {
 }
 
 .slick-dots li.slick-active button:before {
-  background: #ee2654;
+  background: #ec7b34;
   border: none;
 }
 
@@ -2759,7 +2765,8 @@ section.travelcounter {
 }
 
 section.travelcounter:before {
-  background: url(../images/calltoaction1.jpg) no-repeat;
+  
+  background: url('{{ asset("images/calltoaction1.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -2793,7 +2800,7 @@ section.travelcounter .counter-item {
 }
 section.travelcounter .counter-item i {
   font-size: 3.5rem;
-  color: #ef2853;
+  color: #ec7b34;
   margin-bottom: 5px;
   transition: all ease-in-out 0.3s;
 }
@@ -2970,7 +2977,7 @@ section.partners.partners:after {
 
 .insta-main {
   overflow: hidden;
-  background: #ee2654;
+  background: #ec7b34;
 }
 
 .insta-main .insta-inner .col-lg-2,
@@ -3025,7 +3032,8 @@ footer {
   background: #190912;
 }
 footer.footer1 {
-  background: url(../images/breadcrumbbg.jpg) no-repeat;
+ 
+  background:  url('{{ asset("images/breadcrumbbg.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;
@@ -3077,7 +3085,7 @@ footer P {
   content: "";
   height: 2px;
   width: 50px;
-  background: #ef2853;
+  background: #ec7b34;
   left: 0;
   bottom: 0;
 }
@@ -3086,14 +3094,14 @@ footer P {
   line-height: 2.8;
 }
 .footer-upper p span {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .footer-phone {
   display: flex;
 }
 .footer-phone [class^="flaticon-"]:before {
   font-size: 36px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 .footer-about-in {
   padding: 15px 20px;
@@ -3113,7 +3121,7 @@ footer P {
 }
 .footer-about ul.social-links li a:hover {
   color: #fff;
-  background: #ef2853;
+  background: #ec7b34;
 }
 .footer-payment {
   position: relative;
@@ -3224,9 +3232,9 @@ footer P {
 }
 .reserved-form.date-picker-wrapper .month-wrapper table .day.real-today {
   background-color: transparent;
-  color: #ef2853;
+  color: #ec7b34;
   font-weight: 700;
-  border: 1px solid #ef2853;
+  border: 1px solid #ec7b34;
   opacity: 1;
 }
 .reserved-form.date-picker-wrapper .month-wrapper {
@@ -3241,9 +3249,9 @@ footer P {
   background: #ebeff2;
 }
 .reserved-form.date-picker-wrapper .month-wrapper table .day.checked {
-  background: #ef2853 !important;
+  background: #ec7b34 !important;
   color: #fff;
-  border-color: #ef2853;
+  border-color: #ec7b34;
 }
 .reserved-form.date-picker-wrapper .month-wrapper table .day {
   padding: 5px 0px;
@@ -3349,7 +3357,7 @@ footer P {
 .shop-price span {
   margin: 0 5px;
   font-size: 16px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 .shop-price del {
   opacity: 0.7;
@@ -3434,7 +3442,7 @@ footer P {
 .shop-sidebar .shop-sidebar-ad {
   position: relative;
   padding: 80px 20px;
-  background: linear-gradient(to bottom, #daae5d 0%, #ef2853 100%);
+  background: linear-gradient(to bottom, #daae5d 0%, #ec7b34 100%);
   box-shadow: 0 0 10px #cccccc42;
   overflow: hidden;
   border-radius: 10px;
@@ -3606,7 +3614,7 @@ table.shop_table.rt-checkout-review-order-table tr {
 }
 span.rt-Price-amount,
 span.rt-Price-amount span {
-  color: #ef2a4c;
+  color: #ec7b34;
 }
 table.shop_table.rt-checkout-review-order-table tr th,
 table.shop_table.rt-checkout-review-order-table tr td {
@@ -3770,7 +3778,7 @@ span.num-rating {
   font-size: 15px;
 }
 span.num-rating1 {
-  color: #ef2853;
+  color: #ec7b34;
   margin-right: 15px;
 }
 /*Home Style Tour*/
@@ -3841,7 +3849,8 @@ section.popular-hotels {
   padding: 10px 15px;
 }
 section.air-tickets {
-  background: url(../images/flightbg1.jpg) no-repeat;
+
+  background:   url('{{ asset("images/flightbg1.jpg") }}') no-repeat;
   background-attachment: fixed;
   background-size: cover;
   background-position: center;
@@ -3996,7 +4005,7 @@ section.air-tickets {
 .landing .icon {
   float: left;
   font-size: 24px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 .landing-icon i {
   transform: rotate(90deg);
@@ -4075,7 +4084,7 @@ section.air-tickets {
   margin-bottom: 3px;
 }
 .flight-table h6 strong {
-  color: #d60d45;
+  color: #ec7b34;
 }
 .flight-table p {
   margin-bottom: 0;
@@ -4112,7 +4121,7 @@ p.package-days {
   border: 1px solid #f1f1f1;
   width: 100%;
   display: block;
-  color: #d81e47;
+  color: #ec7b34;
   padding: 15px 20px 15px 20px;
   border-radius: 10px;
 }
@@ -4239,10 +4248,10 @@ p.package-days {
   color: #fff;
 }
 .pretty.p-icon input:checked ~ .state .icon {
-  background: #ef2853;
+  background: #ec7b34;
 }
 .sidebar-item .range-slider .ui-slider .ui-slider-range {
-  background: #ef2853;
+  background: #ec7b34;
 }
 .star-rating span {
   color: #ffbc00;
@@ -4302,7 +4311,7 @@ span.rate-btn {
   color: #fff;
 }
 span.feat {
-  background: #ef2853;
+  background: #ec7b34;
 }
 span.discount {
   background: #ff316b;
@@ -4439,7 +4448,7 @@ p.comment {
   margin-left: 30px;
 }
 span.offer {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .room-price p.price {
   padding-top: 20px;
@@ -4471,7 +4480,7 @@ span.offer {
 }
 p.rating {
   font-size: 18px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 p.rating span {
   font-size: 44px;
@@ -4484,7 +4493,7 @@ p.rating span {
   height: 5px;
 }
 .progress-item .progress-bar {
-  background: #ef2853;
+  background: #ec7b34;
 }
 .sidebar-share {
   margin-bottom: 15px;
@@ -4510,7 +4519,7 @@ li.share-box {
   margin-top: 13px;
 }
 .sidebar-share li p {
-  color: #ef2853;
+  color: #ec7b34;
   margin: 0;
   font-weight: 600;
 }
@@ -4520,17 +4529,18 @@ li.share-box {
   padding: 30px 0;
   border-radius: 10px;
   margin-bottom: 15px;
-  background: url(../images/streetmap.jpg);
+   
+  background:  url('{{ asset("images/streetmap.jpg") }}') no-repeat;
   background-size: cover;
 }
 .map-box i {
   display: block;
   font-size: 44px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 span.location-box {
-  color: #ef2853;
-  border: 1px solid #ef2853;
+  color: #ec7b34;
+  border: 1px solid #ec7b34;
   padding: 15px;
   text-align: center;
   border-radius: 5px;
@@ -4540,7 +4550,7 @@ span.location-box {
   margin-bottom: 0;
 }
 .location-features i {
-  color: #ef2853;
+  color: #ec7b34;
   margin-right: 10px;
 }
 .sidebar-contact {
@@ -4584,7 +4594,7 @@ span.location-box {
   padding: 10px;
 }
 .tour-includes li i {
-  color: #ef2853;
+  color: #ec7b34;
   padding-right: 5px;
 }
 .desc-box {
@@ -4597,7 +4607,7 @@ span.location-box {
   border-radius: 10px;
 }
 .description i {
-  color: #ef2853;
+  color: #ec7b34;
   padding-right: 5px;
 }
 ul.expect li i {
@@ -4615,7 +4625,7 @@ ul.expect li:last-child {
 }
 .itinerary-item .btn {
   background: transparent;
-  color: #ef2853;
+  color: #ec7b34;
   padding: 0;
   border: none;
   font-size: 18px;
@@ -4634,7 +4644,7 @@ ul.expect li:last-child {
   color: #666;
 }
 .itinerary-item span {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .highlight {
   display: flex;
@@ -4647,7 +4657,7 @@ ul.expect li:last-child {
 }
 ul.blue li i {
   padding-right: 5px;
-  color: #ef2853;
+  color: #ec7b34;
 }
 ul.blue li:last-child {
   margin-bottom: 0;
@@ -4883,7 +4893,7 @@ section.call-to-action.hotel-action:after {
   margin-bottom: 10px;
 }
 .room-title p {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .deal-rating {
   position: absolute;
@@ -5093,7 +5103,7 @@ section.blogmain.blog-fullwidth:after {
 }
 .blog-image .b-date {
   position: absolute;
-  background: #ef2853;
+  background: #ec7b34;
   right: 10px;
   top: 10px;
   padding: 10px;
@@ -5140,7 +5150,7 @@ section.blogmain.blog-fullwidth:after {
   top: 0;
   height: 100%;
   width: 100%;
-  background: #ef2853;
+  background: #ec7b34;
   z-index: -1;
 }
 .blog-quote p {
@@ -5281,7 +5291,7 @@ section.blogmain.blog-fullwidth:after {
   bottom: 0;
   width: 15%;
   height: 3px;
-  background: #ef2853;
+  background: #ec7b34;
 }
 .sidebar-item .date {
   font-size: 13px;
@@ -5308,7 +5318,8 @@ section.blogmain.blog-fullwidth:after {
 .author-news {
   position: relative;
   overflow: hidden;
-  background: url(../images/list1.jpg) no-repeat;
+  
+  background: url('{{ asset("images/list1.jpg") }}') no-repeat;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -5434,7 +5445,7 @@ ul.sidebar-category li:last-child {
 .sidebar-tabs .nav-pills > li.active > a:hover,
 .sidebar-tabs .nav-pills > li > a:hover {
   color: #fff;
-  background-color: #ef2853;
+  background-color: #ec7b34;
   border: none;
 }
 .sidebar-image {
@@ -5475,7 +5486,7 @@ ul.sidebar-tags a {
   border-radius: 5px;
 }
 ul.sidebar-tags a:hover {
-  background: #ef2853;
+  background: #ec7b34;
   color: #fff;
   transition: all 0.5s;
 }
@@ -6124,7 +6135,7 @@ section.events .meta span {
 .price-tabmain ul.nav.nav-pills li.active a:focus,
 .price-tabmain ul.nav.nav-pills li.active a:hover {
   color: #fff;
-  background-color: #ef2853;
+  background-color: #ec7b34;
   border: none;
   transition: all ease-in-out 0.5s;
 }
@@ -6194,7 +6205,7 @@ section.events .meta span {
   font-size: 200px;
 }
 .error-content span {
-  color: #ef2853;
+  color: #ec7b34;
 }
 .error-btn {
   padding-top: 50px;
@@ -6364,7 +6375,8 @@ section.terms {
 /* ======================================== */
 
 section.comingsoon {
-  background: url(../images/comingsoonbg.jpg) no-repeat;
+   
+  background: url('{{ asset("images/comingsoonbg.jpg") }}') no-repeat;
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -6386,7 +6398,7 @@ section.comingsoon {
   color: #fff;
 }
 .coming-title span {
-  color: #ef2853;
+  color: #ec7b34;
   font-size: 60px;
 }
 .coming-title p {
@@ -6401,13 +6413,13 @@ section.comingsoon {
   text-transform: uppercase;
   padding: 25px;
   margin: 0 5px;
-  border-bottom: 5px solid #ef2853;
+  border-bottom: 5px solid #ec7b34;
   font-size: 21px;
   border-radius: 10px;
 }
 .counter-box span {
   font-size: 80px;
-  color: #ef2853;
+  color: #ec7b34;
   display: block;
   font-weight: 700;
 }
@@ -6558,7 +6570,7 @@ a.btn-twitter {
   margin: 0;
 }
 button.close {
-  background: #ef2853;
+  background: #ec7b34;
   color: #fff;
   position: absolute;
   top: -20px;
@@ -6677,7 +6689,7 @@ button.close {
   color: #fff;
   margin: 0 auto;
   border-radius: 50%;
-  background: #ef2853;
+  background: #ec7b34;
   float: left;
 }
 .search-banner .ef-item .content {
@@ -6815,14 +6827,15 @@ button.close {
   color: #fff;
   border-radius: 50%;
   margin-bottom: 20px;
-  background: #ef2853;
+  background: #ec7b34;
 }
 section.call-to-action.car-action {
-  background: url(../images/calltoaction4.jpg) no-repeat;
+
+  background:   url('{{ asset("images/calltoaction4.jpg") }}') no-repeat;
   background-attachment: fixed;
 }
 section.ready-block {
-  background: #ef2853;
+  background: #ec7b34;
   padding: 40px 0;
 }
 .car-detail .destination-content {
@@ -6879,7 +6892,8 @@ section.ready-block {
 /* ======================================== */
 
 .cruise-desti {
-  background: url(../images/slider/slider6.jpg) no-repeat;
+   
+  background:  url('{{ asset("images/slider/slider6.jpg") }}') no-repeat;
   background-position: center;
   background-attachment: fixed;
   background-size: cover;

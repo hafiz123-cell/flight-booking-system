@@ -12,9 +12,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-    })
+  ->withMiddleware(function (Middleware $middleware) {
+    $middleware->validateCsrfTokens(except: [
+        'payment-success', // Disable CSRF for Easebuzz callback
+    ]);
+})
+
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

@@ -3413,7 +3413,7 @@ button.swiper-pagination-bullet {
     color: transparent;
     border: none;
     outline: none;
-    background: #ef2853;
+    background: #ec7b34;
     line-height: 40px;
     z-index: 1;
     transition: all ease-in-out 0.3s;
@@ -3422,7 +3422,7 @@ button.swiper-pagination-bullet {
 .slick-prev:hover, .slick-prev:focus, .slick-next:hover, .slick-next:focus {
     color: transparent;
     outline: none;
-    background: #ef2853;
+    background: #ec7b34;
 }
 .slick-prev:hover:before, .slick-prev:focus:before, .slick-next:hover:before, .slick-next:focus:before {
     opacity: 1

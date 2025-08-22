@@ -1,5 +1,31 @@
-@extends('layout.layout');
+@extends('layout_new.layout')
+<style>
+  .slide-image {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  transition: background-position 0.5s ease-in-out;
+}
 
+.animation-on {
+  animation: airplaneMove 15s linear infinite;
+}
+
+@keyframes airplaneMove {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 100% 0; /* Move horizontally like an airplane */
+  }
+  100% {
+    background-position: 0 0; /* Return to start */
+  }
+}
+
+  </style>
 @section('content')
 <!-- Success Alert -->
 @if(session('success'))
@@ -23,33 +49,6 @@
 
 <!-- On Load Modal -->
 <!-- Modal -->
-<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content shadow-lg border-0 rounded-4">
-      <!-- Red Header -->
-      <div class="modal-header bg-danger text-white rounded-top-4">
-        <h5 class="modal-title text-white" id="welcomeModalLabel">Welcome to Nepayatri</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-
-      <!-- White Body -->
-      <div class="modal-body text-center py-4 px-4">
-        <p class="fs-5 fw-semibold text-danger mb-3">
-          Discover exclusive travel deals and unforgettable journeys.
-        </p>
-        <p class="text-muted mb-0">
-          Create your account or log in to get started.
-        </p>
-      </div>
-
-      <!-- Clean Footer -->
-      <div class="modal-footer justify-content-center border-0 pb-4">
-        <a href="{{ route('login.show') }}" class="btn btn-danger px-4 me-2">Login</a>
-        <a href="{{ route('register.show') }}" class="btn btn-outline-danger px-4">Register</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 
     <!-- banner starts -->
@@ -57,40 +56,21 @@
       <div class="slider">
         <div class="swiper-container">
           <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <div class="slide-inner">
-                <div class="slide-image animation-off" style="background-image: url(images/slider/slider10.jpg)"></div>
-                <div class="swiper-content">
-                  <h1>Make you Free to <span>travel</span> with us</h1>
-                  <p class="mar-bottom-30">Foresee the pain and trouble that are bound to ensue and equal fail in their duty through weakness.</p>
-                  <a href="" class="biz-btn">Explore More</a>
-                  <a href="" class="biz-btn mar-left-10">Contact Us</a>
-                </div>
-                <div class="overlay"></div>
-              </div>
-            </div>
-            <div class="swiper-slide">
-              <div class="slide-inner">
-                <div class="slide-image animation-off" style="background-image: url(images/slider/slider11.jpg)"></div>
-                <div class="swiper-content">
-                  <h1>Hurry up! <span>Book a Ticket</span> & Just Leave</h1>
-                  <p class="mar-bottom-30">Foresee the pain and trouble that are bound to ensue and equal fail in their duty through weakness.</p>
-                  <a href="" class="biz-btn mar-left-10">Book Now</a>
-                </div>
-                <div class="overlay"></div>
-              </div>
-            </div>
-            <div class="swiper-slide">
-              <div class="slide-inner">
-                <div class="slide-image animation-off" style="background-image: url(images/slider/slider12.jpg)"></div>
-                <div class="swiper-content">
-                  <h1>Your <span>Adventure</span> Travel Experts In Europe!</h1>
-                  <p class="mar-bottom-30">Foresee the pain and trouble that are bound to ensue and equal fail in their duty through weakness.</p>
-                  <a href="" class="biz-btn mar-left-10">Contact Us</a>
-                </div>
-                <div class="overlay"></div>
-              </div>
-            </div>
+            
+           <div class="swiper-slide">
+  <div class="slide-inner">
+    <div class="slide-image animation-on" style="background-image: url('{{ asset('images/slider6.jpg') }}');"></div>
+
+    <div class="swiper-content">
+      <h1>Hurry up! <span>Book a Ticket</span> & Just Leave</h1>
+      <p class="mar-bottom-30">Foresee the pain and trouble that are bound to ensue and equal fail in their duty through weakness.</p>
+      <a href="" class="mar-left-10 p-3" style="background-color:#ec7b34; color:white; border-radius: 5px;">Book Now</a>
+    </div>
+    <div class="overlay"></div>
+  </div>
+</div>
+
+          
           </div>
           <!-- Add Arrows -->
           <div class="swiper-button-next"></div>
@@ -240,7 +220,7 @@
       <!-- Submit Button -->
       <div class="col-lg-3 col-sm-12">
         <div class="form-group mar-top-30">
-          <button type="submit" class="biz-btn"><i class="fa fa-search"></i> Find Now</button>
+          <button type="submit" class="biz-btn" style="background-color:#ec7b34;"><i class="fa fa-search"></i> Find Now</button>
         </div>
       </div>
     </div>
@@ -367,7 +347,7 @@
       <!-- Search Button -->
       <div class="col-lg-3 col-sm-12">
         <div class="form-group mar-top-30">
-          <button type="submit" class="biz-btn" id="findFlightBtn"><i class="fa fa-search"></i> Find Now</button>
+          <button type="submit" class="biz-btn" style="background-color:#ec7b34;" id="findFlightBtn"><i class="fa fa-search"></i> Find Now</button>
         </div>
       </div>
     </div>
@@ -477,7 +457,7 @@
 
       <div class="col-lg-3 col-sm-12">
         <div class="form-group mar-top-30">
-          <button type="submit" class="biz-btn" id="multicityFindFlightBtnUnique"><i class="fa fa-search"></i> Find Now</button>
+          <button type="submit" class="biz-btn" style="background-color:#ec7b34;" id="multicityFindFlightBtnUnique"><i class="fa fa-search"></i> Find Now</button>
         </div>
       </div>
     
@@ -534,7 +514,7 @@
  
 <!-- Segment Actions (Add/Remove buttons go here) -->
 <div class="col-lg-3 col-sm-12 segment-action d-flex">
-  <button type="button" class="biz-btn add-segment-btn w-60" style="margin-top: 35px; width:130px;" onclick="addSegmentRow()">
+  <button type="button" class="biz-btn add-segment-btn w-60" style="margin-top: 35px; background-color:#ec7b34; width:130px;" onclick="addSegmentRow()">
     +Add More
   </button>
 </div>
@@ -554,309 +534,384 @@
   
     <!-- form ends -->
 
-    <!-- featured flight starts -->
-    <section class="featured-flight">
-      <div class="container">
-        <div class="section-title">
-          <h2>Featured Flight Deals</h2>
-        </div>
-        <div class="trend-box">
-          <div class="row mix tour">
-            <div class="col-lg-4 col-sm-6 mar-bottom-30">
-              <div class="trend-item">
-                <div class="ribbon ribbon-top-left"><span>25% OFF</span></div>
-                <div class="trend-image">
-                  <img src="{{asset('images/trending1.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p class="price">From <span>$350.00</span></p>
-                  </div>
+    <!-- form ends -->
+    <!-- top deal starts -->
+    <section class="top-deals">
+        <div class="container">
+            <div class="row display-flex">
+                <div class="col-lg-8">
+                    <div class="section-title title-full width100">
+                        <h2>Offers for you </h2>
+                        <p>
+                            Discover the best holiday packages that fit your budget for your favourite destinations.
+                        </p>
+                    </div>
                 </div>
-                <div class="trend-content">
-                  <p>Multiway Flight</p>
-                  <h3><a href="#">Beijing to Dhaka</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <span class="mar-left-5">38 Reviews</span>
+                <div class="col-lg-4">
+                    <a href="#" class="biz-btn biz-btn1 pull-right"> Get More Deals</a>
                 </div>
-              </div>
             </div>
-            <div class="col-lg-4 col-sm-6 mar-bottom-30">
-              <div class="trend-item">
-                <div class="trend-image">
-                  <img src="{{asset('images/trending2.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p>Multi-day Tours</p>
-                    <p class="price">From <span>$899.00</span></p>
-                  </div>
-                </div>
-                <div class="trend-content">
-                  <p>Oneway Flight</p>
-                  <h3><a href="#">New York to Beijing</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star-half checked"></span>
-                    <span class="fa fa-star-half checked"></span>
-                  </div>
-                  <span class="mar-left-5">48 Reviews</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6 mar-bottom-30">
-              <div class="trend-item">
-                <div class="ribbon ribbon-top-left"><span>Featured</span></div>
-                <div class="trend-image">
-                  <img src="{{asset('images/trending3.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p>Attraction Tickets</p>
-                    <p class="price">From <span>$350.00</span></p>
-                  </div>
-                </div>
-                <div class="trend-content">
-                  <p>Oneway Flight</p>
-                  <h3><a href="#">London to paris</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <span class="mar-left-5">32 Reviews</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="trend-item">
-                <div class="trend-image">
-                  <img src="{{asset('images/trending4.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p class="price">From <span>$350.00</span></p>
-                  </div>
-                </div>
-                <div class="trend-content">
-                  <p>Twoway Flight</p>
-                  <h3><a href="#">Delhi to Munich</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star-half checked"></span>
-                  </div>
-                  <span class="mar-left-5">21 Reviews</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="trend-item">
-                <div class="ribbon ribbon-top-left"><span>25% OFF</span></div>
-                <div class="trend-image">
-                  <img src="{{asset('images/trending5.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p>Multi-day Tours</p>
-                    <p class="price">From <span>$899.00</span></p>
-                  </div>
-                </div>
-                <div class="trend-content">
-                  <p>Multi-city Flight</p>
-                  <h3><a href="#">Tokyo to Kathmandu</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star-half checked"></span>
-                    <span class="fa fa-star-half checked"></span>
-                  </div>
-                  <span class="mar-left-5">48 Reviews</span>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="trend-item">
-                <div class="trend-image">
-                  <img src="{{asset('images/trending6.jpg')}}" alt="image" />
-                  <div class="trend-tags">
-                    <a href="#"><i class="flaticon-like"></i></a>
-                  </div>
-                  <div class="trend-price">
-                    <p>Attraction Tickets</p>
-                    <p class="price">From <span>$350.00</span></p>
-                  </div>
-                </div>
-                <div class="trend-content">
-                  <p>Oneway Flight</p>
-                  <h3><a href="#">London to paris</a></h3>
-                  <div class="rating">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <span class="mar-left-5">18 Reviews</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- featured flight Ends -->
+            <div class="top-deal-main">
+                <div class="row">
+                    <div class="col-lg-4 col-sm-6 mar-bottom-30">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending7.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> United Kingdom</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="review">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking!</p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-1" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 mar-bottom-30">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending8.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> Thailand</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="review">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking!</p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-2" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 mar-bottom-30">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending9.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> South Korea</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="review">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking!</p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-3" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending10.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> Germany</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="review">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking!</p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-4" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- air-tickets starts -->
-    <section class="air-tickets">
-      <div class="container">
-        <div class="section-title">
-          <h2 class="white">Cheap Flights & Air Tickets</h2>
-        </div>
-        <div class="row ticket-slider">
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight1.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">Paris</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight2.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">London</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight3.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">New York</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight1.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">Tokyo</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight2.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">Beijing</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 px-3">
-            <div class="ticket-item">
-              <div class="ticket-image">
-                <img src="{{asset('images/flight3.png')}}" alt="image" />
-              </div>
-              <div class="ticket-content">
-                <div class="ticket-title">
-                  <h3 class="mar-bottom-10">kathmandu</h3>
-                  <p class="price">From <span>$350.00</span> / oneway</p>
-                </div>
-                <div class="ticket-btn">
-                  <a href="#" class="biz-btn biz-btn1">Select</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="overlay"></div>
-    </section>
-    <!-- air-tickets Ends -->
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending6.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> Mexico</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="rePassesview">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking! </p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-5" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
 
-    <!-- travel deals starts -->
-    <section class="travel-deals pad-top-80">
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="slider-item">
+                            <div class="slider-image">
+                                <img src="{{asset('images_gofly/trending5.jpg')}}" alt="image" />
+                            </div>
+                            <div class="slider-content">
+                                <!-- <h6 class="mar-bottom-10"><i class="fa fa-map-marker-alt"></i> Nepal</h6> -->
+                                <h4 class="mar-bottom-5">Up to 20% Discount!</h4>
+                                <!-- <div class="rate-rev mar-bottom-20">
+                                    <span class="num-rating mar-right-5">4.6/5</span>
+                                    <span class="review">(166 reviews)</span>
+                                </div> -->
+                                <p>Enjoy Upto 20% Discount on Your First Holiday Booking!</p>
+                                <button class="book-btn book-now-btn" data-plan-id="special-offer-6" data-plan-name="Special Discount Offer">BOOK NOW</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- top deal ends -->
+
+    <!-- why us starts -->
+    <section class="why-us">
+        <div class="container">
+            <div class="why-us-box">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="why-us-item why-us-item1 text-center">
+                            <div class="why-us-icon">
+                                <i class="flaticon-call"></i>
+                            </div>
+                            <div class="why-us-content">
+                                <h4>Advice & Support</h4>
+                                <p class="mar-0">Count on us for expert travel advice and round the click support to make your journey smooth and stress-free</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="why-us-item why-us-item1 text-center">
+                            <div class="why-us-icon">
+                                <i class="flaticon-global"></i>
+                            </div>
+                            <div class="why-us-content">
+                                <h4>Air Ticketing</h4>
+                                <p class="mar-0">Grab the best deals  on domestic and international flights with our quick and easy air tricketing services</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="why-us-item why-us-item1 text-center">
+                            <div class="why-us-icon">
+                                <i class="flaticon-building"></i>
+                            </div>
+                            <div class="why-us-content">
+                                <h4>Hotel Accomodation</h4>
+                                <p class="mar-0">Enjoy top hotel deals worldwide with comfortable stays, best prices, and easy booking-tailored to your travel needs</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="why-us-item why-us-item1 text-center">
+                            <div class="why-us-icon">
+                                <i class="flaticon-location-pin"></i>
+                            </div>
+                            <div class="why-us-content">
+                                <h4>Tour Peckages</h4>
+                                <p class="mar-0">Discover exciting tour packages with unbeatable prices, curated experiences, and all-in-one travel convenience</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- why us ends -->
+
+    <!-- why us about starts -->
+    <section class="why-us pad-top-80 bg-grey" id="why-us">
+        <div class="container">
+            <div class="why-us-about">
+                <div class="row display-flex">
+                    <div class="col-lg-6">
+                        <div class="why-about-inner">
+                            <h4>Amazing Places To Enjony Your Travel</h4>
+                            <h2>We Provide <span>Best Services</span></h2>
+                            <p class="mar-bottom-25">
+                               We offer hassle-free air ticket booking for domestic and international flights at the best available fares. Our team ensures quick confirmations, flexible options, and 24/7 support for a smooth travel experience
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="why-about-image">
+                                    <img src="{{asset('images_gofly/list3.jpg')}}" alt="about" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-sm-6">
+                                <div class="why-about-image">
+                                    <img src="{{asset('images_gofly/list1.jpg')}}" alt="about" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- why us about ends -->
+
+    <!-- top destination starts -->
+    <section class="top-destinations top-desti2">
+        <div class="container">
+            <div class="section-title">
+                <h2>Top <span>Destinations</span></h2>
+                <p>
+                Discover the best holiday packages that fit your budget for your
+                favourite destinations.
+                </p>
+            </div>
+            <div class="content">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mar-bottom-30">
+                        <div class="td-item td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination5.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Mahabaleshwar</h3>
+                                <p class="white destination-details-div">Mahabaleshwar, which is also known as the \"Queen of Hill Stations,\" is a lovely place located in Maharashtra. It's high up in the Western Ghats, surrounded by lots of green trees and pretty views. When you go there, you'll feel the cool breeze and see lots of beautiful sights. There are mountains, valleys, and waterfalls all around. It's like stepping into a fairy tale! Here you can visit different spots to see amazing views, like Wilson Point for the sunrise or Kate's Point for the sunset. Mahabaleshwar also has old temples and buildings that tell stories from the past. If you like outdoor activities, there's plenty to do. You can go trekking in the forests, boating on lakes, or horse riding on scenic trails. And if you're lucky, you might spot some interesting birds or animals too. In short, Mahabaleshwar is a wonderful place to visit for anyone who loves nature, history, and adventure.</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="1" data-plan-name="Mahabaleshwar">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mar-bottom-30">
+                        <div class="td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination4.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Rishikesh</h3>
+                                <p class="white destination-details-div">Rishikesh is a small city in India, up in the mountains near the Ganges River. People love it here because it's all about yoga and finding peace. You can learn yoga and meditation from experts who've been practicing for ages. Additionally, if you're into excitement, Rishikesh has it too! You can go rafting in the river, swing from tall bridges, and hike through the hills. The city is old and has temples and big bridges that recount stories from long ago. Every evening, there's a special prayer ceremony by the river. It's like a great show with music, lights, and prayers floating in the air. In short, Rishikesh is the perfect place to relax and forget about all your worries</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="2" data-plan-name="Rishikesh">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mar-bottom-30">
+                        <div class="td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination3.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Lonavala</h3>
+                                <p class="white destination-details-div">Lonavala is located in Maharashtra, a beautiful place surrounded by hills and greenery, far away from the noise and hustle of the city. When you visit Lonavala, you'll feel like you've entered a beautiful world of lush forests, waterfalls, and fresh air. It's the perfect place to relax and unwind, away from the stresses of everyday life. One of the best things about Lonavala is its stunning natural beauty. Everywhere you look, there are beautiful sights that will take your breath away. From the majestic peaks of the Sahyadri mountains to the tranquil waters of the lakes and streams, every view is exquisite. Lonavala is also famous for its delicious food. You can feast on local delicacies like chikki and vada pav, or enjoy a meal at one of the many restaurants serving authentic Maharashtrian cuisine. For those who love adventure, Lonavala has plenty to offer. You can go trekking through the hills, rappelling down waterfalls, or even paragliding over the picturesque landscape. It's like an outdoor playground just waiting to be explored! And if you're in the mood for some relaxation, there are plenty of options to choose from. You can spend a peaceful afternoon by the lakeside, or simply sit back and enjoy the stunning views with a hot cup of tea in hand. In short, it's the perfect destination for a memorable vacation.</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="3" data-plan-name="Lonavala">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="td-item td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination6.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Darjeeling</h3>
+                                <p class="white destination-details-div">Darjeeling is a city located in the Indian state of West Bengal, nestled in the foothills of the Eastern Himalayas. The weather here is pleasant, not too hot or too cold. Everywhere you look, you can see the beautiful mountains and tea gardens, making it a perfect place for nature lovers. Summer is a great time to visit Darjeeling because you can enjoy adventures like trekking and rafting. You can also learn about tea and try different varieties. Darjeeling is a melting pot of different cultures, so you can experience new things. And, not to forget, the famous toy train ride that provides a fun way to see the sights. In conclusion, Darjeeling in the summer is a cool and exciting place to visit.</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="4" data-plan-name="Darjeeling">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination7.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Ladakh</h3>
+                                <p class="white destination-details-div">Why visit Ladakh in the summer? Well, Ladakh is like finding a cozy spot under a shady tree on the hottest day of the year - pure bliss, right? Not only is the weather pleasantly cool, but the landscapes are like something out of a dream, with beautiful mountains and clear blue skies. One of the highlights of visiting Ladakh in the summer is the Hemis Festival, which takes place in June or July. This colourful festival celebrates the birth of Guru Padmasambhava, the founder of Tibetan Buddhism, and is a wonderful opportunity to witness traditional dances, music, and other cultural events So, in short, if you're looking for a perfect summer vacation, Ladakh is the perfect destination.</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="5" data-plan-name="Ladakh">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="td-item">
+                            <div class="td-image">
+                                <img src="{{asset('images_gofly/destination8.jpg')}}" alt="image" />
+                            </div>
+                            <!-- <p class="price white">From <span>$350.00</span></p> -->
+                            <div class="td-content">
+                                <div class="rating mar-bottom-15">
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                    <span class="fa fa-star checked"></span>
+                                </div>
+                                <h3><i class="fa fa-map-marker-alt"></i>  Nainital</h3>
+                                <p class="white destination-details-div">Nainital is a beautiful town located in Uttarakhand. It offers a cool retreat from the intense heat of other places. The weather here is delightful with gentle breezes and mild temperatures, making outdoor activities enjoyable and refreshing. You can spend your days boating on the lake, exploring the lush forests, or admiring the beautiful gardens. If you crave some adventure, there are plenty of trekking trails that offer unique scenic beauty. Nainital has its own charm with its quaint hillside cottages and bustling markets filled with local crafts. So, if you're looking for a summer escape that's both refreshing and cooling, Nainital is the perfect destination to chill out.</p>
+                                <button class="biz-btn book-now-btn" data-toggle="modal" data-target="#bookingModal" data-plan-id="6" data-plan-name="Nainital">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- top destination ends -->
+
+    <!-- Trending Starts -->
+    <section class="travel-deals pad-top-0 mt-5 mb-5">
       <div class="container">
         <div class="row">
-          <div class="col-lg-5 col-sm-12">
+          <div class="col-lg-12 col-sm-12 ">
             <!-- section title -->
             <div class="section_heading">
-              <h2 class="section_title">
-                <span>Before You Fly</span>
+              <h2 class="section_title text-center">
+                <span> Frequently Asked Questions (FAQ)</span>
               </h2>
-              <p class="heading_txt">There are variations available majoritaey suffered alteration words which look believable dolor sit.</p>
             </div>
 
             <div class="accrodion-grp faq-accrodion" data-grp-name="faq-accrodion">
               <div class="accrodion active">
                 <div class="accrodion-title">
-                  <h5>Book Your Bag in Advance</h5>
+                  <h5> Do you offer customized tour packages?</h5>
                 </div>
                 <div class="accrodion-content" style="display: block">
-                  <div class="inner">
+                  <div class="inner ps-4">
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, inventore cumque veniam, praesentium velit incidunt rem quas a, quos eos
-                      ipsum, reprehenderit voluptatem.
+                    Absolutely! Share your preferences, and we’ll create a package just for you.
                     </p>
                   </div>
                   <!-- /.inner -->
@@ -864,13 +919,13 @@
               </div>
               <div class="accrodion">
                 <div class="accrodion-title">
-                  <h5>Special Meal Request</h5>
+                  <h5>What if I need to cancel or reschedule my trip?</h5>
                 </div>
                 <div class="accrodion-content" style="display: none">
-                  <div class="inner">
+                  <div class="inner ps-4">
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, inventore cumque veniam, praesentium velit incidunt rem quas a, quos eos
-                      ipsum, reprehenderit voluptatem.
+                    We offer flexible options depending on the airline/hotel policy and provide full support during the
+                    process.
                     </p>
                   </div>
                   <!-- /.inner -->
@@ -878,13 +933,12 @@
               </div>
               <div class="accrodion">
                 <div class="accrodion-title">
-                  <h5>Check Your Flight Status</h5>
+                  <h5>Is customer support available after booking?</h5>
                 </div>
                 <div class="accrodion-content" style="display: none">
-                  <div class="inner">
+                  <div class="inner ps-4">
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, inventore cumque veniam, praesentium velit incidunt rem quas a, quos eos
-                      ipsum, reprehenderit voluptatem.
+                    Yes, our team is available 24/7 to assist you before, during, and after your trip.
                     </p>
                   </div>
                   <!-- /.inner -->
@@ -892,13 +946,25 @@
               </div>
               <div class="accrodion">
                 <div class="accrodion-title">
-                  <h5>Special Guest Appearance</h5>
+                  <h5>How do I make changes to my booking?</h5>
                 </div>
                 <div class="accrodion-content" style="display: none">
-                  <div class="inner">
+                  <div class="inner ps-4">
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, inventore cumque veniam, praesentium velit incidunt rem quas a, quos eos
-                      ipsum, reprehenderit voluptatem.
+                      To make changes to your booking, simply contact our customer support team and we will be happy to assist you.
+                    </p>
+                  </div>
+                  <!-- /.inner -->
+                </div>
+              </div>
+              <div class="accrodion">
+                <div class="accrodion-title">
+                  <h5> Do you help with visa or travel documentation?</h5>
+                </div>
+                <div class="accrodion-content" style="display: none">
+                  <div class="inner ps-4">
+                    <p>
+                    Yes, we provide visa guidance and can assist with necessary travel documents.
                     </p>
                   </div>
                   <!-- /.inner -->
@@ -906,268 +972,152 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-7 col-sm-12">
-            <!-- price -->
-            <div class="price-list">
-              <div class="row">
-                <div class="col-lg-6 col-md-6">
-                  <div class="price-item">
-                    <div class="price-table-head text-center">
-                      <i class="fa fa-user" aria-hidden="true"></i>
-                      <h3>Individual Plan</h3>
-                      <small class="text-uppercase">For Individual</small>
-                    </div>
-                    <div class="price-table-price text-center">
-                      <span>$ 500/Month</span>
-                    </div>
-                    <div class="price-des">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do.</p>
-                    </div>
-                    <div class="price-table-content">
-                      <ul>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Online Booking</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Create Profile</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Manage Booking</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Map Search</li>
-                      </ul>
-                    </div>
-                    <div class="price-btn text-center">
-                      <a href="flight-detail.html" class="biz-btn biz-btn1">See More</a>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-lg-6 col-md-6">
-                  <div class="price-item price-mar">
-                    <div class="price-table-head text-center">
-                      <i class="fa fa-users" aria-hidden="true"></i>
-                      <h3>Group Plan</h3>
-                      <small class="text-uppercase">For Group</small>
-                    </div>
-                    <div class="price-table-price text-center">
-                      <span>$ 300/Month</span>
-                    </div>
-                    <div class="price-des">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do.</p>
-                    </div>
-                    <div class="price-table-content">
-                      <ul>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Online Booking</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Create Profile</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Manage Booking</li>
-                        <li><i class="fa fa-angle-right" aria-hidden="true"></i> Map Search</li>
-                      </ul>
-                    </div>
-                    <div class="price-btn text-center">
-                      <a href="flight-detail.html" class="biz-btn biz-btn1">See More</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- price Ends -->
-          </div>
         </div>
       </div>
     </section>
-    <!-- travel deals ends -->
+    <!-- Trending Ends -->
 
-    <!-- top destination starts -->
-    <section class="top-destinations bg-grey">
-      <div class="container">
-        <div class="section-title">
-          <h2>Top <span>Destinations</span></h2>
-          <p>
-            Lorem Ipsum is simply dummy text the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the
-            1500s,
-          </p>
+
+
+    <!-- Reviews starts-->
+    <section class="home-testimonial bg-grey" 
+   >
+    <div class="container">
+        <div class="section-title" >
+            <h2>Our Happy Customers</h2>
+            <p>
+                Find your best way to reach your destiny
+            </p>
         </div>
-        <div class="content">
-          <div class="row">
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item mar-bottom-30">
-                <div class="td-image">
-                  <img src="{{asset('images/destination3.jpg')}}" alt="image" />
+        <!-- rest of the code -->
+    </div>
+</section>
+
+    <!-- End Reviews -->
+
+    <!-- Top Featured -->
+    <section class="travelcounter counter2"  style="background: url('{{ asset('images/a.jpg') }}') no-repeat center center; 
+           background-size: cover;">
+        <div class="container">
+            <div class="row display-flex">
+                <div class="col-lg-5">
+                    <div class="section-title title-full width100">
+                        <h2 class="white">Our Amazing Rating for our customer</h2>
+                    </div>
                 </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> United Kingdom</h3>
+                <div class="col-lg-7">
+                    <div class="row service-gg">
+                       
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="counter-item display-flex">
+                                <div class="counter-icon">
+                                    <i class="fa fa-walking mar-0" aria-hidden="true"></i>
+                                </div>
+                                <div class="counter-content text-left mar-left-30">
+                                    <h3 class="showroom " id="counter-by-usman">10 </h3>
+                                    <p class="mar-0">Traveling Experience</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="counter-item display-flex">
+                                <div class="counter-icon">
+                                    <i class="fa fa-smile mar-0" aria-hidden="true"></i>
+                                </div>
+                                <div class="counter-content text-left mar-left-30">
+                                    <h3 class="lisence" id="counter-by-usman-license">100</h3>
+                                    <p class="mar-0">Happy Customers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item mar-bottom-30">
-                <div class="td-image">
-                  <img src="{{asset('images/destination4.jpg')}}" alt="image" />
-                </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> Mexico</h3>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item mar-bottom-30">
-                <div class="td-image">
-                  <img src="{{asset('images/destination5.jpg')}}" alt="image" />
-                </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> Turkey</h3>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item">
-                <div class="td-image">
-                  <img src="{{asset('images/destination6.jpg')}}" alt="image" />
-                </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> Ukraine</h3>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item">
-                <div class="td-image">
-                  <img src="{{asset('images/destination7.jpg')}}" alt="image" />
-                </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> France</h3>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4 col-sm-6">
-              <div class="td-item">
-                <div class="td-image">
-                  <img src="{{asset('images/destination8.jpg')}}" alt="image" />
-                </div>
-                <div class="td-content">
-                  <div class="rating mar-bottom-15">
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                    <span class="fa fa-star checked"></span>
-                  </div>
-                  <h3 class="mar-0"><i class="fa fa-map-marker-alt"></i> India</h3>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </section>
-    <!-- top destination ends -->
+    <!-- End Top Featured -->
 
-    <!-- blog article starts -->
-    <section class="blog-article">
-      <div class="container">
-        <div class="section-title">
-          <h2>Recent Articles</h2>
-        </div>
-        <div class="row">
-          <div class="col-lg-4 col-sm-12">
-            <div class="article-item">
-              <div class="article-image">
-                <img src="{{asset('images/trending1.jpg')}}" alt="image" />
-              </div>
-              <div class="article-content">
-                <p><i class="flaticon-calendar"></i> June 6, 2019</p>
-                <h4 class="mar-0">Nations Are Struggling To Save Their Wildlife</h4>
-              </div>
+    <!-- contact starts -->
+    <section class="contact-main">
+        <div class="container">
+            <div class="contact-info mar-bottom-30">
+                <div class="row">
+                    <div class="col-lg-4 col-md-12 col-12">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <p>302, Venus Avan Business Center, Bhat
+Circle, Ahmedabad, Gujarat, India Pin:
+382428.
+</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <p>+91 6359259244/22</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <p>contact@goflyhabibi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <div class="article-item">
-              <div class="article-image">
-                <img src="{{asset('images/trending2.jpg')}}" alt="image" />
-              </div>
-              <div class="article-content">
-                <p><i class="flaticon-calendar"></i> June 6, 2019</p>
-                <h4 class="mar-0">Cardi B Deletes Instagram Social Media Backlash</h4>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4 col-sm-6">
-            <div class="article-item">
-              <div class="article-image">
-                <img src="{{asset('images/trending3.jpg')}}" alt="image" />
-              </div>
-              <div class="article-content">
-                <p><i class="flaticon-calendar"></i> June 6, 2019</p>
-                <h4 class="mar-0">Tesla’s Cooking Up A New Way To Wire Its Cars</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- blog article ends -->
 
-    <!-- partners starts -->
-    <section class="partners bg-grey">
-      <div class="container">
-        <div class="dest-partner">
-          <div class="row attract-slider">
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_5.png')}}" alt="partners" />
+            <div class="contact-map">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <!-- <div id="map" style="height: 535px; width: 100%"></div> -->
+                        <img src="{{asset('images_gofly/slider3.jpg')}}" height="100%" alt="">
+                    </div>
+                    <div class="col-lg-6">
+                        <div id="contact-form1" class="contact-form">
+                            <h3>Keep in Touch</h3>
+                            <div id="contactform-error-msg"></div>
+
+                            <form method="post" action="#" name="contactform" id="contactform">
+                                <div class="form-group mb-3">
+                                    <input type="text" name="first_name" class="form-control" id="fname"
+                                        placeholder="First Name" />
+                                </div>
+                                <div class="form-group mb-3">
+                                    <input type="text" name="last_name" class="form-control" id="lname"
+                                        placeholder="Last Name" />
+                                </div>
+                                <div class="form-group mb-3">
+                                    <input type="email" name="email" class="form-control" id="email"
+                                        placeholder="Email" />
+                                </div>
+                                <div class="form-group mb-3">
+                                    <input type="text" name="phone" class="form-control" id="phnumber"
+                                        placeholder="Phone" />
+                                </div>
+                                <div class="textarea">
+                                    <textarea name="comments" placeholder="Enter a message"></textarea>
+                                </div>
+                                <div class="comment-btn text-right mar-top-15">
+                                    <input type="submit" class="biz-btn" id="submit" value="Send Message" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_2.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_3.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_4.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_5.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_2.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_3.png')}}" alt="partners" />
-            </div>
-            <div class="col-lg-2 px-3">
-              <img src="{{asset('images/flight_grid_4.png')}}" alt="partners" />
-            </div>
-          </div>
         </div>
-      </div>
     </section>
   
 <script>
@@ -1580,19 +1530,27 @@ function initDatePickerByClass(className) {
   });
 
   function updateTravelerSummaryOneway() {
-    const adults = parseInt(document.getElementById("adultCountOneway").innerText) || 0;
-    const children = parseInt(document.getElementById("childCountOneway").innerText) || 0;
-    const infants = parseInt(document.getElementById("infantCountOneway").innerText) || 0;
-    const travelClass = document.getElementById("travelClassOneway").value;
+  const adults = parseInt(document.getElementById("adultCountOneway").innerText) || 0;
+  const children = parseInt(document.getElementById("childCountOneway").innerText) || 0;
+  const infants = parseInt(document.getElementById("infantCountOneway").innerText) || 0;
+  const travelClass = document.getElementById("travelClassOneway").value;
 
-    const total = adults + children + infants;
-    const summary = `${total} Traveler${total > 1 ? 's' : ''} - ${travelClass}`;
+  const total = adults + children + infants;
+  const summary = `${total} Traveler${total > 1 ? 's' : ''} - ${travelClass}`;
 
-    document.getElementById("travelerSummaryOneway").innerText = summary;
+  // Update visible text
+  document.getElementById("travelerSummaryOneway").innerText = summary;
 
-    const hiddenInput = document.getElementById("travelSummaryInputOneway");
-    if (hiddenInput) hiddenInput.value = summary;
-  }
+  // Update hidden summary input
+  const hiddenInput = document.getElementById("travelSummaryInputOneway");
+  if (hiddenInput) hiddenInput.value = summary;
+
+  // ✅ Update hidden count inputs
+  document.getElementById("adultCountInputOneway").value = adults;
+  document.getElementById("childCountInputOneway").value = children;
+  document.getElementById("infantCountInputOneway").value = infants;
+}
+
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {

@@ -191,13 +191,13 @@ function recalculateSegmentButtons() {
 
       if (idx === segments.length - 1) {
         actionCol.innerHTML = `
-          <button type="button" class="biz-btn add-segment-btn" style="margin-top: 35px; margin-right:20px; width:130px;" onclick="addSegmentRow()">
+          <button type="button" class="biz-btn add-segment-btn" style="margin-top: 35px; background-color:#ec7b34; margin-right:20px; width:130px;" onclick="addSegmentRow()">
             +Add More
           </button>`;
 
         if (segments.length > 1) {
           actionCol.innerHTML += `
-            <button type="button" class="biz-btn btn-sm remove-segment-btn" title="Remove" style="margin-top: 40px; width:40px; height:40px; display: flex; align-items: center; justify-content: center;" onclick="removeSegmentRow(this)">
+            <button type="button" class="biz-btn btn-sm remove-segment-btn"  title="Remove" style="margin-top: 40px; background-color:#ec7b34; width:40px; height:40px; display: flex; align-items: center; justify-content: center;" onclick="removeSegmentRow(this)">
               <i class="fas fa-times"></i>
             </button>`;
         }

@@ -68,7 +68,7 @@
             $flightList = $trip['sI'];
             $priceData = $trip['totalPriceList'][0]['fd'] ?? [];
             $fareIdentifier = $trip['totalPriceList'][0]['fareIdentifier'] ?? 'N/A';
-            $priceId = $trip['totalPriceList'][0]['id'] ?? '';
+            $priceId = $priceId1;
             $firstSeg = $flightList[0];
             $lastSeg = end($flightList);
             $fromCity = $firstSeg['da']['city'] ?? '';
@@ -342,7 +342,7 @@
 
 
      @php
-    $priceId = $trip['totalPriceList'][0]['id'] ?? '';
+    $priceId = $priceId1;
     $totalFare = $trip['totalPriceList'][0]['fd']['ADULT']['fC']['TF'] ?? 0;
 @endphp
 
@@ -352,9 +352,10 @@
     <div class="d-flex justify-content-between mt-3">
     <button class="btn btn-border-none text-white" style="background-color: #f37321;">Back</button>
 
-  <button id="proceedBtn_{{ $index }}" class="btn btn-border-none text-white" style="background-color: #f37321;" onclick="confirmPrice({{ $index }})">
+  <a id="proceedBtn_{{ $index }}" href="{{ route('price', ['priceId' =>$priceId ])}}" class="btn btn-border-none text-white d-none" style="background-color: #f37321;">
     Proceed to Passenger Details >>
-</button>
+</a>
+
 
 <button id="loadingBtn_{{ $index }}" class="btn btn-border-none text-white d-none" style="background-color: #f37321;" disabled>
     <span class="spinner-border spinner-border-sm me-2"></span> Confirming Price...
@@ -374,14 +375,17 @@
         $priceId = $trip['totalPriceList'][0]['id'] ?? 'N/A';
 
         $adultFareData = $trip['totalPriceList'][0]['fd']['ADULT'] ?? [];
+        $childFareData = $trip['totalPriceList'][0]['fd']['CHILD'] ?? [];
         $fC = $adultFareData['fC'] ?? [];
+         $child_fc =  $childFareData['fC'] ?? [];
         $afC_TAF = $adultFareData['afC']['TAF'] ?? [];
         $afC_NCM = $adultFareData['afC']['NCM'] ?? [];
 
         // Fare Components
         $baseFare = $fC['BF'] ?? 0;
+       $child_fare = $fC['BF'] ?? 0;
         $taxAndFee = $fC['TAF'] ?? 0;
-
+         $child_fee = $fC['TAF'] ?? 0;
         // Tax Breakdown
         $airlineGst = $afC_TAF['AGST'] ?? 0;
         $mgmtFee = $afC_TAF['MF'] ?? 0;
@@ -391,7 +395,7 @@
         $ftcTax = $afC_TAF['FTC'] ?? 0;
 
         // Amounts
-        $amountToPay = $baseFare + $taxAndFee;
+        $amountToPay =  $data['totalPriceInfo']['totalFareDetail']['fC']['TF'] ?? null;
         $commission = $trip['totalPriceList'][0]['commission'] ?? 0;
         $tds = $afC_NCM['TDS'] ?? 0;
         $netPrice = $amountToPay - $commission + $tds;
@@ -401,10 +405,10 @@
       
 
         <ul class="list-unstyled small mb-2">
-            <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare, 2) }}</li>
+            <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare + $child_fare, 2) }}</li>
             <li>
                 <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-                    <strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee, 2) }}
+                    <strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee + $child_fee, 2) }}
                     <i class="fa fa-chevron-down float-end"></i>
                 </a>
                 <div class="collapse mt-2" id="taxBreakdown">
@@ -535,7 +539,7 @@
             autoConfirmPrice(index);
             
         // Start expiry timer dynamically
-        startExpiryTimer(SESSION_EXPIRY_SECONDS, index);
+        startExpiryTimer(SESSION_EXPIRY_SECONDS, 0);
         });
     });
 
@@ -611,6 +615,7 @@
             remainingSeconds--;
 
             if (remainingSeconds < 0) {
+                // console.log('working');
                 clearInterval(expiryTimerIntervalId);  // Stop the Timer
 
                 expiryBar.classList.add('d-none');     // Hide Timer Bar
@@ -646,42 +651,6 @@
 
         const modal = new bootstrap.Modal(document.getElementById('sessionExpiryModal'));
         modal.show();
-    }
-
-    function autoConfirmPrice(index) {
-        const priceId = document.getElementById('priceId_' + index).value;
-        const initialPrice = parseFloat(document.getElementById('initialPrice_' + index).value);
-
-        // Hide Proceed, Show Loading
-        document.getElementById('proceedBtn_' + index).classList.add('d-none');
-        document.getElementById('loadingBtn_' + index).classList.remove('d-none');
-
-        fetch('/api/flight/review-price', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                priceId: priceId,
-                initialPrice: initialPrice
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('loadingBtn_' + index).classList.add('d-none');
-            document.getElementById('proceedBtn_' + index).classList.remove('d-none');
-
-            if (data.status === 'updated') {
-                alert('The flight price has been updated to ₹' + data.newPrice + '. Please proceed.');
-                document.getElementById('initialPrice_' + index).value = data.newPrice;
-            }
-        })
-        .catch(error => {
-            console.error('Price verification failed:', error);
-            document.getElementById('loadingBtn_' + index).classList.add('d-none');
-            document.getElementById('proceedBtn_' + index).classList.remove('d-none');
-        });
     }
 </script>
 

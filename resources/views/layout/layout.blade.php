@@ -3,10 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ $title ?? 'Nepayatri - Travel' }}</title>
+  <title>{{ $title ?? 'GoFlyHabibi - Travel' }}</title>
 
   <!-- Favicon -->
   <link rel="shortcut icon" href="{{ asset('images/favicon.png') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/personal.css') }}">
+<!-- Latest Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <!-- Flatpickr CSS & JS -->
@@ -20,6 +24,14 @@
   <!-- Your CSS -->
   <link rel="stylesheet" href="{{ asset('css/style.css') }}">
  <link rel="stylesheet" href="{{ asset('css/flight-list.css') }}">
+
+    <!--Custom CSS-->
+    <link href="{{asset('css_gofly/style.css')}}" rel="stylesheet" type="text/css" />
+  
+    <link href="{{asset('fonts_gofly/flaticon.css')}}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/longbill/jquery-date-range-picker@latest/dist/daterangepicker.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/longbill/jquery-date-range-picker@latest/dist/jquery.daterangepicker.min.js"></script>
+
   @stack('styles')
 </head>
 <body>

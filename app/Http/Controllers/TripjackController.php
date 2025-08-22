@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class TripjackController extends Controller
@@ -12,7 +13,7 @@ class TripjackController extends Controller
 public function search(Request $request)
  { 
     $data = $request->all();
-
+       
     // Manually remap values from one-way inputs
     $fromWhere = $data['from_where_oneway'][0] ?? null;
     $toWhere = $data['to_where_oneway'][0] ?? null;
@@ -34,7 +35,13 @@ public function search(Request $request)
         'children' => 'nullable|integer',
         'infants' => 'nullable|integer',
     ])->validate();
-
+    
+     // Save passenger info in session
+    Session::put('passenger_counts', [
+        'adults' => (int) $validated['adults'],
+        'children' => (int) ($validated['children'] ?? 0),
+        'infants' => (int) ($validated['infants'] ?? 0),
+    ]);
     // Prepare payload for TripJack API
     $payload = [
         "searchQuery" => [
@@ -57,19 +64,23 @@ public function search(Request $request)
             ]
         ]
     ];
-      
+        $mode = config('services.tripjack_token.mode'); // "test" or "live"
+$token = config("services.tripjack_token.$mode.token");
+$url = config("services.tripjack_token.$mode.url");
+
     // Send TripJack API request
     $response = Http::withHeaders([
-        'apikey' =>config('services.tripjack_token'),
-        'Content-Type' => 'application/json',
-    ])->post('https://tripjack.com/fms/v1/air-search-all', $payload);
+    'apikey' => $token,
+    'Content-Type' => 'application/json',
+])->post($url . '/fms/v1/air-search-all', $payload);
 
+     
     if ($response->failed()) {
         return back()->with('error', 'TripJack API error: ' . $response->status());
     }
 
     $results = $response->json();
-   
+     
     return view('flight.flight-list', compact('results'));
 }
 
@@ -91,7 +102,13 @@ public function searchRoundTrip(Request $request)
     // Step 2: Extract airport/city codes
     $fromCode = strtoupper($validated['from_where'][0]);
     $toCode   = strtoupper($validated['to_where'][0]);
-
+     
+    // ✅ Save passenger info in session (same as one-way)
+    Session::put('passenger_counts_round', [
+        'adults'   => (int) $validated['adults'],
+        'children' => (int) ($validated['children'] ?? 0),
+        'infants'  => (int) ($validated['infants'] ?? 0),
+    ]);
     // Step 3: Prepare the payload using 'searchQuery' key
     $payload = [
         "searchQuery" => [
@@ -119,12 +136,16 @@ public function searchRoundTrip(Request $request)
             ]
         ]
     ];
+ $mode = config('services.tripjack_token.mode'); // "test" or "live"
+$token = config("services.tripjack_token.$mode.token");
+$url = config("services.tripjack_token.$mode.url");
 
-    // Step 4: Make API request to TripJack
+    // Send TripJack API request
     $response = Http::withHeaders([
-        'apikey' => config('services.tripjack_token'),
-        'Content-Type' => 'application/json',
-    ])->post('https://tripjack.com/fms/v1/air-search-all', $payload);
+    'apikey' => $token,
+    'Content-Type' => 'application/json',
+])->post($url . '/fms/v1/air-search-all', $payload);
+   
 
     // Step 5: Handle response
     if ($response->failed()) {
@@ -203,11 +224,15 @@ public function searchMulticity(Request $request)
         ]
     ];
 
-    // Step 4: Send API request
+    $mode = config('services.tripjack_token.mode'); // "test" or "live"
+$token = config("services.tripjack_token.$mode.token");
+$url = config("services.tripjack_token.$mode.url");
+
+    // Send TripJack API request
     $response = Http::withHeaders([
-        'apikey' =>config('services.tripjack_token'),
-        'Content-Type' => 'application/json',
-    ])->post('https://tripjack.com/fms/v1/air-search-all', $payload);
+    'apikey' => $token,
+    'Content-Type' => 'application/json',
+])->post($url . '/fms/v1/air-search-all', $payload);
 
     if ($response->failed()) {
         return back()->with('error', 'TripJack API Error: ' . $response->status());
