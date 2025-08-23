@@ -87,8 +87,8 @@ Route::get('/pay/link', [ReviewController::class, 'pay_link'])->name('pay_link')
 Route::get('/pay', [EasebuzzController::class, 'pay'])->name('easebuzz.pay');
 Route::match(['get', 'post'], '/payment-success', [EasebuzzController::class, 'success'])->name('easebuzz.success');
 Route::get('/pay/final', [EasebuzzController::class, 'final_payment'])->name('easebuzz.final.pay');
+Route::match(['get', 'post'], '/payment-failure', [EasebuzzController::class, 'failure'])->name('easebuzz.failure');
 
-Route::get('/payment-failure', [EasebuzzController::class, 'failure'])->name('easebuzz.failure');
 Route::get('/phone-lengths', [ReviewController::class, 'phone']);
 Route::post('/payment/initiateLink', function (Request $request) {
     return response()->json([

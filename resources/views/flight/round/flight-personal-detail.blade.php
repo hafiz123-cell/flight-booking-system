@@ -419,85 +419,101 @@
 </div>
          
         {{-- Fare Summary --}}
-       <div class="col-md-3">
-         <h6 class="fw-bold mb-3">Fare Summary</h6>
-    @php
-        $fareType = $trip['totalPriceList'][0]['fareIdentifier'] ?? 'N/A';
-        $priceId = $trip['totalPriceList'][0]['id'] ?? 'N/A';
+      <div class="col-md-3">
+    <h6 class="fw-bold mb-3">Fare Summary</h6>
+@php
+$tripData = $data['tripInfos'] ?? [];
 
-        $adultFareData = $trip['totalPriceList'][0]['fd']['ADULT'] ?? [];
-        $childFareData = $trip['totalPriceList'][0]['fd']['CHILD'] ?? [];
-        $fC = $adultFareData['fC'] ?? [];
-         $child_fc =  $childFareData['fC'] ?? [];
-        $afC_TAF = $adultFareData['afC']['TAF'] ?? [];
-        $afC_NCM = $adultFareData['afC']['NCM'] ?? [];
+// Initialize totals
+$onwardBaseFare = $onwardTaxes = 0;
+$returnBaseFare = $returnTaxes = 0;
 
-        // Fare Components
-        $baseFare = $fC['BF'] ?? 0;
-       $child_fare = $fC['BF'] ?? 0;
-        $taxAndFee = $fC['TAF'] ?? 0;
-         $child_fee = $fC['TAF'] ?? 0;
+$yrTax = $otherTaxes = $airlineGst = $ftcTax = $mgmtFee = $mgmtFeeTax = 0;
+$commission = 0;
+$tds = 0;
 
-        // Tax Breakdown
-        $airlineGst = $afC_TAF['AGST'] ?? 0;
-        $mgmtFee = $afC_TAF['MF'] ?? 0;
-        $mgmtFeeTax = $afC_TAF['MFT'] ?? 0;
-        $otherTaxes = $afC_TAF['OT'] ?? 0;
-        $yrTax = $afC_TAF['YR'] ?? 0;
-        $ftcTax = $afC_TAF['FTC'] ?? 0;
+// Loop through each trip (onward + return)
+foreach ($tripData as $index => $trip) {
+    $adultFareData = $trip['totalPriceList'][0]['fd']['ADULT'] ?? [];
+    $childFareData = $trip['totalPriceList'][0]['fd']['CHILD'] ?? [];
 
-        // Amounts
-        $amountToPay = $data['totalPriceInfo']['totalFareDetail']['fC']['TF'] ?? null;
-        $commission = $trip['totalPriceList'][0]['commission'] ?? 0;
-        $tds = $afC_NCM['TDS'] ?? 0;
-        $netPrice = $amountToPay - $commission + $tds;
-    @endphp
+    $fC = $adultFareData['fC'] ?? [];
+    $child_fc = $childFareData['fC'] ?? [];
 
-    <div class="bg-white shadow-sm rounded mb-4 border p-3">
-      
+    $segmentBaseFare = ($fC['BF'] ?? 0) + ($child_fc['BF'] ?? 0);
+    $segmentTaxes = ($fC['TAF'] ?? 0) + ($child_fc['TAF'] ?? 0);
 
-        <ul class="list-unstyled small mb-2">
-            <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare + $child_fare, 2) }}</li>
-            <li>
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-                    <strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee + $child_fee, 2) }}
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="taxBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
-                        @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
-                        @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
-                        @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
-                        @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
-                        @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
-                    </ul>
-                </div>
-            </li>
-        </ul>
+    if ($index === 0) {
+        $onwardBaseFare = $segmentBaseFare;
+        $onwardTaxes = $segmentTaxes;
+    } else {
+        $returnBaseFare = $segmentBaseFare;
+        $returnTaxes = $segmentTaxes;
+    }
 
-        <hr>
-         <input type="hidden" name="amount" value="{{ $amountToPay }}">
+    $afC_TAF = $adultFareData['afC']['TAF'] ?? [];
+    $afC_NCM = $adultFareData['afC']['NCM'] ?? [];
 
-        <ul class="list-unstyled small mb-2">
-            <li><strong>Total Amount:</strong> ₹{{ number_format($amountToPay, 2) }}</li>
+    $yrTax += $afC_TAF['YQ'] ?? 0;
+    $otherTaxes += $afC_TAF['OT'] ?? 0;
+    $airlineGst += $afC_TAF['AGST'] ?? 0;
+    $ftcTax += $afC_TAF['FTC'] ?? 0;
+    $mgmtFee += $afC_TAF['MF'] ?? 0;
+    $mgmtFeeTax += $afC_TAF['MFT'] ?? 0;
 
-            <li class="mt-2">
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
-                    <strong>Amount Breakdown</strong>
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="amountBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        <li>Commission: -₹{{ number_format($commission, 2) }}</li>
-                        <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                        <li><strong>Net Price: ₹{{ number_format($netPrice, 2) }}</strong></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </div>
+    $commission += $trip['totalPriceList'][0]['commission'] ?? 0;
+    $tds += $afC_NCM['TDS'] ?? 0;
+}
+
+// Total Amount
+$amountToPay = $data['totalPriceInfo']['totalFareDetail']['fC']['TF'] ?? 0;
+$netPrice = $amountToPay - $commission + $tds;
+@endphp
+
+<div class="bg-white shadow-sm rounded mb-4 border p-3">
+    <ul class="list-unstyled small mb-2">
+        <li><strong>Total Base Fare:</strong> ₹{{ number_format($onwardBaseFare + $returnBaseFare, 2) }}</li>
+        <li><strong>Total Taxes & Fees:</strong> ₹{{ number_format($onwardTaxes + $returnTaxes, 2) }}</li>
+
+        <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
+            <strong>Detailed Tax Breakdown:</strong>
+            <i class="fa fa-chevron-down float-end"></i>
+        </a>
+        <div class="collapse mt-2" id="taxBreakdown">
+            <ul class="list-unstyled ms-3">
+                @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
+                @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
+                @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
+                @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
+                @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
+                @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
+            </ul>
+        </div>
+    </ul>
+
+    <hr>
+    <input type="hidden" name="amount" value="{{ $amountToPay }}">
+
+    <ul class="list-unstyled small mb-2">
+        <li><strong>Total Amount:</strong> ₹{{ number_format($amountToPay, 2) }}</li>
+
+        <li class="mt-2">
+            <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
+                <strong>Amount Breakdown</strong>
+                <i class="fa fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse mt-2" id="amountBreakdown">
+                <ul class="list-unstyled ms-3">
+                    <li>Commission: -₹{{ number_format($commission, 2) }}</li>
+                    <li>TDS: +₹{{ number_format($tds, 2) }}</li>
+                    <li><strong>Net Price: ₹{{ number_format($netPrice, 2) }}</strong></li>
+                </ul>
+            </div>
+        </li>
+    </ul>
 </div>
+</div>
+
 </form>
         </div>
 
@@ -929,18 +945,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Baggage dropdown
         let baggageHtml = '<option value="">Add Baggage</option>';
         baggageOptions.forEach(b => {
-            const fullBaggageText = ` ${b.desc} ${b.weight || ''} `;
-            baggageHtml += `<option value="${fullBaggageText}" data-amount="${b.amount}">${fullBaggageText}</option>`;
+            const textOnly = `${b.desc} ${b.weight || ''}`.trim();
+            baggageHtml += `<option value="${textOnly}" data-amount="${b.amount}">${textOnly}</option>`;
         });
 
         // Meal dropdown
         let mealHtml = '';
         if (mealOptions.length > 0) {
-            mealHtml += '<select class="form-select ms-2" name="meal_'+tripIndex+'_'+passengerIndex+'">';
+            mealHtml += `<select class="form-select ms-2 meal-select" name="meal_${tripIndex}_${passengerIndex}">`;
             mealHtml += '<option value="">Add Meal</option>';
             mealOptions.forEach(m => {
-                const fullMealText = `${m.desc}`;
-                mealHtml += `<option value="${fullMealText}" data-amount="${m.amount}">${fullMealText}</option>`;
+                const textOnly = `${m.desc}`.trim();
+                mealHtml += `<option value="${textOnly}" data-amount="${m.amount}">${textOnly}</option>`;
             });
             mealHtml += '</select>';
         }
@@ -983,29 +999,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Toggle collapsible sections
-    window.toggleSection = function(header) {
-        const body = header.nextElementSibling;
-        const icon = header.querySelector('i');
-
-        if (body.style.display === 'block') {
-            body.style.display = 'none';
-            icon?.classList.remove('rotate');
-        } else {
-            body.style.display = 'block';
-            icon?.classList.add('rotate');
-        }
-    };
-
     // Build structured JSON before submit
-    const form = document.querySelector('#yourFormId'); // replace with your form ID
+    const form = document.querySelector('#passengerForm'); 
     if(form){
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', () => {
             const passengers = [];
             const passengerRows = document.querySelectorAll('[data-passenger-index]');
 
             passengerRows.forEach((row, idx) => {
-                if(!passengers[idx]) passengers[idx] = {title:'', type:'', first_name:'', last_name:'', flights:[]};
+                if(!passengers[idx]) passengers[idx] = {
+                    title:'', type:'', first_name:'', last_name:'', flights:[]
+                };
 
                 const tripContainers = document.querySelectorAll('.trip-container');
                 tripContainers.forEach((tc, tripIndex) => {
@@ -1013,12 +1017,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     const mealSelect = tc.querySelector(`select[name="meal_${tripIndex}_${idx}"]`);
 
                     const baggage = baggageSelect?.value || null;
-                    const meal = mealSelect?.value || null;
+                    const baggageAmount = baggageSelect && baggageSelect.selectedIndex > 0
+                        ? Number(baggageSelect.selectedOptions[0].dataset.amount)
+                        : null;
 
-                    passengers[idx].flights[tripIndex] = {baggage, meal};
+                    const meal = mealSelect?.value || null;
+                    const mealAmount = mealSelect && mealSelect.selectedIndex > 0
+                        ? Number(mealSelect.selectedOptions[0].dataset.amount)
+                        : null;
+
+                    passengers[idx].flights[tripIndex] = {
+                        baggage,
+                        baggage_amount: baggageAmount,
+                        meal,
+                        meal_amount: mealAmount
+                    };
                 });
             });
 
+            // Hidden field with JSON
             let hiddenInput = document.querySelector('#passenger_json');
             if(!hiddenInput){
                 hiddenInput = document.createElement('input');

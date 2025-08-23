@@ -123,7 +123,7 @@ public function price(Request $request, $priceId)
 
 
 public function traveller_detail(Request $request)
-{
+{  dd($request->all());
     $amount  = $request->input('amount');
     $priceId = $request->input('price_id');
 
@@ -227,7 +227,7 @@ public function review_detail_add_flight(Request $request, $priceId)
     $departure = $flight['da'];
     $arrival   = $flight['aa'];
     $airline   = $flight['fD']['aI'];
-
+$totalTaxes = $data['totalPriceInfo']['totalFareDetail']['fC']['TAF'] ?? 0;
     // ✅ Save flight details
     $flightDetail = FlightDetail::updateOrCreate(
         ['flight_id' => $flight['id']],
@@ -266,6 +266,7 @@ public function review_detail_add_flight(Request $request, $priceId)
             'is_iand'            => $flight['iand'] ?? null,
             'is_rs'              => $flight['isRs'] ?? null,
             'segment_number'     => $flight['sN'] ?? 0,
+            'price'=>$totalTaxes ?? 0,
         ]
     );
 

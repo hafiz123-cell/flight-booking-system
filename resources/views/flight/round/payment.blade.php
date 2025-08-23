@@ -199,12 +199,16 @@
                     </ul>
                 </div>
             </li>
+        
+{{-- Combined Total --}}
+<li><strong>Meal & Baggage Total:</strong> ₹{{ number_format($mealTotal + $baggageTotal, 2) }}</li>
+
         </ul>
 
         <hr>
 
         <ul class="list-unstyled small mb-2">
-            <li><strong>Total Amount:</strong> ₹{{ number_format($atp, 2) }}</li>
+            <li><strong>Total Amount:</strong> ₹{{ number_format($grandTotal, 2) }}</li>
 
             <li class="mt-2">
                 <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
@@ -215,7 +219,7 @@
                     <ul class="list-unstyled ms-3">
                         <li>Commission: -₹{{ number_format($commission, 2) }}</li>
                         <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                        <li><strong>Net Price: ₹{{ number_format($atp, 2) }}</strong></li>
+                        <li><strong>Net Price: ₹{{ number_format($grandTotal, 2) }}</strong></li>
                     </ul>
                 </div>
             </li>

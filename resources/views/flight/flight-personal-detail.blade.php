@@ -1162,84 +1162,121 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   </script>
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const rawCounts = @json($passengerCounts); // e.g. { "adults": 1, "children": 1, "infants": 1 }
-    const baggageOptions = @json($baggageList); // e.g. [{ code: "15KG", amount: 8190 }, ...]
+document.addEventListener('DOMContentLoaded', () => {
+  const rawCounts = @json($passengerCounts);
+  const baggageOptions = @json($baggageList);
+  const mealOptions = @json($mealList ?? []); // safe fallback
 
-    // --- Normalize backend keys ---
-    const normalizeKey = (key) => {
-      key = key.toLowerCase();
-      if (key === 'adults' || key === 'adult') return 'adult';
-      if (key === 'children' || key === 'child') return 'child';
-      if (key === 'infants' || key === 'infant') return 'infant';
-      return key;
-    };
+  // --- Normalize backend keys ---
+  const normalizeKey = (key) => {
+    key = key.toLowerCase();
+    if (key === 'adults' || key === 'adult') return 'adult';
+    if (key === 'children' || key === 'child') return 'child';
+    if (key === 'infants' || key === 'infant') return 'infant';
+    return key;
+  };
 
-    const passengerCounts = {};
-    Object.entries(rawCounts).forEach(([key, value]) => {
-      const normalized = normalizeKey(key);
-      passengerCounts[normalized] = Number(value) || 0; // ensure numeric & skip falsy
+  const passengerCounts = {};
+  Object.entries(rawCounts).forEach(([key, value]) => {
+    passengerCounts[normalizeKey(key)] = Number(value) || 0;
+  });
+
+  const sectionContainer = document.getElementById('passenger-sections');
+  if (!sectionContainer) return;
+
+  // --- Generate baggage <option> list ---
+  function generateBaggageOptions() {
+    let options = '<option value="">Add Baggage</option>';
+    baggageOptions.forEach(b => {
+      options += `<option value="${b.code}" data-amount="${b.amount}">
+                    Excess Baggage - ${b.code} @ ₹${Number(b.amount).toLocaleString()}.00
+                  </option>`;
     });
+    return options;
+  }
 
-    const sectionContainer = document.getElementById('passenger-sections');
-    if (!sectionContainer) {
-      console.error('Section container not found.');
-      return;
-    }
+  // --- Generate meal <option> list ---
+  function generateMealOptions() {
+    let options = '<option value="">Add Meal</option>';
+    mealOptions.forEach(m => {
+      options += `<option value="${m.code}" data-amount="${m.amount}">
+                    ${m.desc} @ ₹${Number(m.amount).toLocaleString()}.00
+                  </option>`;
+    });
+    return options;
+  }
 
-    // --- Generate baggage <option> list ---
-    function generateBaggageOptions() {
-      let options = '<option value="">Add Baggage</option>';
-      baggageOptions.forEach(b => {
-        options += `<option style="font-size:12px;" value="${b.code}">
-                      Excess Baggage - ${b.code} @ - ₹${Number(b.amount).toLocaleString()}.00
-                    </option>`;
-      });
-      return options;
-    }
+  let globalPassengerIndex = 0;
 
-    let globalPassengerIndex = 0;
+  function createPassengerCard(type, index) {
+    if (type === 'infant') return ''; // infants skip
 
-    function createPassengerCard(type, index) {
-      const label = `${type.toUpperCase()} ${index + 1}`;
-      const showLabels = type === 'adult' && index === 0;
+    const label = `${type.toUpperCase()} ${index + 1}`;
+    const showLabels = type === 'adult' && index === 0;
 
-      // ✅ Skip rendering anything for INFANT
-      if (type === 'infant') {
-        return ''; // no input, no hidden input
-      }
+    const html = `
+      <div class="row align-items-end mt-3">
+        <div class="col-md-3"><strong>${label}</strong></div>
+        <div class="col-md-9">
+          <div class="d-flex gap-3">
 
-      // ✅ Render adults and children
-      const html = `
-        <div class="row align-items-end mt-3">
-          <div class="col-md-3"><strong>${label}</strong></div>
-          <div class="col-md-4">
-            <div class="inner-col-datail">
-              ${showLabels ? '<label class="form-label">Baggage Information</label>' : ''}
-              <select class="form-select" name="passenger_services[${globalPassengerIndex}][baggage]">
+            <!-- Baggage (always full if no meal) -->
+            <div class="inner-col-datail ${mealOptions.length > 0 ? 'flex-fill' : 'w-100'}">
+              ${showLabels ? '<label class="form-label">Baggage</label>' : ''}
+              <select class="form-select baggage-select"
+                      data-passenger="${globalPassengerIndex}"
+                      name="passenger_services[${globalPassengerIndex}][baggage]">
                 ${generateBaggageOptions()}
               </select>
+              <input type="hidden" 
+                     name="passenger_services[${globalPassengerIndex}][baggage_amount]" 
+                     id="baggage_amount_${globalPassengerIndex}" value="">
             </div>
+
+            <!-- Meal (only if available) -->
+            ${mealOptions.length > 0 ? `
+            <div class="inner-col-datail flex-fill">
+              ${showLabels ? '<label class="form-label">Meal</label>' : ''}
+              <select class="form-select meal-select"
+                      data-passenger="${globalPassengerIndex}"
+                      name="passenger_services[${globalPassengerIndex}][meal]">
+                ${generateMealOptions()}
+              </select>
+              <input type="hidden" 
+                     name="passenger_services[${globalPassengerIndex}][meal_amount]" 
+                     id="meal_amount_${globalPassengerIndex}" value="">
+            </div>` : ''}
           </div>
         </div>
-      `;
-      globalPassengerIndex++;
-      return html;
+      </div>
+    `;
+    globalPassengerIndex++;
+    return html;
+  }
+
+  // --- Render passenger cards ---
+  Object.entries(passengerCounts).forEach(([type, count]) => {
+    if (!count) return;
+    for (let i = 0; i < count; i++) {
+      const card = createPassengerCard(type, i);
+      if (card) sectionContainer.insertAdjacentHTML('beforeend', card);
     }
-
-    // --- Render passenger cards / hidden inputs ---
-    Object.entries(passengerCounts).forEach(([type, count]) => {
-      if (!count) return;
-
-      for (let i = 0; i < count; i++) {
-        const card = createPassengerCard(type, i);
-        if (card) {
-          sectionContainer.insertAdjacentHTML('beforeend', card);
-        }
-      }
-    });
   });
+
+  // --- Update hidden inputs ---
+  sectionContainer.addEventListener('change', (e) => {
+    if (e.target.classList.contains('baggage-select')) {
+      const idx = e.target.dataset.passenger;
+      document.getElementById(`baggage_amount_${idx}`).value = e.target.selectedOptions[0]?.dataset.amount || '';
+    }
+    if (e.target.classList.contains('meal-select')) {
+      const idx = e.target.dataset.passenger;
+      document.getElementById(`meal_amount_${idx}`).value = e.target.selectedOptions[0]?.dataset.amount || '';
+    }
+  });
+});
 </script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("passengerForm");

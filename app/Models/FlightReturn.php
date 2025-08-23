@@ -10,7 +10,7 @@ class FlightReturn extends Model
     use HasFactory;
     protected $table='flight_return_detail';
     protected $fillable = [
-        'onward_flight_id', 'flight_id', 'flight_number', 'equipment_type', 'stops', 'duration',
+        'onward_flight_id', 'flight_id', 'price','flight_number', 'equipment_type', 'stops', 'duration',
         'airline_code', 'airline_name', 'is_lcc',
         'departure_code', 'departure_name', 'departure_city', 'departure_country', 'departure_terminal', 'departure_timezone', 'departure_latitude', 'departure_longitude',
         'arrival_code', 'arrival_name', 'arrival_city', 'arrival_country', 'arrival_terminal', 'arrival_timezone', 'arrival_latitude', 'arrival_longitude',
