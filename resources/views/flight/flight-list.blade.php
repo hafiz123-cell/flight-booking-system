@@ -1365,7 +1365,7 @@
     @endphp
 
 
-    <div class="row">
+    <div class="row g-2">
       <div class="col-md-6">
         <div class="d-flex">
           <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5>
@@ -1415,48 +1415,49 @@
         $uniqueId = 'segment_' . $index;
         @endphp
 
-        <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white">
-          <div class="row g-3r">
+        <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white">
+          <div class="row g-3 inner-flight-card">
 
             <div class="col-md-6 col-12">
-              <div class="d-flex flex-column justify-content-start">
+              <div class="d-flex flex-column justify-content-start gap-3">
                 <div class="d-flex justify-content-between gap-3">
                   <div class="d-flex gap-0 flex-column">
-                    <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 40px;">
-                    <p class="mt-2 mb-0 fw-bold text-dark">{{ $airlineName }}</p>
-                    <small>{{ $flightNumber }}</small>
+                    <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+                    <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+                    <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
                   </div>
-                  <div class="d-flex justify-content-between gap-2">
-                    <div class="d-flex gap-0 flex-column">
-                      <small class="text-muted">{{ $fromCity }}</small><br>
-                      <h5 class="mb-1 fw-bold">{{ $fromTime }}</h5>
-                      <small class="text-muted">{{ $fromDate }}</small>
+                  <div class="d-flex justify-content-between gap-3">
+                    <div class="d-flex gap-0 flex-column align-items-end">
+                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
+                      <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
+                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
                     </div>
                     <div class="d-flex flex-column align-item-center gap-0">
-                      <span class="d-block fw-bold">{{ $hours }}h {{ $minutes }}m</span>
-                      <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 6px 0; display: flex; align-items: center; justify-content: end;">
+                      <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
+                      <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
                         <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
                       </div>
-                      <small class="text-muted">{{ $stopLabel }}</small>
+                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
                     </div>
-                    <div class="d-flex gap-0 flex-column">
-                      <small class="text-muted">{{ $toCity }}</small><br>
-                      <h5 class="mb-1 fw-bold">{{ $toTime }}</h5>
-                      <small class="text-muted">{{ $toDate }}</small>
+                    <div class="d-flex gap-0 flex-column align-items-start">
+                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
+                      <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
+                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
                     </div>
                   </div>
                 </div>
-                <button type="button" class="btn btn-sm" style="background-color: #f5f5f5; color: rgb(255, 138, 5)" onclick="toggleDetails(this)">View Details +</button>
+                <div class="d-flex flex-column gap-2">
+                  <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails($uniqueId)" data-details-id="flight-details-content-{{ $uniqueId }}">View Details +</button>
+                  <span style="color: rgb(255, 138, 5); font-size:11px; line-height: 1; margin-left: 6px">7 Seats Left</span>
+                </div>
               </div>
             </div>
-            <div class="col-md-6 col-12"></div>
-
-            <!-- Fare Options -->
             @php
             $containerId = 'fareBlock_' . $index;
             $fareCount = count($priceList);
+            $count = 1
             @endphp
-            <div class="col-md-2 text-start" id="{{ $containerId }}">
+            <div class="col-md-6 col-12" id="{{ $containerId }}">
               @foreach($priceList as $loopIndex => $priceItem)
               @php
               $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
@@ -1464,9 +1465,10 @@
               $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
               $cabinClass = Str::title(strtolower($cabinClassRaw));
               $isHidden = $loopIndex >= 3 ? 'd-none' : '';
-              @endphp
+              $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
+                @endphp
 
-              <div class="mb-2 p-2 more-fare {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
+                <div class="mx-2 py-2  more-fare  position-relative {{ $isNotLast }} {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
                 <div class="d-flex">
                   <!-- Onward Fare Radio Button -->
                   <input type="radio"
@@ -1480,57 +1482,37 @@
                   <input type="hidden" id="onward_fare_id" name="onward_fare_id" value="">
                   <input type="hidden" id="onward_fare_detail" name="onward_fare_detail" value="">
 
-                  <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
+                  <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
                 </div>
                 <div class="">
-                  <span class="badge bg-warning text-white text-uppercase">{{ $tag }}</span>
-                  <small class="text-muted">{{ $cabinClass }}</small>
+                  <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200;">{{ $tag }}</span>
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $cabinClass }}</small>
                 </div>
-              </div>
-              @endforeach
-
-              @if($fareCount > 3)
-              <button class="btn p-1" style="border:1px solid #ccc; font-size:12px; color:orange;" onclick="toggleMoreFares('{{ $containerId }}', this)">+More Fares</button>
-              @endif
+                @if($fareCount > 3 && $loopIndex == 2)
+                <button class="btn p-1" style="border:1px solid #000;font-size: 11px;color: #ffffff;background: #000;padding: 4px 8px 3px !important;border-radius: 14px;position: absolute;right: 0;bottom: -10px;" onclick="toggleMoreFares('{{ $containerId }}', this)">+More Fares</button>
+                @endif
             </div>
+            @endforeach
 
-            <!-- Book Button -->
-            {{-- <div class="col-md-2 text-center">
-                    @php
-                        $itineraryId = $priceItem['id'] ?? '';
-                        $fareIdentifier = $priceItem['fareIdentifier'] ?? '';
-                        $bookUrl = route('redirect.booking', [
-                            'itineraryId' => $itineraryId,
-                            'fareIdentifier' => $fareIdentifier
-                        ]);
-                    @endphp
-                    <a href="{{ $bookUrl }}" class="btn btn-sm w-100 text-white" style="background-color: orange;">Book</a>
-          </div> --}}
-        </div>
+          </div>
+          <div class="col-12">
+            <div class="flight-details-content mt-2 card" id="flight-details-content-{{ $uniqueId }}" style="display: none;">
 
-        <!-- View Details Button -->
-        <div class="mt-3">
-          <button type="button" class="btn btn-sm" style="background-color: #f5f5f5; color: rgb(255, 138, 5)" onclick="toggleDetails(this)">View Details +</button>
-          <div class="flight-details-content mt-2" style="display: none;">
+              <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
+                <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')"><small>Flight Details</small></li>
+                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')"><small>Fare Details</small></li>
+                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')"><small>Fare Rules <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="View Fare Rules"></i></small></li> <!-- Added "i" icon -->
+                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')"><small>Baggage Info <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Baggage Allowance Info"></i></small></li> <!-- Added "i" icon -->
+              </ul>
 
-            <!-- Tabs -->
-            <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
-              <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')"><small>Flight Details</small></li>
-              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')"><small>Fare Details</small></li>
-              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')"><small>Fare Rules <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="View Fare Rules"></i></small></li> <!-- Added "i" icon -->
-              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')"><small>Baggage Info <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Baggage Allowance Info"></i></small></li> <!-- Added "i" icon -->
-            </ul>
-
-            <!-- Include your Details Tabs Here -->
-            {{-- @include('partials.flight-details-tab', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceData])
-                    @include('partials.fare-details-tab', ['results' => $results, 'uniqueId' => $uniqueId])
-                    @include('partials.fare-rules-tab', ['uniqueId' => $uniqueId])
-                    @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
+              <!-- Include your Details Tabs Here -->
+              {{-- @include('partials.flight-details-tab', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceData])
+                      @include('partials.fare-details-tab', ['results' => $results, 'uniqueId' => $uniqueId])
+                      @include('partials.fare-rules-tab', ['uniqueId' => $uniqueId])
+                      @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
+            </div>
           </div>
         </div>
-
-        <br>
-        <span style="margin-left:20px; color: rgb(255, 138, 5); font-size:12px;">7 Seats Left</span>
       </div>
       @endforeach
       @endif
@@ -1589,39 +1571,48 @@
       $uniqueId = 'return_segment_' . $index;
       @endphp
 
-      <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white">
-        <div class="row align-items-center">
-          <div class="col-md-2 text-center">
-            <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 40px;">
-            <p class="mt-2 mb-0 fw-bold text-dark">{{ $airlineName }}</p>
-            <small>{{ $flightNumber }}</small>
-          </div>
-
-          <div class="col-md-2 text-center">
-            <small class="text-muted">{{ $fromCity }}</small><br>
-            <h5 class="mb-1 fw-bold">{{ $fromTime }}</h5>
-            <small class="text-muted">{{ $fromDate }}</small>
-          </div>
-
-          <div class="col-md-2 text-center">
-            <span class="d-block fw-bold">{{ $hours }}h {{ $minutes }}m</span>
-            <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 6px 0; display: flex; align-items: center; justify-content: end;">
-              <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+      <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white">
+        <div class="row g-3 inner-flight-card">
+          <div class="col-md-6 col-12">
+            <div class="d-flex flex-column justify-content-start gap-3">
+              <div class="d-flex justify-content-between gap-3">
+                <div class="d-flex gap-0 flex-column">
+                  <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+                  <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+                  <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
+                </div>
+                <div class="d-flex justify-content-between gap-3">
+                  <div class="d-flex gap-0 flex-column align-items-end">
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
+                    <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
+                  </div>
+                  <div class="d-flex flex-column align-item-center gap-0">
+                    <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
+                    <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
+                      <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+                    </div>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
+                  </div>
+                  <div class="d-flex gap-0 flex-column align-items-start">
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
+                    <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex flex-column gap-2">
+                <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails($uniqueId)" data-details-id="flight-details-content-{{ $uniqueId }}">View Details +</button>
+                <span style="color: rgb(255, 138, 5); font-size:11px; line-height: 1; margin-left: 6px">7 Seats Left</span>
+              </div>
             </div>
-            <small class="text-muted">{{ $stopLabel }}</small>
-          </div>
-
-          <div class="col-md-2 text-center">
-            <small class="text-muted">{{ $toCity }}</small><br>
-            <h5 class="mb-1 fw-bold">{{ $toTime }}</h5>
-            <small class="text-muted">{{ $toDate }}</small>
           </div>
 
           @php
           $containerId = 'return_fareBlock_' . $index;
           $fareCount = count($priceList);
           @endphp
-          <div class="col-md-2 text-start" id="{{ $containerId }}">
+          <div class="col-md-6 col-12 text-start" id="{{ $containerId }}">
             @foreach($priceList as $loopIndex => $priceItem)
             @php
             $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
@@ -1629,9 +1620,10 @@
             $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
             $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw));
             $isHidden = $loopIndex >= 3 ? 'd-none' : '';
-            @endphp
+            $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
+              @endphp
 
-            <div class="mb-2 p-2 more-fare {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
+              <div class="mx-2 py-2  more-fare  position-relative {{ $isNotLast }} {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
               <div class="d-flex">
                 <!-- Return Fare Radio Button -->
                 <!-- Return Fare Radio Button -->
@@ -1646,50 +1638,39 @@
                 <input type="hidden" id="return_fare_id" name="return_fare_id" value="">
                 <input type="hidden" id="return_fare_detail" name="return_fare_detail" value="">
 
-                <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
+                <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
               </div>
               <div class="">
-                <span class="badge bg-warning text-white text-uppercase">{{ $tag }}</span>
-                <small class="text-muted">{{ $cabinClass }}</small>
+                <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200;">{{ $tag }}</span>
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $cabinClass }}</small>
               </div>
-            </div>
-            @endforeach
-
-            @if($fareCount > 3)
-            <button class="btn p-1" style="border:1px solid #ccc; font-size:12px; color:orange;" onclick="toggleMoreFares('{{ $containerId }}', this)">
-              +More Fares
-            </button>
-            @endif
+              @if($fareCount > 3 && $loopIndex == 2)
+              <button class="btn p-1" style="border:1px solid #000;font-size: 11px;color: #ffffff;background: #000;padding: 4px 8px 3px !important;border-radius: 14px;position: absolute;right: 0;bottom: -10px;" onclick="toggleMoreFares('{{ $containerId }}', this)">+More Fares</button>
+              @endif
           </div>
-
-          {{-- <div class="col-md-2 text-center">
-                      @php
-                          $itineraryId = $priceItem['id'] ?? '';
-                          $fareIdentifier = $priceItem['fareIdentifier'] ?? '';
-                          $bookUrl = route('redirect.booking', [
-                              'itineraryId' => $itineraryId,
-                              'fareIdentifier' => $fareIdentifier
-                          ]);
-                      @endphp
-                      <a href="{{ $bookUrl }}" class="btn btn-sm w-100 text-white" style="background-color: orange;">Book</a>
-        </div> --}}
-      </div>
-
-      <div class="mt-3">
-        <button type="button" id="view" class="btn btn-sm" style="background-color: #f5f5f5; color: rgb(255, 138, 5)" onclick="toggleDetails(this)">
-          View Details +
-        </button>
-
-        <div class="flight-details-content mt-2" style="display: none;">
-          {{-- @include('partials.flightDetails', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceList[0] ?? []])
-                      @include('partials.fareDetails', ['uniqueId' => $uniqueId, 'results' => $results])
-                      @include('partials.fareRules', ['uniqueId' => $uniqueId])
-                      @include('partials.baggageInfo', ['uniqueId' => $uniqueId, 'price' => $segment['price'] ?? []]) --}}
+          @endforeach
         </div>
+
+        <div class="col-12">
+          <div class="flight-details-content mt-2 card" id="flight-details-content-{{ $uniqueId }}" style="display: none;">
+
+            <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
+              <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')"><small>Flight Details</small></li>
+              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')"><small>Fare Details</small></li>
+              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')"><small>Fare Rules <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="View Fare Rules"></i></small></li> <!-- Added "i" icon -->
+              <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')"><small>Baggage Info <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Baggage Allowance Info"></i></small></li> <!-- Added "i" icon -->
+            </ul>
+
+            <!-- Include your Details Tabs Here -->
+            {{-- @include('partials.flight-details-tab', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceData])
+                      @include('partials.fare-details-tab', ['results' => $results, 'uniqueId' => $uniqueId])
+                      @include('partials.fare-rules-tab', ['uniqueId' => $uniqueId])
+                      @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
+          </div>
+        </div>
+
       </div>
 
-      <br>
-      <span style="margin-left:20px; color: rgb(255, 138, 5); font-size:12px;">7 Seats Left</span>
     </div>
     @endforeach
     @endif
@@ -2387,12 +2368,16 @@
 </script>
 
 <script>
-  function toggleDetails(button) {
-    const content = button.nextElementSibling;
-    const isVisible = content.style.display === 'block';
+  // function toggleDetails(button) {
+  //   const content = button.nextElementSibling;
+  //   const isVisible = content.style.display === 'block';
 
-    content.style.display = isVisible ? 'none' : 'block';
-    button.textContent = isVisible ? 'View Details +' : 'Hide Details -';
+  //   content.style.display = isVisible ? 'none' : 'block';
+  //   button.textContent = isVisible ? 'View Details +' : 'Hide Details -';
+  // }
+
+  function toggleDetails(uniqueId) {
+    alert(uniqueId);
   }
 
   function closeDetails(closeBtn) {
