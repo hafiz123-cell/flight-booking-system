@@ -1366,7 +1366,7 @@
 
 
     <div class="row g-2">
-      <div class="col-md-6">
+      <div class="col-lg-6">
         <div class="d-flex">
           <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5>
           <p class="ms-2"> {{ $departureDate }}</p>
@@ -1517,7 +1517,7 @@
       @endforeach
       @endif
     </div>
-    <div class="col-md-6">
+    <div class="col-lg-6">
       @php
       $lastOnwardFlight = $returnFlights[0]['sI'][0] ?? null;
       $depCity = $lastOnwardFlight['da']['city'] ?? '';
