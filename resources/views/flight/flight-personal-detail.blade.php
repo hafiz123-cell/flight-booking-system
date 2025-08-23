@@ -703,214 +703,7 @@
     const passengerCounts = @json($passengerCounts);
   const baggageOptions = @json($baggageList); // Should contain [{ code: '15KG', amount: 8190 }, ...]
 </script>
-{{-- 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const cardsContainer = document.getElementById('cardsContainer');
 
-  if (!cardsContainer) {
-    console.error('cardsContainer not found in DOM.');
-    return;
-  }
-
- const passengerCounts = @json($passengerCounts);
-
-
-  const { adults = 1, children = 0, infants = 0 } = passengerCounts || {};
-  let passengerIndex = 0;
-
-  function createCard(type, index) {
-    const cardId = `travelerForm${passengerIndex}`;
-    const iconId = `toggleIcon${passengerIndex}`;
-    const headerNameId = `cardHeaderName${passengerIndex}`;
-    const isFirst = passengerIndex === 0;
-    const showClass = isFirst ? 'show' : '';
-    const iconClass = isFirst ? 'fa-chevron-up' : 'fa-chevron-down';
-
-    const infantDOBInput = type === 'INFANT' ? `
-      <div class="row mb-3">
-        <div class="col-md-4 col-lg-3">
-          <label class="form-label">Date of Birth</label>
-          <input type="date"
-                 class="form-control"
-                 name="passengers[${passengerIndex}][dob]"
-                 max="${new Date().toISOString().split('T')[0]}"
-                 required>
-        </div>
-      </div>
-    ` : '';
-
-    const cardHTML = `
-      <div class="card shadow-sm mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center"
-             data-bs-toggle="collapse"
-             data-bs-target="#${cardId}"
-             aria-expanded="${isFirst ? 'true' : 'false'}"
-             aria-controls="${cardId}">
-          <span id="${headerNameId}"><strong>${type} ${index}</strong></span>
-          <i class="fa-solid ${iconClass}" id="${iconId}"></i>
-        </div>
-        <div class="collapse ${showClass}" id="${cardId}">
-          <div class="card-body">
-            <div class="mb-3">
-             
-  <input type="search"
-         class="form-control traveller-search"
-         placeholder="Search travellers..."
-         autocomplete="off"
-         name="passenger_search_${passengerIndex}">
-  <div class="list-group search-results mt-2" style="position: absolute; z-index: 1000;"></div>
-            </div>
-            <div class="row mb-3 titles-row">
-              <div class="col-md-4 col-lg-3">
-                <label class="form-label">Title</label>
-                <select class="form-select" name="passengers[${passengerIndex}][title]">
-                  <option selected disabled value="">Title</option>
-                  <option>Mr</option>
-                  <option>Ms</option>
-                  <option>Mrs</option>
-                </select>
-              </div>
-
-              <div class="col-md-4 col-lg-3">
-                <label class="form-label">First Name</label>
-                <input type="text"
-                       class="form-control"
-                       name="passengers[${passengerIndex}][first_name]"
-                       required>
-              </div>
-
-              <div class="col-md-4 col-lg-3">
-                <label class="form-label">Last Name</label>
-                <input type="text"
-                       class="form-control"
-                       name="passengers[${passengerIndex}][last_name]"
-                       required>
-              </div>
-            </div>
-
-            ${infantDOBInput}
-
-            <div class="form-check mt-3">
-              <input class="form-check-input" type="checkbox" name="passengers[${passengerIndex}][save]" value="1" checked>
-              <label class="form-check-label">
-                <strong>Add this to My Travellers List</strong>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    cardsContainer.insertAdjacentHTML('beforeend', cardHTML);
-
-    const firstNameInput = document.querySelector(`input[name="passengers[${passengerIndex}][first_name]"]`);
-    const lastNameInput = document.querySelector(`input[name="passengers[${passengerIndex}][last_name]"]`);
-    const headerLabel = document.getElementById(headerNameId);
-
-    const updateHeader = () => {
-      const first = firstNameInput.value.trim();
-      const last = lastNameInput.value.trim();
-      const fullName = `${first} ${last}`.trim();
-      headerLabel.innerHTML = `<strong>${type} ${index}</strong>${fullName ? ' - ' + fullName : ''}`;
-    };
-
-    firstNameInput.addEventListener('input', () => {
-      firstNameInput.value = firstNameInput.value.toUpperCase();
-      updateHeader();
-    });
-
-    lastNameInput.addEventListener('input', () => {
-      lastNameInput.value = lastNameInput.value.toUpperCase();
-      updateHeader();
-    });
-
-    passengerIndex++;
-  }
-
-  // Generate all cards
-  for (let i = 1; i <= adults; i++) createCard('ADULT', i);
-  for (let i = 1; i <= children; i++) createCard('CHILD', i);
-  for (let i = 1; i <= infants; i++) createCard('INFANT', i);
-
-  // Collapse toggle icons
-  for (let i = 0; i < passengerIndex; i++) {
-    const collapseEl = document.getElementById(`travelerForm${i}`);
-    const iconEl = document.getElementById(`toggleIcon${i}`);
-    const collapseInstance = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
-
-    if (i !== 0) collapseInstance.hide();
-
-    collapseEl.addEventListener('show.bs.collapse', () => {
-      iconEl.classList.replace('fa-chevron-down', 'fa-chevron-up');
-    });
-
-    collapseEl.addEventListener('hide.bs.collapse', () => {
-      iconEl.classList.replace('fa-chevron-up', 'fa-chevron-down');
-    });
-  }
-
-  // Toggle all cards
-  const toggleSwitch = document.getElementById('toggleAllSwitch');
-  if (toggleSwitch) {
-    toggleSwitch.addEventListener('change', () => {
-      const turnOn = toggleSwitch.checked;
-      for (let i = 0; i < passengerIndex; i++) {
-        const collapseEl = document.getElementById(`travelerForm${i}`);
-        const instance = bootstrap.Collapse.getOrCreateInstance(collapseEl, { toggle: false });
-        turnOn ? instance.show() : instance.hide();
-      }
-    });
-  }
-
-  // Custom JS validation on form submit
- // Custom JS validation on form submit
-const form = document.getElementById('passengerForm');
-if (form) {
-  form.addEventListener('submit', (e) => {
-    let valid = true;
-
-    // Clear old validation
-    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-    form.querySelectorAll('.validation-msg').forEach(el => el.remove());
-
-    // Validate required fields
-    const requiredFields = form.querySelectorAll('input[required], select[required]');
-    requiredFields.forEach(input => {
-      if (!input.value.trim()) {
-        valid = false;
-
-        input.classList.add('is-invalid');
-
-        const error = document.createElement('div');
-        error.className = 'text-danger small validation-msg';
-        error.textContent = 'This field is required.';
-
-        input.parentElement.appendChild(error);
-
-        // 🆕 Remove error on input/change
-        const removeError = () => {
-          input.classList.remove('is-invalid');
-          const msg = input.parentElement.querySelector('.validation-msg');
-          if (msg) msg.remove();
-          input.removeEventListener('input', removeError);
-          input.removeEventListener('change', removeError);
-        };
-
-        input.addEventListener('input', removeError);
-        input.addEventListener('change', removeError);
-      }
-    });
-
-    if (!valid) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  });
-}
-
-});
-</script> --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const cardsContainer = document.getElementById('cardsContainer');
@@ -1165,7 +958,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const rawCounts = @json($passengerCounts);
   const baggageOptions = @json($baggageList);
-  const mealOptions = @json($mealList ?? []); // safe fallback
+  const mealOptions = @json($mealList ?? []); // only show meal if not empty
 
   // --- Normalize backend keys ---
   const normalizeKey = (key) => {
@@ -1220,8 +1013,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="col-md-9">
           <div class="d-flex gap-3">
 
-            <!-- Baggage (always full if no meal) -->
-            <div class="inner-col-datail ${mealOptions.length > 0 ? 'flex-fill' : 'w-100'}">
+            <!-- Baggage (always fixed width 100px) -->
+            <div class="inner-col-datail" style="width:40%;">
               ${showLabels ? '<label class="form-label">Baggage</label>' : ''}
               <select class="form-select baggage-select"
                       data-passenger="${globalPassengerIndex}"
@@ -1276,6 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
