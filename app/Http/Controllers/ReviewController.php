@@ -123,13 +123,14 @@ public function price(Request $request, $priceId)
 
 
 public function traveller_detail(Request $request)
-{
+{  
     $amount  = $request->input('amount');
     $priceId = $request->input('price_id');
 
     // Store the amount in session
     Session::put('payment_amount', $amount);
 
+    // ✅ Validation
     $validated = $request->validate([
         'passengers' => 'required|array',
         'passengers.*.type' => 'required|string|in:ADULT,CHILD,INFANT',
@@ -142,7 +143,9 @@ public function traveller_detail(Request $request)
 
         'passenger_services' => 'nullable|array',
         'passenger_services.*.baggage' => 'nullable|string',
+        'passenger_services.*.baggage_amount' => 'nullable|numeric',
         'passenger_services.*.meal' => 'nullable|string',
+        'passenger_services.*.meal_amount' => 'nullable|numeric',
 
         'country_code' => 'nullable|string',
         'mobile'       => 'nullable|string',
@@ -162,23 +165,30 @@ public function traveller_detail(Request $request)
         ($validated['gst_address_line1'] ?? '') . ' ' . ($validated['gst_address_line2'] ?? '')
     );
 
-    // Prepare passenger + service data
+    // ✅ Prepare passenger + service data
     $travellerData = [];
     $addToTraveller = false;
     $services = $validated['passenger_services'] ?? [];
 
     foreach ($validated['passengers'] as $index => $passenger) {
-        $service = $services[$index] ?? ['baggage' => null, 'meal' => null];
+        $service = $services[$index] ?? [
+            'baggage' => null,
+            'baggage_amount' => null,
+            'meal' => null,
+            'meal_amount' => null,
+        ];
 
         $passengerEntry = [
-            'title'      => $passenger['title'] ?? null,
-            'type'       => $passenger['type'],
-            'first_name' => $passenger['first_name'],
-            'last_name'  => $passenger['last_name'],
-            'dob'        => $passenger['dob'] ?? null,
-            'ff_number'  => $passenger['ff_number'] ?? null,
-            'baggage'    => $service['baggage'] ?? null,
-            'meal'       => $service['meal'] ?? null,
+            'title'           => $passenger['title'] ?? null,
+            'type'            => $passenger['type'],
+            'first_name'      => $passenger['first_name'],
+            'last_name'       => $passenger['last_name'],
+            'dob'             => $passenger['dob'] ?? null,
+            'ff_number'       => $passenger['ff_number'] ?? null,
+            'baggage'         => $service['baggage'] ?? null,
+            'baggage_amount'  => $service['baggage_amount'] ?? null,
+            'meal'            => $service['meal'] ?? null,
+            'meal_amount'     => $service['meal_amount'] ?? null,
         ];
 
         $travellerData[] = array_filter($passengerEntry, fn($value) => !is_null($value));
@@ -188,7 +198,7 @@ public function traveller_detail(Request $request)
         }
     }
 
-    // ✅ Store traveller data in session (not DB yet!)
+    // ✅ Store traveller data in session
     Session::put('traveller_data', [
         'price_id' => $priceId,
         'passenger_data' => $travellerData,
@@ -212,9 +222,9 @@ public function traveller_detail(Request $request)
 
 public function review_detail_add_flight(Request $request, $priceId)
 {
-    // Get trip data from session
+    // ✅ Get trip + traveller data from session
     $data = Session::get('trip_review_data');
-    $travellerData = Session::get('traveller_data'); // passengers stored earlier
+    $travellerData = Session::get('traveller_data');
 
     if (!$data || !isset($data['tripInfos'][0]['sI'][0])) {
         return response()->json(['message' => 'No flight data found in session'], 404);
@@ -222,16 +232,15 @@ public function review_detail_add_flight(Request $request, $priceId)
 
     $bookingId = $data['bookingId'] ?? null;
     $flight    = $data['tripInfos'][0]['sI'][0];
-
-    // Parse departure & arrival
     $departure = $flight['da'];
     $arrival   = $flight['aa'];
     $airline   = $flight['fD']['aI'];
+    $totalTaxes = $data['totalPriceInfo']['totalFareDetail']['fC']['TAF'] ?? 0;
 
-    // ✅ Save flight details
+    
     $flightDetail = FlightDetail::updateOrCreate(
         ['flight_id' => $flight['id']],
-        [
+        ['type'=>'Oneway',
             'booking_id'         => $bookingId,
             'flight_number'      => $flight['fD']['fN'],
             'equipment_type'     => $flight['fD']['eT'] ?? null,
@@ -262,14 +271,14 @@ public function review_detail_add_flight(Request $request, $priceId)
 
             'departure_time'     => Carbon::parse($flight['dt']),
             'arrival_time'       => Carbon::parse($flight['at']),
-
             'is_iand'            => $flight['iand'] ?? null,
             'is_rs'              => $flight['isRs'] ?? null,
             'segment_number'     => $flight['sN'] ?? 0,
+            'price'              => $totalTaxes ?? 0,
         ]
     );
 
-    // ✅ Save price details
+   
     if (!empty($data['totalPriceInfo']['totalFareDetail'])) {
         $price = $data['totalPriceInfo']['totalFareDetail']['fC'];
         $taxes = $data['totalPriceInfo']['totalFareDetail']['afC']['TAF'] ?? [];
@@ -286,7 +295,7 @@ public function review_detail_add_flight(Request $request, $priceId)
         );
     }
 
-    // ✅ Save fare rules
+    
     if (!empty($data['tripInfos'][0]['totalPriceList'][0]['fareRuleInformation']['tfr'])) {
         $fareRules = $data['tripInfos'][0]['totalPriceList'][0]['fareRuleInformation']['tfr'];
 
@@ -294,7 +303,7 @@ public function review_detail_add_flight(Request $request, $priceId)
             foreach ($rules as $rule) {
                 FlightFareRule::create([
                     'flight_detail_id' => $flightDetail->id,
-                    'type'=>'oneway',
+                    'type'             => 'oneway',
                     'rule_type'        => $ruleType,
                     'amount'           => $rule['amount'] ?? null,
                     'additional_fee'   => $rule['additionalFee'] ?? null,
@@ -307,28 +316,29 @@ public function review_detail_add_flight(Request $request, $priceId)
         }
     }
 
-    // ✅ Save traveller(s) AFTER flight is saved
+    
     if (!empty($travellerData)) {
         TravellerDetail::create([
-            'price_id' => $travellerData['price_id'],
-            'booking_id' => $bookingId,
-            'flight_detail_id' => $flightDetail->id, // ✅ correct FK
-            'passenger_data' => $travellerData['passenger_data'],
-            'add_to_traveller_list' => $travellerData['add_to_traveller_list'],
-            'country_code' => $travellerData['country_code'],
-            'mobile_number' => $travellerData['mobile_number'],
-            'email' => $travellerData['email'],
-            'gst_number' => $travellerData['gst_number'],
-            'company_name' => $travellerData['company_name'],
-            'company_email' => $travellerData['company_email'],
-            'company_phone' => $travellerData['company_phone'],
-            'company_address' => $travellerData['company_address'],
-            'save_gst_details' => $travellerData['save_gst_details'],
+            'price_id'             => $travellerData['price_id'],
+            'booking_id'           => $bookingId,
+            'flight_detail_id'     => $flightDetail->id,
+            'passenger_data'       => $travellerData['passenger_data'], // includes baggage + meal + amounts
+            'add_to_traveller_list'=> $travellerData['add_to_traveller_list'],
+            'country_code'         => $travellerData['country_code'],
+            'mobile_number'        => $travellerData['mobile_number'],
+            'email'                => $travellerData['email'],
+            'gst_number'           => $travellerData['gst_number'],
+            'company_name'         => $travellerData['company_name'],
+            'company_email'        => $travellerData['company_email'],
+            'company_phone'        => $travellerData['company_phone'],
+            'company_address'      => $travellerData['company_address'],
+            'save_gst_details'     => $travellerData['save_gst_details'],
         ]);
     }
 
     return redirect()->route('review_detail', ['priceId' => $priceId]);
 }
+
 
 
 public function review_detail(Request $request, $priceId)
@@ -347,6 +357,9 @@ public function review_detail(Request $request, $priceId)
     // Try to get price dynamically from trip data
    $amount = Session::get('payment_amount');
  // adjust key based on your actual structure
+ if (is_string($passengerDetails)) {
+    $passengerDetails = json_decode($passengerDetails, true);
+}
  
     Session::put('easebuzz_payment_data', [
         'passenger' => $passengerDetails,
@@ -371,44 +384,67 @@ $totalFare = $data['totalPriceInfo']['totalFareDetail']['fC']['TF'] ?? 0;
 
 public function payment(Request $request)
 {
-    $data   = Session::get('trip_review_data');
+    $data = Session::get('trip_review_data');
 
-    $passengerDetails = $detail->passenger_data ?? [];
+    // Fetch bookingId from session data
+    $bookingId = $data['bookingId'] ?? null;
+    $detail = TravellerDetail::where('booking_id', $bookingId)->first();
+
+    // Decode passenger_data properly
+    $passengerDetails = $detail && $detail->passenger_data 
+        ? (is_string($detail->passenger_data) ? json_decode($detail->passenger_data, true) : $detail->passenger_data) 
+        : [];
+
     $contactDetails = [
         'email'  => $detail->email ?? null,
         'mobile' => $detail->mobile_number ?? null,
     ];
 
-    // Get price dynamically
-    $amount = Session::get('payment_amount');
+    // ✅ Get fare details from trip data
+    $priceList   = $data['tripInfos'][0]['totalPriceList'][0]['fd'] ?? [];
+    $adultFare   = $priceList['ADULT']['fC'] ?? [];
+    $childFare   = $priceList['CHILD']['fC'] ?? [];
+    $infantFare  = $priceList['INFANT']['fC'] ?? [];
 
-    // ✅ Extract fare details from totalPriceList
-    $priceList = $data['tripInfos'][0]['totalPriceList'][0]['fd'] ?? [];
-
-    $adultFare = $priceList['ADULT']['fC'] ?? [];
-    $childFare = $priceList['CHILD']['fC'] ?? [];
-    $infantFare = $priceList['INFANT']['fC'] ?? [];
-
-    // ✅ Base Fares
-    $baseFare = ($adultFare['BF'] ?? 0) + ($childFare['BF'] ?? 0) + ($infantFare['BF'] ?? 0);
-
-    // ✅ Taxes
-    $taxAndFee = ($adultFare['TAF'] ?? 0) + ($childFare['TAF'] ?? 0) + ($infantFare['TAF'] ?? 0);
-
-    // ✅ Total Amount
+    // ✅ Base + Taxes from API
+    $baseFare    = ($adultFare['BF'] ?? 0) + ($childFare['BF'] ?? 0) + ($infantFare['BF'] ?? 0);
+    $taxAndFee   = ($adultFare['TAF'] ?? 0) + ($childFare['TAF'] ?? 0) + ($infantFare['TAF'] ?? 0);
     $amountToPay = ($adultFare['TF'] ?? 0) + ($childFare['TF'] ?? 0) + ($infantFare['TF'] ?? 0);
 
+    // ✅ Calculate baggage + meal separately
+    $baggageCharges = 0;
+    $mealCharges    = 0;
+
+    foreach ($passengerDetails as $p) {
+        if (!empty($p['baggage_amount'])) {
+            $baggageCharges += (float) $p['baggage_amount'];
+        }
+        if (!empty($p['meal_amount'])) {
+            $mealCharges += (float) $p['meal_amount'];
+        }
+    }
+
+    // ✅ Total extras
+    $extraCharges = $baggageCharges + $mealCharges;
+
+    // ✅ Final Payable
+    $finalAmount = $amountToPay + $extraCharges;
+
     return view('flight.payment', [
-        'tripData' => $data['tripInfos'] ?? [],
-        'amount' => $amount,
-        'bf' => $baseFare,
-        'tf' => $taxAndFee,
-        'atp' => $amountToPay,
+        'tripData'         => $data['tripInfos'] ?? [],
+        'baseFare'         => $baseFare,
+        'taxAndFee'        => $taxAndFee,
+        'amountToPay'      => $amountToPay,
+        'baggageCharges'   => $baggageCharges,
+        'mealCharges'      => $mealCharges,
+        'extraCharges'     => $extraCharges,   // combined
+        'finalAmount'      => $finalAmount,    // ✅ total payable
         'passengerDetails' => $passengerDetails,
-        'contactDetails' => $contactDetails,
-        'currentStep' => 4,
+        'contactDetails'   => $contactDetails,
+        'currentStep'      => 4,
     ]);
 }
+
 
 public function search(Request $request)
 {

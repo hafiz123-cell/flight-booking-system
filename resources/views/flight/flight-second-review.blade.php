@@ -221,7 +221,7 @@
                 </div>
             @endforeach
 
-             {{-- fare  detail --}}
+            
 {{-- Passenger Details --}}
 <div class="bg-white shadow-sm rounded p-3 mb-4 border">
     <h6 class="fw-bold mb-3">Passenger Details ({{ count($passengerDetails) }})</h6>
@@ -237,35 +237,45 @@
         </thead>
         <tbody>
             @foreach ($passengerDetails as $index => $passenger)
+                @php
+                    // passenger values
+                    $baggage = $passenger['baggage'] ?? null;
+                    $meal    = $passenger['meal'] ?? null;
+
+                    // flight city codes
+                    $firstTrip   = $tripData[0] ?? null;
+                    $flightList  = $firstTrip['sI'] ?? [];
+                    $firstFlight = $flightList[0] ?? null;
+                    $lastFlight  = end($flightList);
+
+                    $depcity = $firstFlight['da']['code'] ?? 'NA';
+                    $arrcity = $lastFlight['aa']['code'] ?? 'NA';
+                @endphp
+
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>
                         {{ strtoupper($passenger['title'] ?? '') }}
                         {{ strtoupper($passenger['first_name'] ?? '') }}
                         {{ strtoupper($passenger['last_name'] ?? '') }}
+
                         @if (!empty($passenger['dob']))
                             <br><small>{{ \Carbon\Carbon::parse($passenger['dob'])->format('d/m/Y') }}</small>
                         @endif
                     </td>
                     <td>NA</td>
-                    <td>
-                        @php
-                            $baggage = $passenger['baggage'] ?? 'NA';
-                            $meal = $passenger['meal'] ?? null;
-                        
-    $firstTrip = $tripData[0] ?? null;
-    $flightList = $firstTrip['sI'] ?? [];
-    $firstFlight = $flightList[0] ?? null;
-    $lastFlight = end($flightList);
+                    <td class="text-start">
+                        {{-- Baggage --}}
+                        @if($baggage)
+                            <i class="fas fa-suitcase-rolling me-1"></i> 
+                            {{ $depcity }} → {{ $arrcity }} +  {{ $baggage }}Kg Xcess Baggage
+                        @else
+                            <span class="text-muted">No extra baggage</span>
+                        @endif
 
-    $depcity = $firstFlight['da']['code'] ?? 'NA';
-    $arrcity = $lastFlight['aa']['code'] ?? 'NA';
-                        @endphp
-
-                         <i class="fas fa-suitcase-rolling me-1"></i>-{{ $depcity }} → {{ $arrcity }}
-        +{{ $baggage }} Xcess Baggage 
-                        @if ($meal)
-                            <br><small>Meal: {{ $meal }}</small>
+                        {{-- Meal --}}
+                        @if($meal)
+                            <br><i class="fas fa-utensils me-1"></i> Meal: {{ $meal }}
                         @endif
                     </td>
                 </tr>
@@ -276,17 +286,26 @@
     {{-- Contact Details --}}
     <div class="mt-3">
         <h6 class="fw-bold">Contact Details</h6>
-        <p class="mb-1">Email: <a href="mailto:{{ $contactDetails['email'] }}">{{ $contactDetails['email'] ?? 'NA' }}</a></p>
+        <p class="mb-1">
+            Email: 
+            @if(!empty($contactDetails['email']))
+                <a href="mailto:{{ $contactDetails['email'] }}">{{ $contactDetails['email'] }}</a>
+            @else
+                NA
+            @endif
+        </p>
         <p>Mobile: {{ $contactDetails['mobile'] ?? 'NA' }}</p>
     </div>
 
     <div class="form-check mt-2">
         <input class="form-check-input" type="checkbox" required id="agreeTerms">
         <label class="form-check-label small" for="agreeTerms">
-            By proceeding, I acknowledge and agree to the <a href="#">terms & conditions</a>.
+            By proceeding, I acknowledge and agree to the 
+            <a href="#">terms & conditions</a>.
         </label>
     </div>
 </div>
+
 
 {{-- ✅ Add content BELOW the bordered box --}}
 <div class="alert alert-info mt-3">
@@ -335,80 +354,107 @@
         {{-- Fare Summary --}}
         <div class="col-md-3">
          <h6 class="fw-bold mb-3">Fare Summary</h6>
-    @php
-        $fareType = $trip['totalPriceList'][0]['fareIdentifier'] ?? 'N/A';
-        $priceId = $trip['totalPriceList'][0]['id'] ?? 'N/A';
+   @php
+    $fareType = $trip['totalPriceList'][0]['fareIdentifier'] ?? 'N/A';
+    $priceId = $trip['totalPriceList'][0]['id'] ?? 'N/A';
 
-        $adultFareData = $trip['totalPriceList'][0]['fd']['ADULT'] ?? [];
-        $childFareData = $trip['totalPriceList'][0]['fd']['CHILD'] ?? [];
-        $fC = $adultFareData['fC'] ?? [];
-         $child_fc =  $childFareData['fC'] ?? [];
-        $afC_TAF = $adultFareData['afC']['TAF'] ?? [];
-        $afC_NCM = $adultFareData['afC']['NCM'] ?? [];
+    $adultFareData = $trip['totalPriceList'][0]['fd']['ADULT'] ?? [];
+    $childFareData = $trip['totalPriceList'][0]['fd']['CHILD'] ?? [];
+    $fC = $adultFareData['fC'] ?? [];
+    $child_fc = $childFareData['fC'] ?? [];
+    $afC_TAF = $adultFareData['afC']['TAF'] ?? [];
+    $afC_NCM = $adultFareData['afC']['NCM'] ?? [];
 
-        // Fare Components
-        $baseFare = $fC['BF'] ?? 0;
-       $child_fare = $fC['BF'] ?? 0;
-        $taxAndFee = $fC['TAF'] ?? 0;
-         $child_fee = $fC['TAF'] ?? 0;
-        // Tax Breakdown
-        $airlineGst = $afC_TAF['AGST'] ?? 0;
-        $mgmtFee = $afC_TAF['MF'] ?? 0;
-        $mgmtFeeTax = $afC_TAF['MFT'] ?? 0;
-        $otherTaxes = $afC_TAF['OT'] ?? 0;
-        $yrTax = $afC_TAF['YR'] ?? 0;
-        $ftcTax = $afC_TAF['FTC'] ?? 0;
+    // Fare Components
+    $baseFare = $fC['BF'] ?? 0;
+    $child_fare = $child_fc['BF'] ?? 0;
+    $taxAndFee = $fC['TAF'] ?? 0;
+    $child_fee = $child_fc['TAF'] ?? 0;
 
-        // Amounts
-        $amountToPay = $tf;
-        $commission = $trip['totalPriceList'][0]['commission'] ?? 0;
-        $tds = $afC_NCM['TDS'] ?? 0;
-        $netPrice = $amountToPay - $commission + $tds;
-    @endphp
+    // Tax Breakdown
+    $airlineGst = $afC_TAF['AGST'] ?? 0;
+    $mgmtFee = $afC_TAF['MF'] ?? 0;
+    $mgmtFeeTax = $afC_TAF['MFT'] ?? 0;
+    $otherTaxes = $afC_TAF['OT'] ?? 0;
+    $yrTax = $afC_TAF['YR'] ?? 0;
+    $ftcTax = $afC_TAF['FTC'] ?? 0;
 
-    <div class="bg-white shadow-sm rounded mb-4 border p-3">
-      
+    // Base amount
+    $amountToPay = $tf;
+    $commission = $trip['totalPriceList'][0]['commission'] ?? 0;
+    $tds = $afC_NCM['TDS'] ?? 0;
 
-        <ul class="list-unstyled small mb-2">
-            <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare + $child_fare, 2) }}</li>
-            <li>
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-                    <strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee + $child_fee, 2) }}
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="taxBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
-                        @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
-                        @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
-                        @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
-                        @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
-                        @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
-                    </ul>
-                </div>
-            </li>
-        </ul>
+    // ✅ Calculate baggage total from passengerDetails
+    $baggageTotal = 0;
+    foreach ($passengerDetails as $p) {
+        if (!empty($p['baggage_amount'])) {
+            $baggageTotal += (float) $p['baggage_amount'];
+        }
+    }
 
-        <hr>
+    // No meal in your current payload, so keep 0
+    $mealTotal = 0;
 
-        <ul class="list-unstyled small mb-2">
-            <li><strong>Total Amount:</strong> ₹{{ number_format($amountToPay, 2) }}</li>
+    $extrasTotal = $baggageTotal + $mealTotal;
 
-            <li class="mt-2">
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
-                    <strong>Amount Breakdown</strong>
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="amountBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        <li>Commission: -₹{{ number_format($commission, 2) }}</li>
-                        <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                        <li><strong>Net Price: ₹{{ number_format($netPrice, 2) }}</strong></li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-    </div>
+    // ✅ Net Price including baggage + meal
+    $netPrice = $amountToPay - $commission + $tds + $extrasTotal;
+@endphp
+<div class="bg-white shadow-sm rounded mb-4 border p-3">
+    <ul class="list-unstyled small mb-2">
+        <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare + $child_fare, 2) }}</li>
+        <li>
+            <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
+                <strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee + $child_fee, 2) }}
+                <i class="fa fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse mt-2" id="taxBreakdown">
+                <ul class="list-unstyled ms-3">
+                    @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
+                    @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
+                    @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
+                    @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
+                    @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
+                    @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
+                </ul>
+            </div>
+        </li>
+    </ul>
+
+    <ul class="list-unstyled small mb-2">
+        @if($baggageTotal)
+            <li><strong>Baggage Charges:</strong> ₹{{ number_format($baggageTotal, 2) }}</li>
+        @endif
+        @if($mealTotal)
+            <li><strong>Meal Charges:</strong> ₹{{ number_format($mealTotal, 2) }}</li>
+        @endif
+    </ul>
+
+    <hr>
+
+    <ul class="list-unstyled small mb-2">
+        <li><strong>Total Amount:</strong> ₹{{ number_format($amountToPay + $extrasTotal, 2) }}</li>
+
+        <li class="mt-2">
+            <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
+                <strong>Amount Breakdown</strong>
+                <i class="fa fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse mt-2" id="amountBreakdown">
+                <ul class="list-unstyled ms-3">
+                    <li>Commission: -₹{{ number_format($commission, 2) }}</li>
+                    <li>TDS: +₹{{ number_format($tds, 2) }}</li>
+                    @if($extrasTotal) 
+                        <li>Extras (Baggage + Meal): +₹{{ number_format($extrasTotal, 2) }}</li>
+                    @endif
+                    <li><strong>Net Price: ₹{{ number_format($netPrice, 2) }}</strong></li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
 </div>
         </div>
 

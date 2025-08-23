@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FlightFareRule;
 use App\Models\FlightPrice;
+use App\Models\FlightReturn;
 use App\Models\Payment;
 use App\Models\TravellerDetail;
 use Illuminate\Http\Request;
@@ -57,18 +58,19 @@ class EasebuzzController extends Controller
 public function success(Request $request)
 {
     $paymentData = $request->all();
-          
-    // Handle GET request without txnid (show thank-you page)
+
+    // ✅ Handle GET request without txnid (direct thank-you page)
     if ($request->isMethod('get') && empty($paymentData['txnid'])) {
         return view('thank-you', [
             'bookingId' => $request->query('bkId')
         ]);
     }
 
+    // ✅ Easebuzz credentials
     $merchantKey = config('services.easebuzz.key');
     $salt        = config('services.easebuzz.salt_key');
 
-    // Extract payment data fields safely
+    // ✅ Extract payment fields
     $status      = $paymentData['status'] ?? '';
     $email       = $paymentData['email'] ?? '';
     $firstname   = $paymentData['firstname'] ?? '';
@@ -76,7 +78,7 @@ public function success(Request $request)
     $amount      = $paymentData['amount'] ?? '';
     $txnid       = $paymentData['txnid'] ?? '';
 
-    // Verify hash to ensure data integrity
+    // ✅ Verify hash
     $hashString = $salt.'|'.$status.'|||||||||||'.$email.'|'.$firstname.'|'.$productinfo.'|'.$amount.'|'.$txnid.'|'.$merchantKey;
     $calculatedHash = strtolower(hash('sha512', $hashString));
 
@@ -84,7 +86,7 @@ public function success(Request $request)
         return response()->json(['error' => 'Hash verification failed'], 400);
     }
 
-    // Save payment record
+    // ✅ Save payment record
     Payment::create([
         'txnid'        => $txnid,
         'easepayid'    => $paymentData['easepayid'] ?? null,
@@ -97,13 +99,11 @@ public function success(Request $request)
         'raw_response' => json_encode($paymentData),
     ]);
 
-    // Retrieve booking IDs from session and request
-    $tripReviewData   = Session::get('trip_review_data', []);
-   
+    // ✅ Retrieve booking ID
+    $tripReviewData   = Session::get('trip_review_datas', []);
     $sessionBookingId = $tripReviewData['bookingId'] ?? null;
     $requestBookingId = $request->query('bkId');
 
-    // Determine bookingId safely
     if ($sessionBookingId && $sessionBookingId === $requestBookingId) {
         $bookingId = $sessionBookingId;
     } elseif (!$sessionBookingId && $requestBookingId) {
@@ -116,54 +116,54 @@ public function success(Request $request)
         ], 400);
     }
 
-    // Fetch traveller details from DB by booking ID
+    // ✅ Fetch traveller details
     $detail = TravellerDetail::where('booking_id', $bookingId)->first();
-      
+
     $passengers = [];
     if ($detail && !empty($detail->passenger_data)) {
-        // passenger_data is already an array thanks to $casts
-        $decoded = $detail->passenger_data;
-       
+        // Decode passenger_data safely
+        $decoded = is_string($detail->passenger_data)
+            ? json_decode($detail->passenger_data, true)
+            : ($detail->passenger_data ?? []);
+
+        if (!is_array($decoded)) {
+            $decoded = [];
+        }
+
+        // Pax type mapping
         $paxTypeMap = [
             'ADULT'  => 'ADULT',
             'CHILD'  => 'CHILD',
             'INFANT' => 'INFANT'
         ];
 
-      foreach ($decoded as $index => $p) {
-    // Use stored values, falling back if missing
-    $storedType = strtoupper($p['type'] ?? 'ADULT');
-    $storedTitle = $p['title'] ?? 'Mr';
-    // If type is CHILD and no dob in DB → set as 10 years old from today
-    if ($storedType === 'CHILD' && empty($p['dob'])) {
-        $storedDob = now()->subYears(10)->format('Y-m-d');
-    } else {
-        $storedDob = $p['dob'] ?? '1990-01-01';
-    }// default DOB if missing
+        foreach ($decoded as $p) {
+            $storedType  = strtoupper($p['type'] ?? 'ADULT');
+            $storedTitle = $p['title'] ?? 'Mr';
 
-    $paxTypeMap = [
-        'ADULT'  => 'ADULT',
-        'CHILD'  => 'CHILD',
-        'INFANT' => 'INFANT'
-    ];
-    $pt = $paxTypeMap[$storedType] ?? 'ADULT';
+            // ✅ Handle DOB logic
+            $storedDob = ($storedType === 'CHILD' && empty($p['dob']))
+                ? now()->subYears(10)->format('Y-m-d')
+                : ($p['dob'] ?? '1990-01-01');
 
-    $passengers[] = [
-        "ti"    => $storedTitle,
-        "fN"    => $p['first_name'] ?? '',
-        "lN"    => $p['last_name'] ?? '',
-        "pt"    => $pt,
-        "pan"   => $p['pan'] ?? 'ABCDE1234F',
-        "dob"   => $storedDob,
-        "pNat"  => $p['nationality'] ?? 'IN',
-        "pNum"  => $p['passport_no'] ?? '87UYITB',
-        "eD"    => $p['passport_expiry'] ?? '2030-08-09',
-        "pid"   => $p['pid'] ?? '2024-09-08',
-    ];
-}
+            $pt = $paxTypeMap[$storedType] ?? 'ADULT';
+
+            $passengers[] = [
+                "ti"    => $storedTitle,
+                "fN"    => $p['first_name'] ?? '',
+                "lN"    => $p['last_name'] ?? '',
+                "pt"    => $pt,
+                "pan"   => $p['pan'] ?? 'ABCDE1234F',
+                "dob"   => $storedDob,
+                "pNat"  => $p['nationality'] ?? 'IN',
+                "pNum"  => $p['passport_no'] ?? '87UYITB',
+                "eD"    => $p['passport_expiry'] ?? '2030-08-09',
+                "pid"   => $p['pid'] ?? '2024-09-08',
+            ];
+        }
     }
 
-    // Prepare booking payload for TripJack API
+    // ✅ Prepare booking payload for TripJack API
     $bookingPayload = [
         "bookingId" => $bookingId,
         "paymentInfos" => [
@@ -171,40 +171,40 @@ public function success(Request $request)
         ],
         "travellerInfo" => $passengers,
         "deliveryInfo" => [
-            "emails" => [$email],
+            "emails"   => [$email],
             "contacts" => [$paymentData['phone'] ?? '']
         ]
     ];
 
     try {
         $client = new Client();
- $mode = config('services.tripjack_token.mode'); // "test" or "live"
-$token = config("services.tripjack_token.$mode.token");
-$url = config("services.tripjack_token.$mode.url");
+        $mode   = config('services.tripjack_token.mode'); // "test" or "live"
+        $token  = config("services.tripjack_token.$mode.token");
+        $url    = config("services.tripjack_token.$mode.url");
 
-        $apiResponse = $client->post($url .'/oms/v1/air/book', [
+        $apiResponse = $client->post($url . '/oms/v1/air/book', [
             'headers' => [
                 'Content-Type' => 'application/json',
-                'apikey' => $token,
+                'apikey'       => $token,
             ],
             'json' => $bookingPayload
         ]);
-        $apiResult = json_decode($apiResponse->getBody(), true);
-       
-          Session::put('apiResult',$apiResult);
-          Session::put('paymentData',$paymentData);
-          
-          
 
-        return redirect()->route('easebuzz.final.pay',[
+        $apiResult = json_decode($apiResponse->getBody(), true);
+
+        // ✅ Save for later usage
+        Session::put('apiResult', $apiResult);
+        Session::put('paymentData', $paymentData);
+
+        return redirect()->route('easebuzz.final.pay', [
             'bookingId' => $bookingId,
         ]);
 
     } catch (\Exception $e) {
         return response()->json([
-            'error' => $e->getMessage(),
+            'error'       => $e->getMessage(),
             'paymentData' => $paymentData,
-            'bookingId' => $bookingId
+            'bookingId'   => $bookingId
         ], 500);
     }
 }
@@ -226,22 +226,28 @@ public function final_payment(Request $request)
       
     // Get all traveller details for this booking
     $travellerDetails = TravellerDetail::where('booking_id', $bookingId)->get();
-    
-
+  
+    // Get return flight details for each onward flight
+    $returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
 
     // Collect passenger details with from/to
     $passengerDetails = [];
     foreach ($travellerDetails as $traveller) {
-           $type = $flightDetails->first()->type ?? null;
+        $type = $flightDetails->first()->type ?? null;
 
+        $data = $traveller->passenger_data;
 
-        $data = $traveller->passenger_data; // already array due to casts
+        // ✅ Decode if still string
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+
         if (is_array($data)) {
             foreach ($data as &$p) {
                 $p['from'] = $flightDetails->first()->from_city ?? 'NA';
                 $p['to']   = $flightDetails->first()->to_city ?? 'NA';
+                $passengerDetails[] = $p;
             }
-            $passengerDetails = array_merge($passengerDetails, $data);
         }
     }
 
@@ -249,15 +255,16 @@ public function final_payment(Request $request)
     $flightDetailIds = $flightDetails->pluck('id')->toArray();
 
     // Fetch fare rules & prices for these flights
-    $fareRules = FlightFareRule::whereIn('flight_detail_id', $flightDetailIds)->get();
+    $fareRules    = FlightFareRule::whereIn('flight_detail_id', $flightDetailIds)->get();
     $priceDetails = FlightPrice::whereIn('flight_detail_id', $flightDetailIds)->get();
 
     return view('flight.payments_success', [
         'bookingId'        => $bookingId,
         'flightDetails'    => $flightDetails,
+        'returnFlight'     => $returnFlights,
         'passengerDetails' => $passengerDetails,
         'fareRules'        => $fareRules,
-        'type'=>$type,
+        'type'             => $type,
         'priceDetails'     => $priceDetails,
         'contactDetails'   => [
             'email'  => $travellerDetails->first()->email ?? null,
@@ -268,71 +275,106 @@ public function final_payment(Request $request)
     ]);
 }
 
+
 public function invoice($bookingId)
 {
     if (!$bookingId) {
         abort(404, 'Booking ID is missing');
     }
 
-    // Fetch flight details
+    // Fetch onward flight details
     $flightDetails = FlightDetail::where('booking_id', $bookingId)->get();
+    $type = $flightDetails->first()->type ?? null;
+    $baseOnwardPrice = $flightDetails->first()->price ?? 0; // base price from flight detail
 
-    // Fetch flight prices
-    $flightDetailIds = $flightDetails->pluck('id')->toArray();
-    $priceDetails = FlightPrice::whereIn('flight_detail_id', $flightDetailIds)->get()->keyBy('flight_detail_id');
-
-    // Attach price info to each flight individually
-    foreach ($flightDetails as $flight) {
-        $flightPrice = $priceDetails[$flight->id] ?? null;
-        $flight->base_fare  = $flightPrice->base_fare ?? 0;
-        $flight->total_fare = $flightPrice->total_fare ?? 0; 
-        $flight->net_fare   = $flightPrice->net_fare ?? 0;
-        $flight->taxes      = $flightPrice->total_taxes ?? 0;
-    }
+    // Fetch return flight details
+    $returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
+    $baseReturnPrice = $returnFlights->first()->price ?? 0; // base price from return flight
 
     // Fetch traveller details
     $travellerDetails = TravellerDetail::where('booking_id', $bookingId)->get();
 
-    // Prepare passengers with from/to
     $passengerDetails = [];
+    $adultMeal = $adultBaggage = $childMeal = $childBaggage = 0;
+
+    $firstOnwardSum = 0;
+    $firstReturnSum = 0;
+
+    // Prepare passengers and collect meal/baggage info
     foreach ($travellerDetails as $traveller) {
-        foreach ($traveller->passenger_data as $p) {
-            $p['from'] = $flightDetails->first()->from_city ?? 'NA';
-            $p['to']   = $flightDetails->first()->to_city ?? 'NA';
-            $passengerDetails[] = $p;
+        $data = $traveller->passenger_data;
+        if (is_string($data)) $data = json_decode($data, true);
+
+        if (is_array($data)) {
+            foreach ($data as &$p) {
+                $p['from'] = $flightDetails->first()->from_city ?? 'NA';
+                $p['to']   = $flightDetails->first()->to_city ?? 'NA';
+
+                if (!empty($p['flights'])) {
+                    foreach ($p['flights'] as $i => &$f) {
+                        $f['baggage'] = $f['baggage'] ?? 'NA';
+                        $f['baggage_amount'] = $f['baggage_amount'] ?? 0;
+                        $f['meal'] = $f['meal'] ?? 'NA';
+                        $f['meal_amount'] = $f['meal_amount'] ?? 0;
+
+                        // Aggregate adult/child totals globally
+                        if ($p['type'] === 'ADULT') {
+                            $adultBaggage += $f['baggage_amount'];
+                            $adultMeal    += $f['meal_amount'];
+                        } elseif ($p['type'] === 'CHILD') {
+                            $childBaggage += $f['baggage_amount'];
+                            $childMeal    += $f['meal_amount'];
+                        }
+
+                        // First onward flight sum
+                        if ($i === 0) {
+                            $firstOnwardSum += ($f['meal_amount'] ?? 0) + ($f['baggage_amount'] ?? 0);
+                        }
+
+                        // First return flight sum (after onward flights)
+                        if ($i === count($flightDetails)) {
+                            $firstReturnSum += ($f['meal_amount'] ?? 0) + ($f['baggage_amount'] ?? 0);
+                        }
+                    }
+                }
+
+                $passengerDetails[] = $p;
+            }
         }
     }
 
-    // Fare rules
-    $fareRules = FlightFareRule::whereIn('flight_detail_id', $flightDetailIds)->get();
-
-    // Contact details
-    $contactDetails = [
-        'email' => $travellerDetails->first()->email ?? null,
-        'mobile'=> $travellerDetails->first()->mobile_number ?? null,
-        'name'  => $travellerDetails->first()->name ?? null,
-    ];
-
-    // Calculate net price per flight
-    $netPrice = $flightDetails->sum(fn($flight) => $flight->total_fare ?? 0);
+    $onward= $baseOnwardPrice+$firstOnwardSum;
+    $returnFlight=$baseReturnPrice+$firstReturnSum;
+        
+    // Calculate net price (sum of all flights including addons)
+    $netPrice = $onward+$returnFlight;
 
     return view('flight.invoice', [
         'bookingId'        => $bookingId,
         'flightDetails'    => $flightDetails,
+        'returnFlights'    => $returnFlights,
         'passengerDetails' => $passengerDetails,
-        'fareRules'        => $fareRules,
-        'priceDetails'     => $priceDetails,
-        'contactDetails'   => $contactDetails,
         'netPrice'         => $netPrice,
+        'adultMeal'        => $adultMeal,
+        'adultBaggage'     => $adultBaggage,
+        'childMeal'        => $childMeal,
+        'childBaggage'     => $childBaggage,
+        'onward'=>$onward,
+        'returnFlight'=> $returnFlight,
+        'type'             => $type,
     ]);
 }
 
 
-    public function failure(Request $request)
-    {
-        return response()->json([
-            'message' => 'Payment Failed',
-            'data' => $request->all()
-        ]);
-    }
+   public function failure(Request $request)
+{
+    $data = $request->all();
+
+    return view('flight.payment_failure', [
+        'amount' => $data['amount'] ?? 0,
+        'txnid'  => $data['txnid'] ?? '',
+        'msg'    => $data['error_Message'] ?? 'Your payment could not be processed.',
+    ]);
+}
+
 }

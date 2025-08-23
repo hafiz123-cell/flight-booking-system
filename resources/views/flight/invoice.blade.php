@@ -30,14 +30,14 @@
         <h1>INVOICE</h1>
         <div class="invoice-details d-flex">
             <div class="d-flex flex-column">
-    Date: <b>{{ \Carbon\Carbon::now()->format('F d, Y') }}</b>
+                Date: <b>{{ \Carbon\Carbon::now()->format('F d, Y') }}</b>
             </div>
-    <br>
-    |
-     <div class="d-flex  flex-column ms-3">
-   Flight ID: <b>{{ $flightDetails->first()->id ?? 'N/A' }}</b>
-     </div>
-</div>
+            <br>
+            |
+            <div class="d-flex flex-column ms-3">
+                Flight ID: <b>{{ $flightDetails->first()->id ?? 'N/A' }}</b>
+            </div>
+        </div>
     </div>
 
     <div class="company-info d-flex justify-content-between">
@@ -51,7 +51,7 @@
             Booking ID: {{ $bookingId ?? 'N/A' }}<br>
             Status: Paid<br>
             Service: Flight<br>
-            Travel Type: One Way
+            Travel Type: {{ ucfirst(strtolower($type)) }}
         </div>
     </div>
 
@@ -59,42 +59,59 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Title</th>
-                <th>Airport From</th>
-                <th>Airport To</th>
+                <th>Airline</th>
+                <th>From</th>
+                <th>To</th>
                 <th>Departure Date</th>
                 <th>Duration</th>
-                <th>Price (Total Fare)</th>
+                <th>Total Fare (Including Meal & Baggage)</th>
             </tr>
         </thead>
         <tbody>
+            {{-- Onward Flights --}}
             @foreach($flightDetails as $index => $flight)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $flight->airline_name ?? 'N/A' }}</td>
                 <td>{{ $flight->departure_name ?? 'N/A' }} ({{ $flight->departure_city ?? 'N/A' }})</td>
                 <td>{{ $flight->arrival_name ?? 'N/A' }} ({{ $flight->arrival_city ?? 'N/A' }})</td>
-                <td>{{ \Carbon\Carbon::parse($flight->departure_time)->format('D, d M y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($flight->departure_time)->format('D, d M Y') }}</td>
                 <td>{{ number_format($flight->duration / 60, 2) }}h</td>
-                <td>₹ {{ number_format($flight->total_fare ?? 0, 0) }}</td>
+                <td>₹ {{ $onward ?? 0}}</td>
             </tr>
             @endforeach
+
+            {{-- Return Flights --}}
+            @if($returnFlights->isNotEmpty())
+                @foreach($returnFlights as $index => $return)
+                <tr>
+                    <td>{{ $flightDetails->count() + $index + 1 }}</td>
+                    <td>{{ $return->airline_name ?? 'N/A' }}</td>
+                    <td>{{ $return->departure_name ?? 'N/A' }} ({{ $return->departure_city ?? 'N/A' }})</td>
+                    <td>{{ $return->arrival_name ?? 'N/A' }} ({{ $return->arrival_city ?? 'N/A' }})</td>
+                    <td>{{ \Carbon\Carbon::parse($return->departure_time)->format('D, d M Y') }}</td>
+                    <td>{{ number_format($return->duration / 60, 2) }}h</td>
+                    <td>₹ {{  $returnFlight ?? 0}}</td>
+                </tr>
+                @endforeach
+            @endif
         </tbody>
     </table>
 
+    {{-- Totals --}}
     <div class="totals">
         <div>Net total: ₹ {{ number_format($netPrice ?? 0, 0) }}</div>
         <div>Total paid: ₹ {{ number_format($netPrice ?? 0, 0) }}</div>
         <div class="total-remaining">Total Remaining: ₹ 0</div>
     </div>
 
+    {{-- Billing Info --}}
     <div class="billing">
         <b>Billing to:</b>
-       Priya Konwar<br>
-admin@goflyhabibi.com<br>
-        07636939948
+        {{ $passengerDetails[0]['title'] ?? 'N/A' }} {{ $passengerDetails[0]['first_name'] ?? 'N/A' }} {{ $passengerDetails[0]['last_name'] ?? '' }}<br>
+        {{ $contactDetails['email'] ?? 'N/A' }}<br>
+        {{ $contactDetails['mobile'] ?? 'N/A' }}
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

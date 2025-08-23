@@ -184,43 +184,49 @@ $steps = [
       <div class="bg-white shadow-sm rounded mb-4 border p-3">
 
         <ul class="list-unstyled small mb-2">
-          <li><strong>Base Fare:</strong> ₹{{ number_format($bf, 2) }}</li>
-          <li>
-            <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-              <strong>Taxes & Fees:</strong> ₹{{ number_format($tf, 2) }}
-              <i class="fa fa-chevron-down float-end"></i>
-            </a>
-            <div class="collapse mt-2" id="taxBreakdown">
-              <ul class="list-unstyled ms-3">
-                @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
-                @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
-                @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
-                @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
-                @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
-                @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
-              </ul>
-            </div>
-          </li>
+
+            <li><strong>Base Fare:</strong> ₹{{ number_format($bf, 2) }}</li>
+            <li>
+                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
+                    <strong>Taxes & Fees:</strong> ₹{{ number_format($tf, 2) }}
+                    <i class="fa fa-chevron-down float-end"></i>
+                </a>
+                <div class="collapse mt-2" id="taxBreakdown">
+                    <ul class="list-unstyled ms-3">
+                        @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
+                        @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
+                        @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
+                        @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
+                        @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
+                        @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
+                    </ul>
+                </div>
+            </li>
+        
+{{-- Combined Total --}}
+<li><strong>Meal & Baggage Total:</strong> ₹{{ number_format($mealTotal + $baggageTotal, 2) }}</li>
+
         </ul>
 
         <hr>
 
         <ul class="list-unstyled small mb-2">
-          <li><strong>Total Amount:</strong> ₹{{ number_format($atp, 2) }}</li>
 
-          <li class="mt-2">
-            <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
-              <strong>Amount Breakdown</strong>
-              <i class="fa fa-chevron-down float-end"></i>
-            </a>
-            <div class="collapse mt-2" id="amountBreakdown">
-              <ul class="list-unstyled ms-3">
-                <li>Commission: -₹{{ number_format($commission, 2) }}</li>
-                <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                <li><strong>Net Price: ₹{{ number_format($atp, 2) }}</strong></li>
-              </ul>
-            </div>
-          </li>
+            <li><strong>Total Amount:</strong> ₹{{ number_format($grandTotal, 2) }}</li>
+
+            <li class="mt-2">
+                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
+                    <strong>Amount Breakdown</strong>
+                    <i class="fa fa-chevron-down float-end"></i>
+                </a>
+                <div class="collapse mt-2" id="amountBreakdown">
+                    <ul class="list-unstyled ms-3">
+                        <li>Commission: -₹{{ number_format($commission, 2) }}</li>
+                        <li>TDS: +₹{{ number_format($tds, 2) }}</li>
+                        <li><strong>Net Price: ₹{{ number_format($grandTotal, 2) }}</strong></li>
+                    </ul>
+                </div>
+            </li>
         </ul>
       </div>
     </div>

@@ -13,6 +13,7 @@ class FlightDetail extends Model
         'flight_id',
         'type',
         'flight_number',
+        'price',
         'equipment_type',
         'stops',
         'duration',

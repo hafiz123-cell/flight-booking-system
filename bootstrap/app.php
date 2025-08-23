@@ -14,7 +14,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
   ->withMiddleware(function (Middleware $middleware) {
     $middleware->validateCsrfTokens(except: [
-        'payment-success', // Disable CSRF for Easebuzz callback
+        'payment-success',
+         'payment-failure', // Disable CSRF for Easebuzz callback
     ]);
 })
 
