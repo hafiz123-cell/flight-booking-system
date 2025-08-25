@@ -60,6 +60,7 @@ return new class extends Migration
             $table->index('airline_code');
             $table->index('departure_code');
             $table->index('arrival_code');
+              $table->decimal('price', 12, 2);
         });
     }
 

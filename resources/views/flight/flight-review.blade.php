@@ -524,27 +524,29 @@
         }
     }
 </script>
-
 <script>
-    const SESSION_START_TIME = "{{ $sessionStartTime }}"; // "2025-08-05T15:54:39.486"
-    const SESSION_EXPIRY_SECONDS = {{ $sessionExpirySeconds }}; 
-     // Example: 1800
+    // Values passed from controller
+    const SESSION_EXPIRY_TIME   = "{{ $expiryTime ?? '' }}"; // exact expiry datetime (for reference)
+    const SESSION_REMAINING_SEC = {{ $remainingSeconds ?? 0 }}; // countdown in seconds
 </script>
-
 
 <script>
     window.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[id^="proceedBtn_"]').forEach(btn => {
             const index = btn.id.split('_')[1];
+
+            // Auto-confirm price once page loads
             autoConfirmPrice(index);
-            
-        // Start expiry timer dynamically
-        startExpiryTimer(SESSION_EXPIRY_SECONDS, 0);
+
+            // Start session expiry countdown timer (only if > 0)
+            if (SESSION_REMAINING_SEC > 0) {
+                startExpiryTimer(SESSION_REMAINING_SEC, index);
+            }
         });
     });
 
     function autoConfirmPrice(index) {
-        const priceId = document.getElementById('priceId_' + index).value;
+        const priceId      = document.getElementById('priceId_' + index).value;
         const initialPrice = parseFloat(document.getElementById('initialPrice_' + index).value);
 
         // Hide Proceed, Show Loading
@@ -564,64 +566,57 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'same') {
-                // Price is same, show Proceed button
-                document.getElementById('loadingBtn_' + index).classList.add('d-none');
-                document.getElementById('proceedBtn_' + index).classList.remove('d-none');
-            } else if (data.status === 'updated') {
+            if (data.status === 'updated') {
                 alert('The flight price has been updated to ₹' + data.newPrice + '. Please proceed.');
                 document.getElementById('initialPrice_' + index).value = data.newPrice;
-                document.getElementById('loadingBtn_' + index).classList.add('d-none');
-                document.getElementById('proceedBtn_' + index).classList.remove('d-none');
-            } else {
-                
-                document.getElementById('loadingBtn_' + index).classList.add('d-none');
-                document.getElementById('proceedBtn_' + index).classList.remove('d-none');
             }
+            toggleProceed(index, true);
         })
         .catch(error => {
             console.error('Price verification failed:', error);
-            document.getElementById('loadingBtn_' + index).classList.add('d-none');
-            document.getElementById('proceedBtn_' + index).classList.remove('d-none');
+            toggleProceed(index, true);
         });
     }
 
+    function toggleProceed(index, showProceed) {
+        document.getElementById('loadingBtn_' + index).classList.add('d-none');
+        if (showProceed) {
+            document.getElementById('proceedBtn_' + index).classList.remove('d-none');
+        }
+    }
+
     function confirmPrice(index) {
-        // You can reuse autoConfirmPrice for manual button click also
         autoConfirmPrice(index);
     }
 </script>
+
 <script>
-    let expiryTimerIntervalId = null;  // Global to keep track of interval
+    // keep separate intervals per index (in case of multiple fares)
+    const expiryIntervals = {};
 
     function startExpiryTimer(totalSeconds, index) {
-        const expiryBar = document.getElementById('expiryTimerBar');
+        const expiryBar   = document.getElementById('expiryTimerBar');
         const minutesSpan = document.getElementById('timerMinutes');
         const secondsSpan = document.getElementById('timerSeconds');
 
         if (!expiryBar || !minutesSpan || !secondsSpan) return;
 
         expiryBar.classList.remove('d-none');
+        let remainingSeconds = parseInt(totalSeconds, 10);
 
-        let remainingSeconds = totalSeconds;
-
-        // Immediately update UI before interval starts ticking
+        // Initial UI update
         updateTimerUI(remainingSeconds, minutesSpan, secondsSpan);
 
-        // Clear previous interval if any (prevent multiple intervals)
-        if (expiryTimerIntervalId) clearInterval(expiryTimerIntervalId);
+        if (expiryIntervals[index]) clearInterval(expiryIntervals[index]);
 
-        expiryTimerIntervalId = setInterval(() => {
+        expiryIntervals[index] = setInterval(() => {
             remainingSeconds--;
 
             if (remainingSeconds < 0) {
-                // console.log('working');
-                clearInterval(expiryTimerIntervalId);  // Stop the Timer
-
-                expiryBar.classList.add('d-none');     // Hide Timer Bar
-                document.getElementById('proceedBtn_' + index)?.setAttribute('disabled', true);  // Disable Proceed Button
-
-                showSessionExpiryModal();  // Show Expiry Modal
+                clearInterval(expiryIntervals[index]);
+                expiryBar.classList.add('d-none');
+                document.getElementById('proceedBtn_' + index)?.setAttribute('disabled', true);
+                showSessionExpiryModal();
                 return;
             }
 
@@ -637,22 +632,11 @@
         secondsSpan.innerText = seconds.toString().padStart(2, '0');
     }
 
-    function getElapsedMinutes(sessionStart) {
-        const startTime = new Date(sessionStart).getTime();
-        const currentTime = new Date().getTime();
-        const diffInMinutes = Math.floor((currentTime - startTime) / 60000);
-        return diffInMinutes;
-    }
-
     function showSessionExpiryModal() {
-        const elapsedMinutes = getElapsedMinutes(SESSION_START_TIME);
         document.querySelector('#sessionExpiryModal .modal-body').innerHTML =
-            `It has been over <strong>${elapsedMinutes} minutes</strong> since the price was last updated. Click on Continue to view the latest price and availability.`;
+            `Your session has expired. Please refresh to get the latest price and availability.`;
 
         const modal = new bootstrap.Modal(document.getElementById('sessionExpiryModal'));
         modal.show();
     }
 </script>
-
-
-

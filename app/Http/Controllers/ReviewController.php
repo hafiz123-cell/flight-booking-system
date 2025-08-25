@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Country;
 class ReviewController extends Controller
 {
-public function review(Request $request, $priceId)
+
+   public function review(Request $request, $priceId)
 {
     $fareIdentifier = $request->query('fT');
 
     // Load TripJack config
-    $mode = config('services.tripjack_token.mode'); // "test" or "live"
+    $mode  = config('services.tripjack_token.mode'); // "test" or "live"
     $token = config("services.tripjack_token.$mode.token");
     $url   = config("services.tripjack_token.$mode.url");
 
@@ -34,14 +35,29 @@ public function review(Request $request, $priceId)
     if ($response->successful()) {
         $data = $response->json();
 
-        // Extract session expiry (if available)
+        // Extract session expiry details
         $conditions = $data['conditions'] ?? [];
-        $st  = $conditions['st']  ?? null; // seconds
-        $sct = $conditions['sct'] ?? null; // timestamp
+        $st  = $conditions['st']  ?? null; // session validity in seconds
+        $sct = $conditions['sct'] ?? null; // session creation timestamp
 
-        $expiryTime = null;
+        $expiryTime       = null;
+        $remainingSeconds = 0;
+        $remainingMinutes = null;
+
         if ($st && $sct) {
-            $expiryTime = \Carbon\Carbon::parse($sct)->addSeconds($st);
+            // Expiry in UTC (raw calculation)
+            $expiryTimeUtc = \Carbon\Carbon::parse($sct, 'UTC')
+                ->addSeconds((int) $st);
+
+            // Remaining time in seconds (calculate in UTC)
+            $remainingSeconds = now('UTC')->diffInSeconds($expiryTimeUtc, false);
+
+            // Expiry time converted to app timezone for display
+            $expiryTime = $expiryTimeUtc->copy()
+                ->setTimezone(config('app.timezone'));
+
+            // Remaining minutes (round down)
+            $remainingMinutes = floor($remainingSeconds / 60);
         }
 
         // Save expiry time + response in session
@@ -49,27 +65,27 @@ public function review(Request $request, $priceId)
         Session::put('tripjack_expiry_time', $expiryTime);
 
         return view('flight.flight-review', [
-            'tripData'       => $data['tripInfos'] ?? [],
-            'data'           => $data,
-            'fareIdentifier' => $fareIdentifier,
-            'priceId1'       => $priceId,
-            'priceData'      => $data ?? [],
-            'expiryTime'     => $expiryTime, // directly available in view
-            'currentStep'    => 1,
+            'tripData'         => $data['tripInfos'] ?? [],
+            'data'             => $data,
+            'fareIdentifier'   => $fareIdentifier,
+            'priceId1'         => $priceId,
+            'priceData'        => $data ?? [],
+            'expiryTime'       => $expiryTime?->toDateTimeString(),
+            'remainingSeconds' => $remainingSeconds,   // ✅ correct now
+            'remainingMinutes' => $remainingMinutes,
+            'currentStep'      => 1,
         ]);
-
-    } else {
-        // Handle failure gracefully
-        $status     = $response->status();
-        $errorBody  = $response->json();
-        $errorMessage = $errorBody['message'] ?? ($errorBody['errors'][0]['message'] ?? 'Unknown error occurred while reviewing flight.');
-
-        return redirect()->back()
-            ->with('error', "TripJack Review API Failed: [HTTP $status] $errorMessage");
     }
+
+    // Handle failure gracefully
+    $status       = $response->status();
+    $errorBody    = $response->json();
+    $errorMessage = $errorBody['message']
+        ?? ($errorBody['errors'][0]['message'] ?? 'Unknown error occurred while reviewing flight.');
+
+    return redirect()->back()
+        ->with('error', "TripJack Review API Failed: [HTTP $status] $errorMessage");
 }
-
-
 
 public function reviewFlightPrice(Request $request)
 {

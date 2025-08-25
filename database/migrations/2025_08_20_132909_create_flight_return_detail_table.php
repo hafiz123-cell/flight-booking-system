@@ -58,7 +58,7 @@ return new class extends Migration
     $table->boolean('is_iand')->default(false);
     $table->boolean('is_rs')->default(false);
     $table->integer('segment_number')->default(0);
-
+       $table->decimal('price', 12, 2);  
     $table->timestamps();
 });
 
