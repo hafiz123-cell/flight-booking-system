@@ -109,8 +109,8 @@
     <div class="billing">
         <b>Billing to:</b>
         {{ $passengerDetails[0]['title'] ?? 'N/A' }} {{ $passengerDetails[0]['first_name'] ?? 'N/A' }} {{ $passengerDetails[0]['last_name'] ?? '' }}<br>
-        {{ $contactDetails['email'] ?? 'N/A' }}<br>
-        {{ $contactDetails['mobile'] ?? 'N/A' }}
+        adminGoFly@gmail.com<br>
+        03434333223
     </div>
 </div>
 

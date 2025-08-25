@@ -14,47 +14,78 @@ use Illuminate\Support\Facades\Session;
 use App\Models\Country;
 class ReviewController extends Controller
 {
- public function review(Request $request, $priceId)
-{  
-    $fareIdentifier = $request->query('fT');
- $mode = config('services.tripjack_token.mode'); // "test" or "live"
-$token = config("services.tripjack_token.$mode.token");
-$url = config("services.tripjack_token.$mode.url");
 
-    // Call the review API
+   public function review(Request $request, $priceId)
+{
+    $fareIdentifier = $request->query('fT');
+
+    // Load TripJack config
+    $mode  = config('services.tripjack_token.mode'); // "test" or "live"
+    $token = config("services.tripjack_token.$mode.token");
+    $url   = config("services.tripjack_token.$mode.url");
+
+    // Call the Review API
     $response = Http::withHeaders([
         'Content-Type' => 'application/json',
-        'apikey' => $token,
-    ])->post($url .'/fms/v1/review', [
+        'apikey'       => $token,
+    ])->post($url . '/fms/v1/review', [
         'priceIds' => [$priceId]
     ]);
-     
+
     if ($response->successful()) {
-          $data = $response->json();
-                
-          // Save the full response in session
+        $data = $response->json();
+
+        // Extract session expiry details
+        $conditions = $data['conditions'] ?? [];
+        $st  = $conditions['st']  ?? null; // session validity in seconds
+        $sct = $conditions['sct'] ?? null; // session creation timestamp
+
+        $expiryTime       = null;
+        $remainingSeconds = 0;
+        $remainingMinutes = null;
+
+        if ($st && $sct) {
+            // Expiry in UTC (raw calculation)
+            $expiryTimeUtc = \Carbon\Carbon::parse($sct, 'UTC')
+                ->addSeconds((int) $st);
+
+            // Remaining time in seconds (calculate in UTC)
+            $remainingSeconds = now('UTC')->diffInSeconds($expiryTimeUtc, false);
+
+            // Expiry time converted to app timezone for display
+            $expiryTime = $expiryTimeUtc->copy()
+                ->setTimezone(config('app.timezone'));
+
+            // Remaining minutes (round down)
+            $remainingMinutes = floor($remainingSeconds / 60);
+        }
+
+        // Save expiry time + response in session
         Session::put('trip_review_data', $data);
-           
+        Session::put('tripjack_expiry_time', $expiryTime);
+
         return view('flight.flight-review', [
-            'tripData' => $data['tripInfos'] ?? [],
-            'data'=>$data,
-            'fareIdentifier' => $fareIdentifier,
-            'priceId1' => $priceId,
-            'priceData' => $data ?? [],
-            'currentStep' => 1,
+            'tripData'         => $data['tripInfos'] ?? [],
+            'data'             => $data,
+            'fareIdentifier'   => $fareIdentifier,
+            'priceId1'         => $priceId,
+            'priceData'        => $data ?? [],
+            'expiryTime'       => $expiryTime?->toDateTimeString(),
+            'remainingSeconds' => $remainingSeconds,   // ✅ correct now
+            'remainingMinutes' => $remainingMinutes,
+            'currentStep'      => 1,
         ]);
-    } else {
-        // Handle failure gracefully
-        $status = $response->status();
-        $errorBody = $response->json();
-
-        $errorMessage = $errorBody['message'] ?? 'Unknown error occurred while reviewing flight.';
-        
-        // Redirect back with an error flash message
-        return redirect()->back()->with('error', "TripJack Review API Failed: [HTTP $status] $errorMessage");
     }
-}
 
+    // Handle failure gracefully
+    $status       = $response->status();
+    $errorBody    = $response->json();
+    $errorMessage = $errorBody['message']
+        ?? ($errorBody['errors'][0]['message'] ?? 'Unknown error occurred while reviewing flight.');
+
+    return redirect()->back()
+        ->with('error', "TripJack Review API Failed: [HTTP $status] $errorMessage");
+}
 
 public function reviewFlightPrice(Request $request)
 {
@@ -499,23 +530,45 @@ public function pay_link(Request $request)
     $detail = TravellerDetail::where('booking_id', $bookingId)->first();
    
     $data   = Session::get('trip_review_data');
-          
+     $passenger= $detail && $detail->passenger_data 
+        ? (is_string($detail->passenger_data) ? json_decode($detail->passenger_data, true) : $detail->passenger_data) 
+        : [];      
+
     $passengerDetails = $detail->passenger_data ?? [];
    
     $contactDetails = [
         'email'  => $detail->email ?? null,
         'mobile' => $detail->mobile_number ?? null,
     ];
-
-    // Try to get price dynamically from trip data
+        // Try to get price dynamically from trip data
    $amount = Session::get('payment_amount');
+     // ✅ Calculate baggage + meal separately
+    $baggageCharges = 0;
+    $mealCharges    = 0;
+
+    foreach ($passenger as $p) {
+        if (!empty($p['baggage_amount'])) {
+            $baggageCharges += (float) $p['baggage_amount'];
+        }
+        if (!empty($p['meal_amount'])) {
+            $mealCharges += (float) $p['meal_amount'];
+        }
+    }
+
+    // ✅ Total extras
+    $extraCharges = $baggageCharges + $mealCharges;
+
+    // ✅ Final Payable
+    $finalAmount = $amount + $extraCharges;
+
+  
  // adjust key based on your actual structure
 
     Session::put('easebuzz_payment_data', [
         'passenger' => $passengerDetails,
         'contact'   => $contactDetails,
         'price_id'  => $price,
-        'amount'    => $amount,
+        'amount'    => $finalAmount,
         'trip_info' => $data['tripInfos'] ?? [],
         'bookingId' => $data['bookingId'] ?? null,
 

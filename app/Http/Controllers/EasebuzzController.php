@@ -226,7 +226,7 @@ public function final_payment(Request $request)
       
     // Get all traveller details for this booking
     $travellerDetails = TravellerDetail::where('booking_id', $bookingId)->get();
-  
+ 
     // Get return flight details for each onward flight
     $returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
 
