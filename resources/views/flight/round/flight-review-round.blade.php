@@ -57,10 +57,11 @@ $steps = [
                 style="width: 40px; height: 40px; background-color: {{ $currentStep == $item['step'] ? '#f37321' : '#e0e0e0' }};">
                 <i class="fa {{ $item['icon'] }} text-white"></i>
             </div>
-            <div class="small text-uppercase"
+            <div class="small text-uppercase d-none d-sm-block"
                 style="color: {{ $currentStep == $item['step'] ? '#f37321' : '#888' }}">
-                <strong>{{ $item['step'] == 4 ? 'FINISH STEP' : 'STEP ' . $item['step'] }}</strong><br>
-                <span>{{ $item['label'] }}</span>
+                <strong>{{ $item['step'] == 4 ? 'FINISH STEP' : 'STEP ' . $item['step'] }}</strong>
+                <br>
+                <span class="d-none d-lg-block">{{ $item['label'] }}</span>
             </div>
         </div>
         @endforeach
@@ -72,7 +73,7 @@ $steps = [
 <div class="container my-4">
     <div class="row">
         {{-- Flight Details --}}
-        <div class="col-md-9">
+        <div class="col-xl-9">
             <h5 class="mb-3 fw-bold">Flight Details</h5>
 
             @php
@@ -180,14 +181,24 @@ $steps = [
 
                     <div class="col-12">
                         <div class="d-flex flex-column justify-content-start gap-3">
-                            <div class="d-flex justify-content-between gap-4">
-                                <div class="d-flex gap-0 flex-column">
-                                    <img src="{{ asset("AirlinesLogo/$airlineCode.png") }}" onerror="this.src='{{ asset("AirlinesLogo/default.png") }}'" class="img-fluid" style="max-height: 40px; max-width: 40px;">
-                                    <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
-                                    <small style="font-size: 11px; line-height: 1;">{{ $airlineCode }}-{{ $flightNumber }}-{{ $equipmentCode }}</small>
+                            <div class="d-flex flex-column flex-lg-row justify-content-start justify-content-lg-between gap-3 gap-lg-4">
+                                <div class="d-flex flex-row flex-lg-column gap-4 justify-content-between justify-content-lg-start">
+                                    <div class="d-flex gap-0 flex-column">
+                                        <img src="{{ asset("AirlinesLogo/$airlineCode.png") }}" onerror="this.src='{{ asset("AirlinesLogo/default.png") }}'" class="img-fluid" style="max-height: 40px; max-width: 40px;">
+                                        <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+                                        <small style="font-size: 11px; line-height: 1;">{{ $airlineCode }}-{{ $flightNumber }}-{{ $equipmentCode }}</small>
+                                    </div>
+                                    <div class="d-flex flex-column gap-2 align-items-end align-items-lg-start">
+                                        <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200; max-width: fit-content;">{{ ucfirst(strtolower($fareIdentifier)) }}</span>
+                                        <small class="text-muted" style="font-size: 11px; line-height: 1;">
+                                            <i class="fa fa-suitcase me-1" style="color:#000; padding:2px;"></i>
+                                            (Adult) Check-in: {{ $checkinBaggage }},
+                                            Cabin: {{ $cabinBaggage }}
+                                        </small>
+                                    </div>
                                 </div>
                                 <div class="d-flex justify-content-between gap-4">
-                                    <div class="d-flex gap-0 flex-column align-items-end">
+                                    <div class="d-flex gap-0 flex-column align-items-start align-items-sm-end">
                                         <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $depTime }}</h5>
                                         <small class="text-muted mt-1" style="font-size: 11px; line-height: 1;">{{ $depCity }}</small>
                                         <small class="text-muted mt-2" style="font-size: 11px; line-height: 1;">{{ $depAirport }}</small>
@@ -209,14 +220,7 @@ $steps = [
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column gap-2">
-                                <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200; max-width: fit-content;">{{ ucfirst(strtolower($fareIdentifier)) }}</span>
-                                <small class="text-muted" style="font-size: 11px; line-height: 1;">
-                                    <i class="fa fa-suitcase me-1" style="color:#000; padding:2px;"></i>
-                                    (Adult) Check-in: {{ $checkinBaggage }},
-                                    Cabin: {{ $cabinBaggage }}
-                                </small>
-                            </div>
+
                         </div>
                     </div>
 
@@ -230,12 +234,10 @@ $steps = [
                 @endphp
 
                 <div class="mt-2">
-                    <button class="btn btn-link text-decoration-none fw-bold p-2 mb-2" style="background-color: #f8f9fa; color:#f37321;"
-                        onclick="toggleDetails('fare_rules_container', this)">
-                        Fare Rules +
-                    </button>
+                    <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails('fare_rules_container', this)">Fare Rules +</button>
 
-                    <div id="fare_rules_container" class="d-none bg-light p-2 rounded">
+
+                    <div id="fare_rules_container" class="d-none bg-light p-2 rounded mt-2">
                         <div class="mt-3">
                             {{-- Outer tabs (DEL → BOM / BOM → DEL) --}}
                             <div class="d-flex justify-content-between p-2">
@@ -439,45 +441,45 @@ $steps = [
         $netPrice = $amountToPay - $commission + $tds;
         @endphp
 
-        <div class="col-md-3">
+        <div class="col-xl-3">
             <h6 class="fw-bold mb-3">Fare Summary</h6>
 
             <div class="bg-white shadow-sm rounded mb-4 border p-3">
                 <ul class="list-unstyled small mb-2">
-                    <li><strong>Total Base Fare:</strong> ₹{{ number_format($onwardBaseFare + $returnBaseFare, 2) }}</li>
-                    <li><strong>Total Taxes & Fees:</strong> ₹{{ number_format($onwardTaxes + $returnTaxes, 2) }}</li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Total Base Fare:</strong><span>₹{{ number_format($onwardBaseFare + $returnBaseFare, 2) }}</span></li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Total Taxes & Fees:</strong><span>₹{{ number_format($onwardTaxes + $returnTaxes, 2) }}</span></li>
 
                     <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-                        <strong>Detailed Tax Breakdown:</strong>
+                        <strong class="my-1 fw-semibold" style="font-size: 14px;">Detailed Tax Breakdown:</strong>
                         <i class="fa fa-chevron-down float-end"></i>
                     </a>
                     <div class="collapse mt-2" id="taxBreakdown">
                         <ul class="list-unstyled ms-3">
-                            @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
-                            @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
-                            @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
-                            @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
-                            @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
-                            @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
+                            @if($yrTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>YR Tax:</span><span>₹{{ number_format($yrTax, 2) }}</span></li> @endif
+                            @if($otherTaxes) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Other Taxes:</span><span>₹{{ number_format($otherTaxes, 2) }}</span></li> @endif
+                            @if($airlineGst) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Airline GST:</span> <span>₹{{ number_format($airlineGst, 2) }}</span></li> @endif
+                            @if($ftcTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>FTC:</span> <span>₹{{ number_format($ftcTax, 2) }}</span></li> @endif
+                            @if($mgmtFee) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Management Fee:</span> <span>₹{{ number_format($mgmtFee, 2) }}</span></li> @endif
+                            @if($mgmtFeeTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Mgmt Fee Tax:</span> <span>₹{{ number_format($mgmtFeeTax, 2) }}</span></li> @endif
                         </ul>
                     </div>
                 </ul>
 
-                <hr>
+                <div style="border-bottom:1px solid #f1f1f1; margin:10px;"></div>
 
                 <ul class="list-unstyled small mb-2">
-                    <li><strong>Total Amount:</strong> ₹{{ number_format($amountToPay, 2) }}</li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Total Amount:</strong><span>₹{{ number_format($amountToPay, 2) }}</span></li>
 
                     <li class="mt-2">
                         <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
-                            <strong>Amount Breakdown</strong>
+                            <strong class="my-1 fw-semibold" style="font-size: 14px;">Amount Breakdown</strong>
                             <i class="fa fa-chevron-down float-end"></i>
                         </a>
                         <div class="collapse mt-2" id="amountBreakdown">
                             <ul class="list-unstyled ms-3">
-                                <li>Commission: -₹{{ number_format($commission, 2) }}</li>
-                                <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                                <li><strong>Net Price: ₹{{ number_format($netPrice, 2) }}</strong></li>
+                                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Commission:</span> <span>-₹{{ number_format($commission, 2) }}</span></li>
+                                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>TDS:</span> <span>+₹{{ number_format($tds, 2) }}</span></li>
+                                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Net Price:</strong><strong>₹{{ number_format($netPrice, 2) }}</strong></li>
                             </ul>
                         </div>
                     </li>
