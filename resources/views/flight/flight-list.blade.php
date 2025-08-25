@@ -133,6 +133,43 @@
                       $stops[$stopCount]++;
                   }
               }
+          }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+              foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                  $flightList = $segment['sI'];
+                  $stopovers = [];
+                  foreach ($flightList as $leg) {
+                      if (($leg['sN'] ?? 0) === 1) {
+                          $stopovers[] = $leg['da'];
+                      }
+                  }
+                  $stopCount = count($stopovers);
+
+                  if (!isset($stops[$stopCount])) {
+                      $stops[$stopCount] = 1;
+                  } else {
+                      $stops[$stopCount]++;
+                  }
+              }
+          }elseif(isset($resultsMulticity['searchResult']['tripInfos'])){
+             foreach($resultsMulticity['searchResult']['tripInfos'] as $tripInfos) {
+              foreach($tripInfos as $segmentGroup){
+                foreach($segmentGroup as $segment)
+                  $flightList = $segment['sI'];
+                  $stopovers = [];
+                  foreach ($flightList as $leg) {
+                      if (($leg['sN'] ?? 0) === 1) {
+                          $stopovers[] = $leg['da'];
+                      }
+                  }
+                  $stopCount = count($stopovers);
+
+                  if (!isset($stops[$stopCount])) {
+                      $stops[$stopCount] = 1;
+                  } else {
+                      $stops[$stopCount]++;
+                  }
+              }
+            }
           }
         @endphp
 
@@ -150,28 +187,40 @@
 
       </div>
 
-@php
-    $allPrices = [];
-    foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment){
-        foreach(($segment['totalPriceList'] ?? []) as $priceItem){
-            $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      @php
+          $allPrices = [];
+          $globalMinPrice = 0;
+          $globalMaxPrice = 2000;
+        if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+          foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment){
+              foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+                  $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+              }
+          }
+          $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+          $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
+        }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+           foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment){
+              foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+                  $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+              }
+          }
+          $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+          $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
         }
-    }
-    $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
-    $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
-@endphp
+      @endphp
 
-<!-- price range -->
-<div class="sidebar-item">
-  <h3>Price Range (₹)</h3>
-  <div class="range-slider">
-    <div id="priceRange"></div>
-    <div class="d-flex justify-content-between mt-2">
-      <span class="min-value">{{ number_format($globalMinPrice) }} ₹</span>
-      <span class="max-value">{{ number_format($globalMaxPrice) }} ₹</span>
-    </div>
-  </div>
-</div>
+      <!-- price range -->
+      <div class="sidebar-item">
+        <h3>Price Range (₹)</h3>
+        <div class="range-slider">
+          <div id="priceRange"></div>
+          <div class="d-flex justify-content-between mt-2">
+            <span class="min-value">{{ number_format($globalMinPrice) }} ₹</span>
+            <span class="max-value">{{ number_format($globalMaxPrice) }} ₹</span>
+          </div>
+        </div>
+      </div>
 
 
       <!-- airlines -->
@@ -198,6 +247,25 @@
                               $airlines[$key]['count']++;
                           }
                       }
+                  }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+                  foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                                  $flightList = $segment['sI'];
+                                  $firstFlight = $flightList[0];
+                                  $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+                                  $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
+
+                                  $key = $airlineName . ' ' . $flightNumber;
+
+                                  if (!isset($airlines[$key])) {
+                                      $airlines[$key] = [
+                                          'name' => $airlineName,
+                                          'flight' => $flightNumber,
+                                          'count' => 1
+                                      ];
+                                  } else {
+                                      $airlines[$key]['count']++;
+                                  }
+                              }
                   }
               @endphp
          @foreach($airlines as $airline)
@@ -221,6 +289,20 @@
               $flightTypes = [];
               if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
                   foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                      $priceList = $segment['totalPriceList'] ?? [];
+                      foreach($priceList as $priceItem) {
+                          $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+                          $cabinClass = Str::title(strtolower($cabinClassRaw));
+
+                          if (!isset($flightTypes[$cabinClass])) {
+                              $flightTypes[$cabinClass] = 1;
+                          } else {
+                              $flightTypes[$cabinClass]++;
+                          }
+                      }
+                  }
+              }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+                 foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
                       $priceList = $segment['totalPriceList'] ?? [];
                       foreach($priceList as $priceItem) {
                           $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
@@ -789,9 +871,23 @@
     $priceList = $segment['totalPriceList'] ?? [];
 
     $uniqueId = 'segment_' . $index;
+         $allFares = [];
+        foreach ($priceList as $priceItem) {
+            $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+            $allFares[] = $farePrice;
+        }
+        $minFare = !empty($allFares) ? min($allFares) : 0;
+        $maxFare = !empty($allFares) ? max($allFares) : 0;
+        $fareString = implode(',', $allFares); // for data attribute
     @endphp
 
     <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white"
+    data-stops="{{ $stopCount }}"
+          data-airline="{{ $airlineName}}-{{$flightNumber }}"
+          data-type="{{ $cabinClass ?? '' }}"
+            data-prices="{{ $fareString }}"
+          data-min-price="{{ $minFare }}"
+          data-max-price="{{ $maxFare }}"
       >
       <div class="row align-items-center">
         <div class="col-md-2 text-center">
@@ -1641,7 +1737,7 @@
       @endphp
 
       {{-- Keep frontend from your flight-card or flight-multicity structure --}}
-      <div class="flight-multicity border rounded shadow-sm mb-4 p-3 bg-white">
+      <div class="flight-multicity border rounded shadow-sm mb-4 p-3 bg-white" data-stops="{{ $stopCount }}">
         <div class="row align-items-center border-bottom py-3">
           <div class="col-md-2 text-center">
             <div class="d-flex">
