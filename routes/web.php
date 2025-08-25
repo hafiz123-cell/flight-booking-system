@@ -12,6 +12,9 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
+use App\Http\Controllers\RoutingController;
+
+
 Route::get('/', function () {
     return view('flight.index-flights');
 })->name('home');
@@ -121,3 +124,4 @@ Route::get('/pay/link/round', [RoundReviewController::class, 'pay_link_round'])-
 Route::get('/contact', function () {
     return view('main.contact');
 })->name('contact');
+
