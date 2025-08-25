@@ -232,6 +232,7 @@
         </tr>
     </thead>
     <tbody>
+       
         @foreach ($passengerDetails as $index => $passenger)
             <tr>
                 <td>{{ $index + 1 }}</td>
@@ -254,9 +255,24 @@
     // Return flight codes (first flight in return collection)
     $returnFrom = $returnFlight->first()->departure_code ?? 'NA';
     $returnTo   = $returnFlight->last()->arrival_code ?? 'NA';
+    // Flight type (oneway / round / multi)
+    $flightType = $flightDetails->first()->type ?? 'NA';
 @endphp
 
+                 @if ($flightType === 'Oneway')
+    <div>
+        <strong>{{ $onwardFrom }} → {{ $onwardTo }}</strong><br>
+        <i class="fas fa-suitcase-rolling me-1"></i>
+        {{ $passenger['baggage'] ?? 'NA' }}Kg, with
+        @if (!empty($passenger['baggage_amount']))
+            ₹{{ $passenger['baggage_amount'] }}  price
+        @endif
+        @if (!empty($passenger['meal']))
+            <br><small>🍴 Meal: {{ $passenger['meal'] }}</small>
+        @endif
+    </div>
 
+@elseif(!empty($passenger['flights']))
                     @if (!empty($passenger['flights']))
                         {{-- Onward Flight (first flight) --}}
                         @if (!empty($passenger['flights'][0]))
@@ -296,6 +312,7 @@
                         @endif
                     @else
                         NA
+                    @endif
                     @endif
                 </td>
             </tr>

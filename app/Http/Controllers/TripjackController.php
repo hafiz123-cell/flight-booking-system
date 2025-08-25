@@ -11,7 +11,7 @@ class TripjackController extends Controller
 {
 
     public function search(Request $request)
-    {
+    {    
         $data = $request->all();
 
         // Manually remap values from one-way inputs
@@ -86,7 +86,7 @@ class TripjackController extends Controller
 
 
     public function searchRoundTrip(Request $request)
-    {
+    {   
         // Step 1: Validate the request
         $validated = $request->validate([
             'from_where'     => 'required|array|min:1',
