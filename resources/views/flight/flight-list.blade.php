@@ -110,297 +110,141 @@
       </button>
     </div>
     <div class="list-sidebar">
-      <div class="sidebar-item d-none">
-        <form class="filter-box">
-          <h3 class="white">Find The Places</h3>
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-group">
-                <label class="white">Your Destination</label>
-                <div class="input-box">
-                  <i class="flaticon-placeholder"></i>
-                  <select class="niceSelect">
-                    <option value="1">Where are you going?</option>
-                    <option value="2">Argentina</option>
-                    <option value="3">Belgium</option>
-                    <option value="4">Canada</option>
-                    <option value="5">Denmark</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6">
-              <div class="form-group">
-                <label class="white">Check In</label>
-                <div class="input-box">
-                  <i class="flaticon-calendar"></i>
-                  <input id="date-range0" type="text" placeholder="yyyy-mm-dd" />
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6">
-              <div class="form-group">
-                <label class="white">Check Out</label>
-                <div class="input-box">
-                  <i class="flaticon-calendar"></i>
-                  <input id="date-range1" type="text" placeholder="yyyy-mm-dd" />
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6">
-              <div class="form-group">
-                <label class="white">Adult</label>
-                <div class="input-box">
-                  <i class="flaticon-add-user"></i>
-                  <select class="niceSelect">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6">
-              <div class="form-group">
-                <label class="white">Children</label>
-                <div class="input-box">
-                  <i class="flaticon-add-user"></i>
-                  <select class="niceSelect">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-12">
-              <div class="form-group mar-top-15">
-                <a href="#" class="biz-btn">Search</a>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
 
       <!-- stops -->
       <div class="sidebar-item">
         <h3>Stops</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Non Stop</label>
+        @php
+          $stops = [];
+          if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+              foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                  $flightList = $segment['sI'];
+                  $stopovers = [];
+                  foreach ($flightList as $leg) {
+                      if (($leg['sN'] ?? 0) === 1) {
+                          $stopovers[] = $leg['da'];
+                      }
+                  }
+                  $stopCount = count($stopovers);
+
+                  if (!isset($stops[$stopCount])) {
+                      $stops[$stopCount] = 1;
+                  } else {
+                      $stops[$stopCount]++;
+                  }
+              }
+          }
+        @endphp
+
+        @foreach($stops as $count => $total)
+          <div class="pretty p-default p-thick p-pulse">
+            <input type="checkbox" value="{{ $count }}" class="filter-stop"/>
+            <div class="state">
+              <label>
+                {{ $count == 0 ? 'Non Stop' : $count . ' Stop' . ($count > 1 ? 's' : '') }}
+                <span class="number">{{ $total }}</span>
+              </label>
+            </div>
           </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>1 Stop</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>2 Stop</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>3 Stop</label>
-          </div>
-        </div>
+        @endforeach
+
       </div>
 
-      <!-- price range -->
-      <div class="sidebar-item">
-        <h3>Price Range($)</h3>
-        <div class="range-slider">
-          <div
-            data-min="0"
-            data-max="2000"
-            data-unit="$"
-            data-min-name="min_price"
-            data-max-name="max_price"
-            class="range-slider-ui ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"
-            aria-disabled="false">
-            <span class="min-value">0 $</span>
-            <span class="max-value">2000 $</span>
-            <div class="ui-slider-range ui-widget-header ui-corner-all full" style="left: 0%; width: 100%"></div>
-          </div>
-          <div class="clearfix"></div>
-        </div>
-      </div>
+@php
+    $allPrices = [];
+    foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment){
+        foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+            $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+        }
+    }
+    $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+    $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
+@endphp
+
+<!-- price range -->
+<div class="sidebar-item">
+  <h3>Price Range (₹)</h3>
+  <div class="range-slider">
+    <div id="priceRange"></div>
+    <div class="d-flex justify-content-between mt-2">
+      <span class="min-value">{{ number_format($globalMinPrice) }} ₹</span>
+      <span class="max-value">{{ number_format($globalMaxPrice) }} ₹</span>
+    </div>
+  </div>
+</div>
+
 
       <!-- airlines -->
       <div class="sidebar-item">
         <h3>Airlines</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Air Asia<span class="number">749</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Thai Airlines<span class="number">749</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Turkish Airlines<span class="number">749</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>United Airlines<span class="number">630</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Major Airlines<span class="number">58</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Dragon<span class="number">29</span></label>
-          </div>
-        </div>
-      </div>
+         @php
+            $airlines = [];
+                  if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+                      foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                          $flightList = $segment['sI'];
+                          $firstFlight = $flightList[0];
+                          $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+                          $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
 
-      <!-- categorys -->
-      <div class="sidebar-item d-none">
-        <h3>Categories</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>SEA TOURS (785)</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>ROMANTIC TOURS (125)</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>FOOD TOURS (85)</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>HONEYMOON TOURS (70)</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>MOUNTAIN TOURS (159)</label>
-          </div>
-        </div>
-      </div>
+                          $key = $airlineName . ' ' . $flightNumber;
 
-      <!-- faclities -->
-      <div class="sidebar-item d-none">
-        <h3>Facilities</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Snack With Drinks</label>
+                          if (!isset($airlines[$key])) {
+                              $airlines[$key] = [
+                                  'name' => $airlineName,
+                                  'flight' => $flightNumber,
+                                  'count' => 1
+                              ];
+                          } else {
+                              $airlines[$key]['count']++;
+                          }
+                      }
+                  }
+              @endphp
+         @foreach($airlines as $airline)
+          <div class="pretty p-default p-thick p-pulse">
+              <input type="checkbox" value="{{ $airline['name'] }}-{{ $airline['flight'] }}" class="filter-airline" />
+              <div class="state">
+                <label>
+                  {{ $airline['name'] }} ({{ $airline['flight'] }})
+                  <span class="number">{{ $airline['count'] }}</span>
+                </label>
+              </div>
+            </div>
+          @endforeach
           </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>High Class Dinner</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Online Gaming</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Seat Television</label>
-          </div>
-        </div>
-      </div>
+      
 
-      <!-- flight type -->
       <div class="sidebar-item">
-        <h3>Flight Type</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Business<span class="number">749</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>First Class<span class="number">630</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Economy<span class="number">58</span></label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Premium Economy<span class="number">29</span></label>
-          </div>
-        </div>
-      </div>
+          <h3>Flight Type</h3>
 
-      <!-- inflight experience -->
-      <div class="sidebar-item d-none">
-        <h3>Inflight Experience</h3>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Inflight Dining</label>
-          </div>
+          @php
+              $flightTypes = [];
+              if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+                  foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+                      $priceList = $segment['totalPriceList'] ?? [];
+                      foreach($priceList as $priceItem) {
+                          $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+                          $cabinClass = Str::title(strtolower($cabinClassRaw));
+
+                          if (!isset($flightTypes[$cabinClass])) {
+                              $flightTypes[$cabinClass] = 1;
+                          } else {
+                              $flightTypes[$cabinClass]++;
+                          }
+                      }
+                  }
+              }
+          @endphp
+
+          @foreach($flightTypes as $type => $count)
+            <div class="pretty p-default p-thick p-pulse">
+              <input type="checkbox" data-flighttype="{{ $type }}" class="filter-type" value="{{ $type }}"/>
+              <div class="state">
+                <label>{{ $type }} <span class="number">{{ $count }}</span></label>
+              </div>
+            </div>
+          @endforeach
         </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>Music</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" />
-          <div class="state">
-            <label>Sky Shopping</label>
-          </div>
-        </div>
-        <div class="pretty p-default p-thick p-pulse">
-          <input type="checkbox" checked />
-          <div class="state">
-            <label>Seat & Cabin</label>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -947,7 +791,8 @@
     $uniqueId = 'segment_' . $index;
     @endphp
 
-    <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white">
+    <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white"
+      >
       <div class="row align-items-center">
         <div class="col-md-2 text-center">
           <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 40px;">
@@ -1413,9 +1258,24 @@
 
         $priceList = $segment['totalPriceList'] ?? [];
         $uniqueId = 'segment_' . $index;
+        $allFares = [];
+        foreach ($priceList as $priceItem) {
+            $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+            $allFares[] = $farePrice;
+        }
+        $minFare = !empty($allFares) ? min($allFares) : 0;
+        $maxFare = !empty($allFares) ? max($allFares) : 0;
+        $fareString = implode(',', $allFares); // for data attribute
         @endphp
 
-        <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white">
+
+        <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white"
+          data-stops="{{ $stopCount }}"
+          data-airline="{{ $airlineName}}-{{$flightNumber }}"
+          data-type="{{ $cabinClass ?? '' }}"
+            data-prices="{{ $fareString }}"
+          data-min-price="{{ $minFare }}"
+          data-max-price="{{ $maxFare }}">
           <div class="row g-3 inner-flight-card">
 
             <div class="col-md-6 col-12">
@@ -1569,9 +1429,23 @@
 
       $priceList = $segment['totalPriceList'] ?? [];
       $uniqueId = 'return_segment_' . $index;
+      $allFares = [];
+      foreach ($priceList as $priceItem) {
+          $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+          $allFares[] = $farePrice;
+      }
+      $minFare = !empty($allFares) ? min($allFares) : 0;
+      $maxFare = !empty($allFares) ? max($allFares) : 0;
+      $fareString = implode(',', $allFares); // for data attribute
       @endphp
 
-      <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white">
+      <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white"
+        data-stops="{{ $stopCount }}"
+        data-airline="{{ $airlineName}}-{{$flightNumber }}"
+        data-type="{{ $cabinClass ?? '' }}"
+        data-prices="{{ $fareString }}"
+          data-min-price="{{ $minFare }}"
+          data-max-price="{{ $maxFare }}">
         <div class="row g-3 inner-flight-card">
           <div class="col-md-6 col-12">
             <div class="d-flex flex-column justify-content-start gap-3">
@@ -2233,6 +2107,84 @@
 </section>
 <!-- flight-list ends -->
 <script src="{{ asset('js/flight-list.js') }}"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filters = document.querySelectorAll(".filter-stop, .filter-airline, .filter-type");
+    const flightCards = document.querySelectorAll(".flight-card");
+
+    let selectedMinPrice = parseFloat(@json($globalMinPrice));
+    let selectedMaxPrice = parseFloat(@json($globalMaxPrice));
+
+    // ✅ Init jQuery UI slider
+    $("#priceRange").slider({
+        range: true,
+        min: selectedMinPrice,
+        max: selectedMaxPrice,
+        values: [selectedMinPrice, selectedMaxPrice],
+        slide: function (event, ui) {
+            selectedMinPrice = ui.values[0];
+            selectedMaxPrice = ui.values[1];
+
+            document.querySelector(".min-value").innerText = selectedMinPrice.toLocaleString() + " ₹";
+            document.querySelector(".max-value").innerText = selectedMaxPrice.toLocaleString() + " ₹";
+
+            applyFilters();
+        }
+    });
+
+    function applyFilters() {
+        const selectedStops = Array.from(document.querySelectorAll(".filter-stop:checked")).map(cb => cb.value.toLowerCase());
+        const selectedAirlines = Array.from(document.querySelectorAll(".filter-airline:checked")).map(cb => cb.value.toLowerCase());
+        const selectedTypes = Array.from(document.querySelectorAll(".filter-type:checked")).map(cb => cb.value.toLowerCase());
+
+        let anyVisible = false;
+
+        flightCards.forEach(card => {
+            const cardStops = card.getAttribute("data-stops") || "";
+            const cardAirline = card.getAttribute("data-airline")?.toLowerCase() || "";
+            const cardType = card.getAttribute("data-type")?.toLowerCase() || "";
+
+            const prices = (card.getAttribute("data-prices") || "")
+                            .split(",")
+                            .map(Number)
+                            .filter(p => !isNaN(p));
+            const priceMatch = prices.some(price => price >= selectedMinPrice && price <= selectedMaxPrice);
+
+            const stopMatch = selectedStops.length === 0 || selectedStops.includes(cardStops);
+            const airlineMatch = selectedAirlines.length === 0 || selectedAirlines.includes(cardAirline);
+            const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(cardType);
+
+            if (stopMatch && airlineMatch && typeMatch && priceMatch) {
+                card.style.display = "block";
+                anyVisible = true;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        let msg = document.getElementById("noResultsMsg");
+        if (!anyVisible) {
+            if (!msg) {
+                msg = document.createElement("div");
+                msg.id = "noResultsMsg";
+                msg.innerHTML = "<p class='text-center text-danger fw-bold mt-3'>No flights found.</p>";
+                document.querySelector(".flight-list .container").appendChild(msg);
+            }
+        } else {
+            if (msg) msg.remove();
+        }
+    }
+
+    filters.forEach(f => f.addEventListener("change", applyFilters));
+});
+
+
+</script>
+
+
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     const onwardFlights = @json($onwardFlights);
