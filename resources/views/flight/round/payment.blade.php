@@ -77,10 +77,10 @@ $steps = [
         style="width: 40px; height: 40px; background-color: {{ $currentStep == $item['step'] ? '#f37321' : '#e0e0e0' }};">
         <i class="fa {{ $item['icon'] }} text-white"></i>
       </div>
-      <div class="small text-uppercase"
+      <div class="small text-uppercase d-none d-sm-block"
         style="color: {{ $currentStep == $item['step'] ? '#f37321' : '#888' }}">
         <strong>{{ $item['step'] == 4 ? 'FINISH STEP' : 'STEP ' . $item['step'] }}</strong><br>
-        <span>{{ $item['label'] }}</span>
+        <span class="d-none d-md-block">{{ $item['label'] }}</span>
       </div>
     </div>
     @endforeach
@@ -92,19 +92,19 @@ $steps = [
 <div class="container my-4">
   <div class="row">
     {{-- Flight Details --}}
-    <div class="col-md-9">
+    <div class="col-xl-9">
       <h4>Payments</h4>
       <div class="row mt-3">
         <div class="col-md-3">
           <!-- Nav tabs -->
           <ul class="nav flex-column nav-pills admin-pills" id="paymentTabs" role="tablist" aria-orientation="vertical">
             <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="deposit-tab" data-bs-toggle="pill" data-bs-target="#deposit" type="button" role="tab" aria-controls="deposit" aria-selected="true">
+              <button class="btn btn-warning w-100" id="deposit-tab" data-bs-toggle="pill" data-bs-target="#deposit" type="button" role="tab" aria-controls="deposit" aria-selected="true">
                 <i class="bi bi-cash-stack me-2"></i> Deposit
               </button>
             </li>
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="netbanking-tab" data-bs-toggle="pill" data-bs-target="#netbanking" type="button" role="tab" aria-controls="netbanking" aria-selected="false">
+              <button class="btn btn-secondary w-100" id="netbanking-tab" data-bs-toggle="pill" data-bs-target="#netbanking" type="button" role="tab" aria-controls="netbanking" aria-selected="false">
                 <i class="bi bi-credit-card-2-front me-2"></i> Net-banking / Credit Card/ Debit Card
               </button>
             </li>
@@ -185,26 +185,29 @@ $steps = [
 
         <ul class="list-unstyled small mb-2">
 
-            <li><strong>Base Fare:</strong> ₹{{ number_format($bf, 2) }}</li>
-            <li>
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#taxBreakdown" role="button">
-                    <strong>Taxes & Fees:</strong> ₹{{ number_format($tf, 2) }}
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="taxBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        @if($yrTax) <li>YR Tax: ₹{{ number_format($yrTax, 2) }}</li> @endif
-                        @if($otherTaxes) <li>Other Taxes: ₹{{ number_format($otherTaxes, 2) }}</li> @endif
-                        @if($airlineGst) <li>Airline GST: ₹{{ number_format($airlineGst, 2) }}</li> @endif
-                        @if($ftcTax) <li>FTC: ₹{{ number_format($ftcTax, 2) }}</li> @endif
-                        @if($mgmtFee) <li>Management Fee: ₹{{ number_format($mgmtFee, 2) }}</li> @endif
-                        @if($mgmtFeeTax) <li>Mgmt Fee Tax: ₹{{ number_format($mgmtFeeTax, 2) }}</li> @endif
-                    </ul>
-                </div>
-            </li>
-        
-{{-- Combined Total --}}
-<li><strong>Meal & Baggage Total:</strong> ₹{{ number_format($mealTotal + $baggageTotal, 2) }}</li>
+          <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Base Fare:</strong> <span>₹{{ number_format($bf, 2) }}</span></li>
+          <li>
+            <a class="text-dark text-decoration-none d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;" data-bs-toggle="collapse" href="#amountBreakdown2" role="button">
+              <strong>Taxes & Fees:</strong>
+              <span>
+                ₹{{ number_format($tf, 2) }}
+                <i class="fa fa-chevron-down float-end"></i>
+              </span>
+            </a>
+            <div class="collapse mt-2" id="amountBreakdown2">
+              <ul class="list-unstyled ms-3">
+                @if($yrTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>YR Tax:</span> <span>₹{{ number_format($yrTax, 2) }}</span></li> @endif
+                @if($otherTaxes) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Other Taxes:</span> <span>₹{{ number_format($otherTaxes, 2) }}</span></li> @endif
+                @if($airlineGst) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Airline GST:</span> <span>₹{{ number_format($airlineGst, 2) }}</span></li> @endif
+                @if($ftcTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>FTC:</span> <span>₹{{ number_format($ftcTax, 2) }}</span></li> @endif
+                @if($mgmtFee) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Management Fee:</span> <span>₹{{ number_format($mgmtFee, 2) }}</span></li> @endif
+                @if($mgmtFeeTax) <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Mgmt Fee Tax:</span> <span>₹{{ number_format($mgmtFeeTax, 2) }}</span></li> @endif
+              </ul>
+            </div>
+          </li>
+
+          {{-- Combined Total --}}
+          <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Meal & Baggage Total:</strong> <span>₹{{ number_format($mealTotal + $baggageTotal, 2) }}</span></li>
 
         </ul>
 
@@ -212,21 +215,21 @@ $steps = [
 
         <ul class="list-unstyled small mb-2">
 
-            <li><strong>Total Amount:</strong> ₹{{ number_format($grandTotal, 2) }}</li>
+          <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Total Amount:</strong> <span>₹{{ number_format($grandTotal, 2) }}</span></li>
 
-            <li class="mt-2">
-                <a class="text-dark text-decoration-none" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
-                    <strong>Amount Breakdown</strong>
-                    <i class="fa fa-chevron-down float-end"></i>
-                </a>
-                <div class="collapse mt-2" id="amountBreakdown">
-                    <ul class="list-unstyled ms-3">
-                        <li>Commission: -₹{{ number_format($commission, 2) }}</li>
-                        <li>TDS: +₹{{ number_format($tds, 2) }}</li>
-                        <li><strong>Net Price: ₹{{ number_format($grandTotal, 2) }}</strong></li>
-                    </ul>
-                </div>
-            </li>
+          <li>
+            <a class="text-dark text-decoration-none d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;" data-bs-toggle="collapse" href="#amountBreakdown" role="button">
+              <strong>Amount Breakdown</strong>
+              <i class="fa fa-chevron-down float-end"></i>
+            </a>
+            <div class="collapse mt-2" id="amountBreakdown">
+              <ul class="list-unstyled ms-3">
+                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>Commission:</span> <span>-₹{{ number_format($commission, 2) }}</span></li>
+                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><span>TDS:</span> <span>+₹{{ number_format($tds, 2) }}</span></li>
+                <li class="text-muted mb-2 d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Net Price:</strong><strong class="my-1 fw-semibold" style="font-size: 14px;"> ₹{{ number_format($grandTotal, 2) }}</strong></li>
+              </ul>
+            </div>
+          </li>
         </ul>
       </div>
     </div>

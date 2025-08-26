@@ -340,8 +340,6 @@ $steps = [
                                 @endforeach
                         </div>
 
-
-
                     </div>
                 </div>
             </div>
@@ -370,13 +368,25 @@ $steps = [
                 @endforeach
 
                 <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn btn-border-none text-white" style="background-color:#f37321;">Back</button>
+                    <button type="button" class="btn btn-border-none text-white" style="background-color:#f37321;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevrons-left">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M11 7l-5 5l5 5" />
+                            <path d="M17 7l-5 5l5 5" />
+                        </svg>
+                        <span>Back</span>
+                    </button>
 
                     <button type="button"
                         id="proceedBtn"
                         class="btn btn-border-none text-white"
                         style="background-color:#f37321;">
-                        Proceed to Passenger Details >>
+                        <span>Proceed to Passenger Details</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-chevrons-right">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M7 7l5 5l-5 5" />
+                            <path d="M13 7l5 5l-5 5" />
+                        </svg>
                     </button>
 
                     <button id="loadingBtn"

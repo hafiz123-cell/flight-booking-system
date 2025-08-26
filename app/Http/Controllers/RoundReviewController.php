@@ -154,7 +154,7 @@ class RoundReviewController extends Controller
         // default empty array if nothing is in session
 
 
-        return view('flight.round.flight-personal-detail', [
+        return view('flight.round.flight-pfreview_detail_roundersonal-detail', [
             'tripData' => $data['tripInfos'] ?? [],
             'data' => $data,
             'selectedPriceIds' => $selectedPriceIds,
@@ -169,7 +169,8 @@ class RoundReviewController extends Controller
     }
 
     public function traveller_detail_round(Request $request)
-    {dd($request->all());
+    {
+        // dd($request->all());
         $amount   = $request->input('amount');
         $priceIds = $request->input('priceIds', []); // round trip = multiple priceIds
 
