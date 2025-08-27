@@ -35,9 +35,16 @@ Route::get('/test-env', function () {
     ]);
 });
 
+Route::get('/register/page/1', function () {
+    return view('user_login.register'); // Assuming this is your register view
+})->name('register.show.1'); // Use a unique name
+
 Route::get('/register/page', function () {
     return view('auth.register'); // Assuming this is your register view
 })->name('register.show'); // Use a unique name
+Route::get('/login/page/1', function () {
+    return view('user_login.login'); // Assuming this is your register view
+})->name('login.show1'); // Use a unique name
 
 
 Route::get('/contact', function () {
@@ -172,5 +179,5 @@ Route::group(['prefix' => '/', 'middleware' => 'auth'], function () {
     // Route::get('', [RoutingController::class, 'index'])->name('root');
     // Route::get('{first}/{second}/{third}', [RoutingController::class, 'thirdLevel'])->name('third');
     // Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])->name('second');
-    Route::get('{any}', [RoutingController::class, 'root'])->name('any');
+    // Route::get('{any}', [RoutingController::class, 'root'])->name('any');
 });
