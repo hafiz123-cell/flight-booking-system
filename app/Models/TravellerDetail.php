@@ -37,4 +37,10 @@ class TravellerDetail extends Model
         'save_gst_details' => 'boolean',
     ];
 
+    // 🔹 A traveller belongs to one booking
+   public function booking()
+{
+    return $this->hasOne(BookingList::class, 'traveller_detail_id');
+}
+
 }

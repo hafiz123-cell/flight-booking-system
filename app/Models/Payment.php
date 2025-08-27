@@ -17,5 +17,12 @@ class Payment extends Model
         'phone',
         'raw_response',
     ];
+
+    // 🔹 A payment belongs to one booking
+   public function booking()
+{
+    return $this->hasOne(BookingList::class, 'payment_id');
+}
+
 }
 

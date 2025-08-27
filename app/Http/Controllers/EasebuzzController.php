@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config;
 use GuzzleHttp\Client;
 use App\Models\FlightDetail;
+use App\Models\BookingList;
 
 class EasebuzzController extends Controller
 {
@@ -86,7 +87,7 @@ public function success(Request $request)
         return response()->json(['error' => 'Hash verification failed'], 400);
     }
 
-    // ✅ Save payment record
+    //  Save payment record
     Payment::create([
         'txnid'        => $txnid,
         'easepayid'    => $paymentData['easepayid'] ?? null,
@@ -99,7 +100,20 @@ public function success(Request $request)
         'raw_response' => json_encode($paymentData),
     ]);
 
-    // ✅ Retrieve booking ID
+    // ✅ Save payment record
+$payment = Payment::create([
+    'txnid'        => $txnid,
+    'easepayid'    => $paymentData['easepayid'] ?? null,
+    'status'       => $status, // "success" / "failed"
+    'amount'       => number_format($amount, 2, '.', ''),
+    'productinfo'  => $productinfo,
+    'firstname'    => $firstname,
+    'email'        => $email,
+    'phone'        => $paymentData['phone'] ?? null,
+    'raw_response' => json_encode($paymentData),
+]);
+      Session::put('payment', $payment);   
+    //  Retrieve booking ID
     $tripReviewData   = Session::get('trip_review_datas', []);
     $sessionBookingId = $tripReviewData['bookingId'] ?? null;
     $requestBookingId = $request->query('bkId');
@@ -116,7 +130,8 @@ public function success(Request $request)
         ], 400);
     }
 
-    // ✅ Fetch traveller details
+
+    //  Fetch traveller details
     $detail = TravellerDetail::where('booking_id', $bookingId)->first();
 
     $passengers = [];
@@ -223,13 +238,29 @@ public function final_payment(Request $request)
    
     // Get flight details for this booking
     $flightDetails = FlightDetail::where('booking_id', $bookingId)->get();
-      
+       $flightDetail= FlightDetail::where('booking_id', $bookingId)->first();
     // Get all traveller details for this booking
     $travellerDetails = TravellerDetail::where('booking_id', $bookingId)->get();
- 
-    // Get return flight details for each onward flight
+$payment     = Payment::where('raw_response', 'like', '%"bkId":"'.$bookingId.'"%')->first();
+$travellerDetail = TravellerDetail::where('booking_id', $bookingId)->first();
+// Make sure payment is found
+if (!$payment) {
+    return response()->json(['error' => 'Payment not found for bookingId '.$bookingId], 404);
+}
     $returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
+   
+$bookingStatus     = $payment->status === 'success' ? 'confirmed' : 'cancelled';
+$bookingPayStatus  = $payment->status === 'success' ? 'paid' : 'failed';
 
+//  Save booking
+$booking = BookingList::create([
+    'user_id'             => auth()->id()??38 , // or auth()->id() Session::get('user_id')
+    'flight_detail_id'    => $flightDetail['id'] ?? null,
+    'traveller_detail_id' => $travellerDetail['id'] ?? null,
+    'payment_id'          => $payment->id,
+    'status'              => $bookingStatus,    // dynamic
+    'payment_status'      => $bookingPayStatus, // dynamic
+]); 
     // Collect passenger details with from/to
     $passengerDetails = [];
     foreach ($travellerDetails as $traveller) {

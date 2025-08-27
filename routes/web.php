@@ -8,12 +8,14 @@ use App\Http\Controllers\TripjackController;
 use App\Models\Airport;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RoutingController;
 
+require __DIR__ . '/auth.php';
 
 Route::get('/', function () {
     return view('flight.index-flights');
@@ -49,8 +51,8 @@ Route::get('/login/page', function () {
 })->name('login.show'); // Use a unique name
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/logout', [AuthController::class, 'logout']);
+// Route::post('/login', [AuthController::class, 'login'])->name('login');
+// Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/gofly/search', [TripjackController::class, 'search'])->name('tripjack.search');
 Route::get('/gofly/search/roundtrip', [TripjackController::class, 'searchRoundTrip'])->name('flight.search.roundtrip');
 Route::get('/gofly/search/multicity', [TripjackController::class, 'searchMulticity'])->name('flight.search.multicity');
@@ -125,3 +127,43 @@ Route::get('/contact', function () {
     return view('main.contact');
 })->name('contact');
 
+
+//admin dashboard
+Route::get('gofly/admin_dashboard', function () {
+    return view('admin_dashboard.index');
+})->middleware('auth')->name('admin.index');
+ // optional, if you want to protect it
+
+Route::get('/user/data', [AdminController::class, 'getUserData'])
+    ->middleware('auth') // make sure only logged-in users can access
+    ->name('user.data');
+Route::get('/admin/users/{user}', [AdminController::class, 'show'])->name('admin.users.show');
+Route::get('/admin/users/{user}/edit', [AdminController::class, 'edit'])->name('admin.users.edit');
+Route::delete('/admin/users/{user}', [AdminController::class, 'destroy'])->name('admin.users.destroy');
+
+Route::get('/user/search', [AdminController::class, 'index'])->name('admin.users.index');
+ Route::get('/user/management', [AdminController::class, 'view'])->name('admin.user');
+
+Route::get('/user/{id}', [AdminController::class, 'show'])->name('admin.admin.view');
+Route::get('/user/{id}/edit', [AdminController::class, 'edit'])->name('admin.admin.edit');
+Route::put('/user/{id}', [AdminController::class, 'update'])->name('admin.users.update');
+Route::delete('/user/{id}', [AdminController::class, 'destroy'])->name('admin.admin.destroy');
+
+
+//booking
+
+
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}/edit', [BookingController::class, 'edit'])->name('bookings.edit');
+    Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
+});
+
+Route::get('/user/booking', [BookingController::class, 'index'])->name('admin.bookings.index');
+Route::group(['prefix' => '/', 'middleware' => 'auth'], function () {
+    // Route::get('', [RoutingController::class, 'index'])->name('root');
+    // Route::get('{first}/{second}/{third}', [RoutingController::class, 'thirdLevel'])->name('third');
+    // Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])->name('second');
+    Route::get('{any}', [RoutingController::class, 'root'])->name('any');
+});
