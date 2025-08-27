@@ -139,7 +139,7 @@ class TripjackController extends Controller
         $mode = config('services.tripjack_token.mode'); // "test" or "live"
         $token = config("services.tripjack_token.$mode.token");
         $url = config("services.tripjack_token.$mode.url");
-
+        dd($mode);
         // Send TripJack API request
         $response = Http::withHeaders([
             'apikey' => $token,

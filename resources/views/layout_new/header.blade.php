@@ -112,15 +112,18 @@
 
                         <li><a href="/flight"><i class="fa fa-plane"></i> Flights</a></li>
                         <li><a href="/search-hotels"><i class="fa fa-hotel"></i> Hotel</a></li>
-                        @auth
-                            <li>
-                                <a href="/user/profile"><i class="fa fa-user"></i> {{ Auth::user()->name }}</a>
-                            </li>
-                        @else
-                            <li>
-                                <a href="{{ route('register.show') }}"><i class="fa fa-user"></i> Login or Signup</a>
-                            </li>
-                        @endauth
+                       @auth
+    @if(Auth::user()->role === 'user')
+        <li>
+            <a href="/user/profile"><i class="fa fa-user"></i> {{ Auth::user()->name }}</a>
+        </li>
+    @endif
+@else
+    <li>
+        <a href="{{ route('register.show') }}"><i class="fa fa-user"></i> Login or Signup</a>
+    </li>
+@endauth
+
                     </ul>
                 </nav>
             </div>

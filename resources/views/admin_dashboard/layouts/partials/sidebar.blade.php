@@ -68,7 +68,15 @@
                    
                </li>
 
-             
+             <li class="nav-item">
+                    <a class="nav-link" href="{{route('config')}}" role="button">
+                         <span class="nav-icon">
+                              <iconify-icon icon="solar:chart-square-outline"></iconify-icon>
+                         </span> 
+                         <span class="nav-text">Configuration</span>
+                    </a>
+                   
+               </li>
 
                <li class="menu-title">UI Kit...</li>
 

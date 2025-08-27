@@ -12,27 +12,28 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('booking_list', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    // Which user made the booking
-    $table->unsignedBigInteger('user_id');
+            // Which user made the booking
+            $table->unsignedBigInteger('user_id');
 
-    // Foreign keys to related records
-    $table->unsignedBigInteger('flight_detail_id')->nullable();
-    $table->unsignedBigInteger('traveller_detail_id')->nullable();
-    $table->unsignedBigInteger('payment_id')->nullable();
+            // Foreign keys to related records
+            $table->unsignedBigInteger('flight_detail_id')->nullable();
+            $table->string('return_flight_detail_id')->nullable(); 
+            $table->unsignedBigInteger('traveller_detail_id')->nullable();
+            $table->unsignedBigInteger('payment_id')->nullable();
 
-    // Booking status
-    $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
-    $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
+            // Booking status
+            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
+            $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
 
-    $table->timestamps();
+            $table->timestamps();
 
-    // Relationships
-    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-    $table->foreign('flight_detail_id')->references('id')->on('flight_detail')->onDelete('set null');
-    $table->foreign('traveller_detail_id')->references('id')->on('traveller_detail')->onDelete('set null');
-    $table->foreign('payment_id')->references('id')->on('payments')->onDelete('set null');
+            // Relationships
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('flight_detail_id')->references('id')->on('flight_detail')->onDelete('set null');
+            $table->foreign('traveller_detail_id')->references('id')->on('traveller_detail')->onDelete('set null');
+            $table->foreign('payment_id')->references('id')->on('payments')->onDelete('set null');
         });
     }
 

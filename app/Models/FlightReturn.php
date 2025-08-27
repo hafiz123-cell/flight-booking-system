@@ -34,4 +34,6 @@ class FlightReturn extends Model
     {
         return $this->hasMany(TravellerDetail::class, 'flight_detail_id', 'id');
     }
+
+     
 }

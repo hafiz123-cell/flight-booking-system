@@ -54,34 +54,34 @@
 
 @section('content')
 @php
-    $sessionStartTime = $tripData['conditions']['sct'] ?? now()->toIso8601String();
-    $sessionExpirySeconds = $tripData['conditions']['st'] ?? 1800;
+$sessionStartTime = $tripData['conditions']['sct'] ?? now()->toIso8601String();
+$sessionExpirySeconds = $tripData['conditions']['st'] ?? 1800;
 @endphp
 
 @php
-    $steps = [
-        ['label' => 'Flight Itinerary', 'icon' => 'fa-plane', 'step' => 1],
-        ['label' => 'Passenger Details', 'icon' => 'fa-user', 'step' => 2],
-        ['label' => 'Review', 'icon' => 'fa-file-alt', 'step' => 3],
-        ['label' => 'Payments', 'icon' => 'fa-credit-card', 'step' => 4],
-    ];
+$steps = [
+['label' => 'Flight Itinerary', 'icon' => 'fa-plane', 'step' => 1],
+['label' => 'Passenger Details', 'icon' => 'fa-user', 'step' => 2],
+['label' => 'Review', 'icon' => 'fa-file-alt', 'step' => 3],
+['label' => 'Payments', 'icon' => 'fa-credit-card', 'step' => 4],
+];
 @endphp
 
 {{-- Stepper --}}
 <div class="bg-light py-3 border-bottom">
     <div class="container d-flex justify-content-between align-items-center">
         @foreach ($steps as $item)
-            <div class="text-center flex-fill position-relative">
-                <div class="rounded-circle mx-auto mb-1 d-flex align-items-center justify-content-center"
-                     style="width: 40px; height: 40px; background-color: {{ $currentStep == $item['step'] ? '#f37321' : '#e0e0e0' }};">
-                    <i class="fa {{ $item['icon'] }} text-white"></i>
-                </div>
-                <div class="small text-uppercase"
-                     style="color: {{ $currentStep == $item['step'] ? '#f37321' : '#888' }}">
-                    <strong>{{ $item['step'] == 4 ? 'FINISH STEP' : 'STEP ' . $item['step'] }}</strong><br>
-                    <span>{{ $item['label'] }}</span>
-                </div>
+        <div class="text-center flex-fill position-relative">
+            <div class="rounded-circle mx-auto mb-1 d-flex align-items-center justify-content-center"
+                style="width: 40px; height: 40px; background-color: {{ $currentStep == $item['step'] ? '#f37321' : '#e0e0e0' }};">
+                <i class="fa {{ $item['icon'] }} text-white"></i>
             </div>
+            <div class="small text-uppercase d-none d-sm-block"
+                style="color: {{ $currentStep == $item['step'] ? '#f37321' : '#888' }}">
+                <strong>{{ $item['step'] == 4 ? 'FINISH STEP' : 'STEP ' . $item['step'] }}</strong><br>
+                <span class='d-none d-md-block'>{{ $item['label'] }}</span>
+            </div>
+        </div>
         @endforeach
     </div>
 </div>
@@ -92,19 +92,19 @@
     <div class="row">
 
         {{-- Payments --}}
-        <div class="col-md-9">
+        <div class="col-xl-9">
             <h4>Payments</h4>
             <div class="row mt-3">
                 <div class="col-md-3">
                     <!-- Nav tabs -->
                     <ul class="nav flex-column nav-pills admin-pills" id="paymentTabs" role="tablist" aria-orientation="vertical">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="deposit-tab" data-bs-toggle="pill" data-bs-target="#deposit" type="button" role="tab" aria-controls="deposit" aria-selected="true">
+                            <button class="btn btn-warning w-100" id="deposit-tab" data-bs-toggle="pill" data-bs-target="#deposit" type="button" role="tab" aria-controls="deposit" aria-selected="true">
                                 <i class="bi bi-cash-stack me-2"></i> Deposit
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="netbanking-tab" data-bs-toggle="pill" data-bs-target="#netbanking" type="button" role="tab" aria-controls="netbanking" aria-selected="false">
+                            <button class="btn btn-secondary w-100" id="netbanking-tab" data-bs-toggle="pill" data-bs-target="#netbanking" type="button" role="tab" aria-controls="netbanking" aria-selected="false">
                                 <i class="bi bi-credit-card-2-front me-2"></i> Net-banking / Credit Card/ Debit Card
                             </button>
                         </li>
@@ -117,18 +117,18 @@
                             <div class="alert alert-warning d-flex align-items-center" role="alert">
                                 <i class="bi bi-credit-card me-2"></i>
                                 <div>
-                                    By placing this order, you agree to our 
-                                    <a href="#" class="text-decoration-underline">Terms Of Use</a> and 
+                                    By placing this order, you agree to our
+                                    <a href="#" class="text-decoration-underline">Terms Of Use</a> and
                                     <a href="#" class="text-decoration-underline">Privacy Policy</a>
                                 </div>
                             </div>
 
                             {{-- ✅ Pay Now Button with Final Amount --}}
-                            <a href="{{ route('pay_link') }}" 
-                                class="btn btn-border-none bg-warning text-white disabled-link" 
-                                id="payNowBtn" 
-                                aria-disabled="true" 
-                                tabindex="-1" 
+                            <a href="{{ route('pay_link') }}"
+                                class="btn btn-border-none bg-warning text-white disabled-link"
+                                id="payNowBtn"
+                                aria-disabled="true"
+                                tabindex="-1"
                                 style="pointer-events: none; opacity: 0.6;">
                                 Pay Now ₹{{ number_format($finalAmount, 2) }}
                             </a>
@@ -150,22 +150,22 @@
         </div>
 
         {{-- Fare Summary --}}
-        <div class="col-md-3">
+        <div class="col-xl-3">
             <h6 class="fw-bold mb-3">Fare Summary</h6>
             <div class="bg-white shadow-sm rounded mb-4 border p-3">
                 <ul class="list-unstyled small mb-2">
-                    <li><strong>Base Fare:</strong> ₹{{ number_format($baseFare, 2) }}</li>
-                    <li><strong>Taxes & Fees:</strong> ₹{{ number_format($taxAndFee, 2) }}</li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Base Fare:</strong> <span>₹{{ number_format($baseFare, 2) }}</span></li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Taxes & Fees:</strong> <span>₹{{ number_format($taxAndFee, 2) }}</span></li>
 
                     @if($extraCharges > 0)
-                        <li><strong>Extras (Meals + Baggage):</strong> ₹{{ number_format($extraCharges, 2) }}</li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Extras (Meals + Baggage):</strong> <span>₹{{ number_format($extraCharges, 2) }}</span></li>
                     @endif
                 </ul>
 
-                <hr>
+                <div style="border-bottom:1px solid #f1f1f1; margin:10px;"></div>
 
                 <ul class="list-unstyled small mb-2">
-                    <li><strong>Total Amount:</strong> ₹{{ number_format($finalAmount, 2) }}</li>
+                    <li class="text-muted d-flex justify-content-between gap-2" style="font-size: 13px; line-height: 1;"><strong class="my-1 fw-semibold" style="font-size: 14px;">Total Amount:</strong> <strong class="my-1 fw-semibold" style="font-size: 14px;">₹{{ number_format($finalAmount, 2) }}</strong></li>
                 </ul>
             </div>
         </div>
@@ -175,10 +175,10 @@
 {{-- Timer Bar --}}
 <div id="expiryTimerBar" class="d-none">
     <div class="expiry-content">
-        <i class="fa fa-clock me-2"></i> 
+        <i class="fa fa-clock me-2"></i>
         <span id="expiryTimerMessage">
-            Your Session will expire in 
-            <span id="timerMinutes">14</span> mins : 
+            Your Session will expire in
+            <span id="timerMinutes">14</span> mins :
             <span id="timerSeconds">59</span> secs
         </span>
     </div>
@@ -186,42 +186,42 @@
 
 {{-- Session Expiry Modal --}}
 <div class="modal fade" id="sessionExpiryModal" tabindex="-1" aria-labelledby="sessionExpiryModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="sessionExpiryModalLabel">Session Expired</h5>
-      </div>
-      <div class="modal-body"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='{{route('tripjack.search')}}'">Back to flight list</button>
-        <button type="button" class="btn btn-primary" onclick="window.location.reload();">Continue</button>
-      </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sessionExpiryModalLabel">Session Expired</h5>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='{{route('tripjack.search')}}'">Back to flight list</button>
+                <button type="button" class="btn btn-primary" onclick="window.location.reload();">Continue</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 @endsection
 
 {{-- ✅ Scripts for session expiry & terms --}}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const termsCheckbox = document.getElementById('termsCheck');
-    const payNowLink = document.getElementById('payNowBtn');
+    document.addEventListener('DOMContentLoaded', function() {
+        const termsCheckbox = document.getElementById('termsCheck');
+        const payNowLink = document.getElementById('payNowBtn');
 
-    termsCheckbox.addEventListener('change', function() {
-      if (this.checked) {
-        payNowLink.style.pointerEvents = 'auto';
-        payNowLink.style.opacity = '1';
-        payNowLink.setAttribute('aria-disabled', 'false');
-        payNowLink.removeAttribute('tabindex');
-        payNowLink.classList.remove('disabled-link');
-      } else {
-        payNowLink.style.pointerEvents = 'none';
-        payNowLink.style.opacity = '0.6';
-        payNowLink.setAttribute('aria-disabled', 'true');
-        payNowLink.setAttribute('tabindex', '-1');
-        payNowLink.classList.add('disabled-link');
-      }
+        termsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                payNowLink.style.pointerEvents = 'auto';
+                payNowLink.style.opacity = '1';
+                payNowLink.setAttribute('aria-disabled', 'false');
+                payNowLink.removeAttribute('tabindex');
+                payNowLink.classList.remove('disabled-link');
+            } else {
+                payNowLink.style.pointerEvents = 'none';
+                payNowLink.style.opacity = '0.6';
+                payNowLink.setAttribute('aria-disabled', 'true');
+                payNowLink.setAttribute('tabindex', '-1');
+                payNowLink.classList.add('disabled-link');
+            }
+        });
     });
-  });
 </script>

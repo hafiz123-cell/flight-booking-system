@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AirportController;
+use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\EasebuzzController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoundReviewController;
@@ -51,7 +52,7 @@ Route::get('/login/page', function () {
 })->name('login.show'); // Use a unique name
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-// Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login/page', [AuthController::class, 'loginUser'])->name('login_user_page');
 // Route::post('/logout', [AuthController::class, 'logout']);
 Route::get('/gofly/search', [TripjackController::class, 'search'])->name('tripjack.search');
 Route::get('/gofly/search/roundtrip', [TripjackController::class, 'searchRoundTrip'])->name('flight.search.roundtrip');
@@ -155,9 +156,15 @@ Route::delete('/user/{id}', [AdminController::class, 'destroy'])->name('admin.ad
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::get('/bookings/{booking}/edit', [BookingController::class, 'edit'])->name('bookings.edit');
-    Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
+   // Show the configuration page
+Route::get('config', [ConfigController::class, 'config'])->name('config');
+
+// Handle Live/Test switch
+Route::post('config/set-mode', [ConfigController::class, 'setMode'])->name('config.setMode');
+
+    // Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    // Route::get('/bookings/{booking}/edit', [BookingController::class, 'edit'])->name('bookings.edit');
+    // Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
 });
 
 Route::get('/user/booking', [BookingController::class, 'index'])->name('admin.bookings.index');

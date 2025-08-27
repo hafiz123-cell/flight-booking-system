@@ -15,6 +15,7 @@ class BookingList extends Model
         'user_id',
         'flight_detail_id',
         'traveller_detail_id',
+        'return_flight_detail_id', 
         'payment_id',
         'status',
         'payment_status',
@@ -37,6 +38,7 @@ class BookingList extends Model
     {
         return $this->belongsTo(FlightDetail::class, 'flight_detail_id');
     }
+
 
     // Traveller info for this booking
     public function travellerDetail()

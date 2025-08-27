@@ -32,18 +32,33 @@
                                             <p class="fw-semibold mb-0">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
                                             <small class="text-muted">
                                                 <strong>{{ Str::ucfirst($booking->flightDetail?->type ?? 'One way') }}</strong> · 
-                                                BookingID-{{ $booking->id ?? 'Tj123456' }}
+                                                BookingID-{{  $booking->flightDetail?->booking_id ?? 'Tj123456' }}
                                             </small>
                                         </div>
                                     </div>
                                     <h5 class="fw-bold mb-0">₹ {{ number_format($booking->payment?->amount ?? 0, 2) }}</h5>
-                                    <button class="btn btn-outline-warning btn-sm">Actions ▾</button>
+                                  <div class="dropdown">
+    <button class="btn btn-outline-warning btn-sm dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Actions
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="actionsDropdown">
+        <li>
+            <a class="dropdown-item" href="{{ route('invoice.show', $booking->flightDetail?->booking_id) }}">View Invoice</a>
+        </li>
+       
+    </ul>
+</div>
+
                                 </div>
 
                                 <!-- Flight Info -->
                                 <div class="row mt-4">
                                     <!-- From -->
+                                     @if ($booking->flightDetail?->type =='roundtrip')
+                                          <p class="text-muted mb-1">Depart:</p>
+                                        @endif
                                     <div class="col-md-4 col-lg-2 mb-3">
+                                       
                                         <p class="text-muted mb-1">From</p>
                                         <p class="fw-medium mb-0">
                                             {{ $booking->flightDetail?->departure_time ? \Carbon\Carbon::parse($booking->flightDetail->departure_time)->format('D, d M y H:i') : '' }}
@@ -59,6 +74,8 @@
                                         </p>
                                         <small class="text-muted">{{ $booking->flightDetail?->arrival_name ?? '' }}</small>
                                     </div>
+
+                                   
 
                                     <!-- Duration -->
                                     <div class="col-md-4 col-lg-2 mb-3">
@@ -81,98 +98,82 @@
 
                                     <!-- Ticket Number -->
                                     <div class="col-md-4 col-lg-2 mb-3">
-                                        <p class="text-muted mb-1">Ticket Number</p>
-                                        <p class="fw-medium mb-0">{{ $booking->ticket_number ?? '—' }}</p>
+                                        <p class="text-muted mb-1">User</p>
+                                        <p class="fw-medium mb-0">{{ $booking->payment?->firstname ?? '—' }}</p>
                                     </div>
 
                                     <!-- Status -->
                                     <div class="col-md-4 col-lg-2 mb-3">
                                         <p class="text-muted mb-1">Status</p>
-                                        <span class="badge {{ $booking->payment?->status == 'Paid' ? 'bg-success' : 'bg-warning text-dark' }}">
-                                            {{ $booking->payment?->status ?? 'Unpaid' }}
-                                        </span>
+                                        <span class="badge {{ $booking->payment?->status === 'success' ? ' bg-success fs-6 p-2 rounded-sm opacity-50 ' : 'bg-warning  fs-6 p-2 rounded-sm opacity-50' }}">
+    {{ $booking->payment?->status === 'success' ? 'Paid' : ($booking->payment?->status ?? 'Unpaid') }}
+</span>
                                     </div>
                                 </div>
+                              @if($returnFlights && $returnFlights->where('onward_flight_id', $booking->flight_detail_id)->count() > 0)
+    <p class="text-muted mb-1">Return:</p>
+    <div class="col-md-12 mb-3">
+        @foreach($returnFlights->where('onward_flight_id', $booking->flight_detail_id) as $rf)
+            <div class="row">
+                <!-- From -->
+                <div class="col-md-4 col-lg-2 mb-3">
+                    <p class="fw-medium mb-0">
+                        {{ \Carbon\Carbon::parse($rf->departure_time)->format('D, d M y H:i') }}
+                    </p>
+                    <small class="text-muted">{{ $rf->departure_name ?? '' }}</small>
+                </div>
+
+                <!-- To -->
+                <div class="col-md-4 col-lg-2 mb-3">
+                    <p class="fw-medium mb-0">
+                        {{ \Carbon\Carbon::parse($rf->arrival_time)->format('D, d M y H:i') }}
+                    </p>
+                    <small class="text-muted">{{ $rf->arrival_name ?? '' }}</small>
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endif
+
                             </div>
+                             <!-- Return Flight(s) -->
+                                  
                         </div>
                     @endforeach
+                    
                 </div>
                 <div class="mt-3">
                     {{ $bookings->links() }}
                 </div>
             </div>
 
-            <!-- Completed -->
-            <div class="tab-pane fade" id="completed">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Completed') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-success">Completed</span>
+            <!-- Other Tabs (Completed, Processing, Confirmed, Cancelled, Paid, Unpaid) -->
+            @foreach(['completed','processing','confirmed','cancelled','paid','unpaid'] as $statusTab)
+                <div class="tab-pane fade" id="{{ $statusTab }}">
+                    @foreach($bookings->filter(fn($b) => strtolower($b->payment?->status ?? '') === $statusTab) as $booking)
+                        <div class="card shadow-sm mb-3">
+                            <div class="card-body">
+                                <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
+                                @if($booking->returnFlights && $booking->returnFlights->count() > 0)
+                                    <div>
+                                        <small>Return Flight(s):</small>
+                                        @foreach($booking->returnFlights as $rf)
+                                            <p class="mb-0">{{ $rf->flight_number }}: {{ $rf->departure_name }} → {{ $rf->arrival_name }}</p>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                <span class="badge 
+                                    @if($statusTab==='paid') bg-success 
+                                    @elseif($statusTab==='unpaid') bg-warning text-dark
+                                    @elseif($statusTab==='cancelled') bg-danger
+                                    @elseif($statusTab==='confirmed') bg-primary
+                                    @elseif($statusTab==='processing') bg-info
+                                    @else bg-success @endif">{{ ucfirst($statusTab) }}</span>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Processing -->
-            <div class="tab-pane fade" id="processing">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Processing') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-info">Processing</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Confirmed -->
-            <div class="tab-pane fade" id="confirmed">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Confirmed') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-primary">Confirmed</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Cancelled -->
-            <div class="tab-pane fade" id="cancelled">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Cancelled') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-danger">Cancelled</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Paid -->
-            <div class="tab-pane fade" id="paid">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Paid') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-success">Paid</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <!-- Unpaid -->
-            <div class="tab-pane fade" id="unpaid">
-                @foreach($bookings->filter(fn($b) => $b->payment?->status === 'Unpaid') as $booking)
-                    <div class="card shadow-sm mb-3">
-                        <div class="card-body">
-                            <p class="fw-semibold">{{ $booking->flightDetail?->airline_name ?? 'Unknown Airline' }}</p>
-                            <span class="badge bg-warning text-dark">Unpaid</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @endforeach
 
         </div>
     </div>

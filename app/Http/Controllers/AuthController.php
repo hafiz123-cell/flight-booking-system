@@ -38,7 +38,7 @@ class AuthController extends Controller
         return view('auth.login'); // make sure you have a Blade view at resources/views/auth/login.blade.php
     }
 
-public function login(Request $request)
+public function loginUser(Request $request)
 {
     $credentials = $request->validate([
         'email_login' => 'required|email',

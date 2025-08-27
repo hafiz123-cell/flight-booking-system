@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FlightReturn;
 use Illuminate\Http\Request;
 use App\Models\BookingList;
+
 class BookingController extends Controller
 {
    public function index()
@@ -19,12 +21,16 @@ class BookingController extends Controller
         })
         ->latest()
         ->paginate(10); // <-- use paginate instead of get()
-
+ // Fetch return flight data
+    $returnFlightIds = $bookings->pluck('return_flight_detail_id')->filter(); // remove nulls
+    $returnFlights = FlightReturn::whereIn('id', $returnFlightIds)->get()->keyBy('id');
+    
     if(request()->ajax()) {
-        return view('admin_dashboard.booking.partials.table', compact('bookings'));
+        return view('admin_dashboard.booking.partials.table', compact('bookings', 'returnFlights'));
     }
 
-    return view('admin_dashboard.booking.index', compact('bookings'));
+    return view('admin_dashboard.booking.index', compact('bookings', 'returnFlights'));
 }
+
 
 }

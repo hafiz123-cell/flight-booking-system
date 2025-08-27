@@ -140,7 +140,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-outline-light btn-sm register-btn" href="#">
+            <a class="btn btn-outline-light btn-sm register-btn"  data-toggle="modal" data-target="#loginModal" href="#">
               Sign In / Register
             </a>
           </li>

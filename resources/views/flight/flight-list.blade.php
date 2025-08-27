@@ -115,103 +115,103 @@
       <div class="sidebar-item">
         <h3>Stops</h3>
         @php
-          $stops = [];
-            if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
-              foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                  $flightList = $segment['sI'];
-                  $stopovers = [];
-                  foreach ($flightList as $leg) {
-                      if (($leg['sN'] ?? 0) === 1) {
-                          $stopovers[] = $leg['da'];
-                      }
-                  }
-                  $stopCount = count($stopovers);
+        $stops = [];
+        if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+        foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $flightList = $segment['sI'];
+        $stopovers = [];
+        foreach ($flightList as $leg) {
+        if (($leg['sN'] ?? 0) === 1) {
+        $stopovers[] = $leg['da'];
+        }
+        }
+        $stopCount = count($stopovers);
 
-                  if (!isset($stops[$stopCount])) {
-                      $stops[$stopCount] = 1;
-                  } else {
-                      $stops[$stopCount]++;
-                  }
-              }
-            }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
-              foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                  $flightList = $segment['sI'];
-                  $stopovers = [];
-                  foreach ($flightList as $leg) {
-                      if (($leg['sN'] ?? 0) === 1) {
-                          $stopovers[] = $leg['da'];
-                      }
-                  }
-                  $stopCount = count($stopovers);
+        if (!isset($stops[$stopCount])) {
+        $stops[$stopCount] = 1;
+        } else {
+        $stops[$stopCount]++;
+        }
+        }
+        }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+        foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $flightList = $segment['sI'];
+        $stopovers = [];
+        foreach ($flightList as $leg) {
+        if (($leg['sN'] ?? 0) === 1) {
+        $stopovers[] = $leg['da'];
+        }
+        }
+        $stopCount = count($stopovers);
 
-                  if (!isset($stops[$stopCount])) {
-                      $stops[$stopCount] = 1;
-                  } else {
-                      $stops[$stopCount]++;
-                  }
-              }
-            } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
-               foreach ($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
-                foreach ($segmentGroup as $segment) {
-                    $flightList = $segment['sI'];
-                    $stopovers = [];
-                    foreach ($flightList as $leg) {
-                        if (($leg['sN'] ?? 0) === 1) {
-                            $stopovers[] = $leg['da'];
-                        }
-                    }
-                    $stopCount = count($stopovers);
-                    $stops[$stopCount] = ($stops[$stopCount] ?? 0) + 1;
-                }
-                }
-            }
+        if (!isset($stops[$stopCount])) {
+        $stops[$stopCount] = 1;
+        } else {
+        $stops[$stopCount]++;
+        }
+        }
+        } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
+        foreach ($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
+        foreach ($segmentGroup as $segment) {
+        $flightList = $segment['sI'];
+        $stopovers = [];
+        foreach ($flightList as $leg) {
+        if (($leg['sN'] ?? 0) === 1) {
+        $stopovers[] = $leg['da'];
+        }
+        }
+        $stopCount = count($stopovers);
+        $stops[$stopCount] = ($stops[$stopCount] ?? 0) + 1;
+        }
+        }
+        }
         @endphp
 
         @foreach($stops as $count => $total)
-          <div class="pretty p-default p-thick p-pulse">
-            <input type="checkbox" value="{{ $count }}" class="filter-stop"/>
-            <div class="state">
-              <label>
-                {{ $count == 0 ? 'Non Stop' : $count . ' Stop' . ($count > 1 ? 's' : '') }}
-                <span class="number">{{ $total }}</span>
-              </label>
-            </div>
+        <div class="pretty p-default p-thick p-pulse">
+          <input type="checkbox" value="{{ $count }}" class="filter-stop" />
+          <div class="state">
+            <label>
+              {{ $count == 0 ? 'Non Stop' : $count . ' Stop' . ($count > 1 ? 's' : '') }}
+              <span class="number">{{ $total }}</span>
+            </label>
           </div>
+        </div>
         @endforeach
 
       </div>
 
       @php
-          $allPrices = [];
-          $globalMinPrice = 0;
-          $globalMaxPrice = 2000;
-        if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
-          foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment){
-              foreach(($segment['totalPriceList'] ?? []) as $priceItem){
-                  $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-              }
-          }
-          $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
-          $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
-        }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
-           foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment){
-              foreach(($segment['totalPriceList'] ?? []) as $priceItem){
-                  $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-              }
-          }
-          $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
-          $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
-        } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
-            foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
-                foreach($segmentGroup as $segment) {
-                    foreach(($segment['totalPriceList'] ?? []) as $priceItem){
-                        $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-                    }
-                }
-            }
-            $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
-            $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
-        }
+      $allPrices = [];
+      $globalMinPrice = 0;
+      $globalMaxPrice = 2000;
+      if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+      foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment){
+      foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+      $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      }
+      }
+      $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+      $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
+      }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+      foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment){
+      foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+      $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      }
+      }
+      $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+      $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
+      } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
+      foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
+      foreach($segmentGroup as $segment) {
+      foreach(($segment['totalPriceList'] ?? []) as $priceItem){
+      $allPrices[] = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      }
+      }
+      }
+      $globalMinPrice = !empty($allPrices) ? min($allPrices) : 0;
+      $globalMaxPrice = !empty($allPrices) ? max($allPrices) : 0;
+      }
       @endphp
 
       <!-- price range -->
@@ -230,137 +230,137 @@
       <!-- airlines -->
       <div class="sidebar-item">
         <h3>Airlines</h3>
-         @php
-            $airlines = [];
-                  if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
-                      foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                          $flightList = $segment['sI'];
-                          $firstFlight = $flightList[0];
-                          $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
-                          $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
+        @php
+        $airlines = [];
+        if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+        foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $flightList = $segment['sI'];
+        $firstFlight = $flightList[0];
+        $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+        $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
 
-                          $key = $airlineName . ' ' . $flightNumber;
+        $key = $airlineName . ' ' . $flightNumber;
 
-                          if (!isset($airlines[$key])) {
-                              $airlines[$key] = [
-                                  'name' => $airlineName,
-                                  'flight' => $flightNumber,
-                                  'count' => 1
-                              ];
-                          } else {
-                              $airlines[$key]['count']++;
-                          }
-                      }
-                  }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
-                  foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                                  $flightList = $segment['sI'];
-                                  $firstFlight = $flightList[0];
-                                  $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
-                                  $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
+        if (!isset($airlines[$key])) {
+        $airlines[$key] = [
+        'name' => $airlineName,
+        'flight' => $flightNumber,
+        'count' => 1
+        ];
+        } else {
+        $airlines[$key]['count']++;
+        }
+        }
+        }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+        foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $flightList = $segment['sI'];
+        $firstFlight = $flightList[0];
+        $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+        $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
 
-                                  $key = $airlineName . ' ' . $flightNumber;
+        $key = $airlineName . ' ' . $flightNumber;
 
-                                  if (!isset($airlines[$key])) {
-                                      $airlines[$key] = [
-                                          'name' => $airlineName,
-                                          'flight' => $flightNumber,
-                                          'count' => 1
-                                      ];
-                                  } else {
-                                      $airlines[$key]['count']++;
-                                  }
-                              }
-                  } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
-                    foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
-                        foreach($segmentGroup as $segment) {
-                            $flightList = $segment['sI'];
-                            $firstFlight = $flightList[0];
-                            $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
-                            $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
-                            $key = $airlineName . ' ' . $flightNumber;
+        if (!isset($airlines[$key])) {
+        $airlines[$key] = [
+        'name' => $airlineName,
+        'flight' => $flightNumber,
+        'count' => 1
+        ];
+        } else {
+        $airlines[$key]['count']++;
+        }
+        }
+        } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
+        foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
+        foreach($segmentGroup as $segment) {
+        $flightList = $segment['sI'];
+        $firstFlight = $flightList[0];
+        $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+        $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
+        $key = $airlineName . ' ' . $flightNumber;
 
-                            if (!isset($airlines[$key])) {
-                                $airlines[$key] = [
-                                    'name' => $airlineName,
-                                    'flight' => $flightNumber,
-                                    'count' => 1
-                                ];
-                            } else {
-                                $airlines[$key]['count']++;
-                            }
-                        }
-                    }
-                }
-              @endphp
-         @foreach($airlines as $airline)
-          <div class="pretty p-default p-thick p-pulse">
-              <input type="checkbox" value="{{ $airline['name'] }}-{{ $airline['flight'] }}" class="filter-airline" />
-              <div class="state">
-                <label>
-                  {{ $airline['name'] }} ({{ $airline['flight'] }})
-                  <span class="number">{{ $airline['count'] }}</span>
-                </label>
-              </div>
-            </div>
-          @endforeach
+        if (!isset($airlines[$key])) {
+        $airlines[$key] = [
+        'name' => $airlineName,
+        'flight' => $flightNumber,
+        'count' => 1
+        ];
+        } else {
+        $airlines[$key]['count']++;
+        }
+        }
+        }
+        }
+        @endphp
+        @foreach($airlines as $airline)
+        <div class="pretty p-default p-thick p-pulse">
+          <input type="checkbox" value="{{ $airline['name'] }}-{{ $airline['flight'] }}" class="filter-airline" />
+          <div class="state">
+            <label>
+              {{ $airline['name'] }} ({{ $airline['flight'] }})
+              <span class="number">{{ $airline['count'] }}</span>
+            </label>
           </div>
+        </div>
+        @endforeach
+      </div>
 
 
       <div class="sidebar-item">
-          <h3>Flight Type</h3>
+        <h3>Flight Type</h3>
 
-          @php
-              $flightTypes = [];
-              if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
-                  foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                      $priceList = $segment['totalPriceList'] ?? [];
-                      foreach($priceList as $priceItem) {
-                          $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
-                          $cabinClass = Str::title(strtolower($cabinClassRaw));
+        @php
+        $flightTypes = [];
+        if(isset($resultsRound['searchResult']['tripInfos']['ONWARD'])) {
+        foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $priceList = $segment['totalPriceList'] ?? [];
+        foreach($priceList as $priceItem) {
+        $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+        $cabinClass = Str::title(strtolower($cabinClassRaw));
 
-                          if (!isset($flightTypes[$cabinClass])) {
-                              $flightTypes[$cabinClass] = 1;
-                          } else {
-                              $flightTypes[$cabinClass]++;
-                          }
-                      }
-                  }
-              }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
-                 foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
-                      $priceList = $segment['totalPriceList'] ?? [];
-                      foreach($priceList as $priceItem) {
-                          $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
-                          $cabinClass = Str::title(strtolower($cabinClassRaw));
+        if (!isset($flightTypes[$cabinClass])) {
+        $flightTypes[$cabinClass] = 1;
+        } else {
+        $flightTypes[$cabinClass]++;
+        }
+        }
+        }
+        }elseif(isset($results['searchResult']['tripInfos']['ONWARD'])){
+        foreach($results['searchResult']['tripInfos']['ONWARD'] as $segment) {
+        $priceList = $segment['totalPriceList'] ?? [];
+        foreach($priceList as $priceItem) {
+        $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+        $cabinClass = Str::title(strtolower($cabinClassRaw));
 
-                          if (!isset($flightTypes[$cabinClass])) {
-                              $flightTypes[$cabinClass] = 1;
-                          } else {
-                              $flightTypes[$cabinClass]++;
-                          }
-                      }
-                  }
-              } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
-                foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
-                    foreach($segmentGroup as $segment) {
-                        foreach(($segment['totalPriceList'] ?? []) as $priceItem) {
-                            $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
-                            $cabinClass = Str::title(strtolower($cabinClassRaw));
-                            $flightTypes[$cabinClass] = ($flightTypes[$cabinClass] ?? 0) + 1;
-                        }
-                    }
-                }
-            }
-          @endphp
+        if (!isset($flightTypes[$cabinClass])) {
+        $flightTypes[$cabinClass] = 1;
+        } else {
+        $flightTypes[$cabinClass]++;
+        }
+        }
+        }
+        } elseif(isset($resultsMulticity['searchResult']['tripInfos'])) {
+        foreach($resultsMulticity['searchResult']['tripInfos'] as $segmentGroup) {
+        foreach($segmentGroup as $segment) {
+        foreach(($segment['totalPriceList'] ?? []) as $priceItem) {
+        $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+        $cabinClass = Str::title(strtolower($cabinClassRaw));
+        $flightTypes[$cabinClass] = ($flightTypes[$cabinClass] ?? 0) + 1;
+        }
+        }
+        }
+        }
+        @endphp
 
-          @foreach($flightTypes as $type => $count)
-            <div class="pretty p-default p-thick p-pulse">
-              <input type="checkbox" data-flighttype="{{ $type }}" class="filter-type" value="{{ $type }}"/>
-              <div class="state">
-                <label>{{ $type }} <span class="number">{{ $count }}</span></label>
-              </div>
-            </div>
-          @endforeach
+        @foreach($flightTypes as $type => $count)
+        <div class="pretty p-default p-thick p-pulse">
+          <input type="checkbox" data-flighttype="{{ $type }}" class="filter-type" value="{{ $type }}" />
+          <div class="state">
+            <label>{{ $type }} <span class="number">{{ $count }}</span></label>
+          </div>
         </div>
+        @endforeach
+      </div>
     </div>
   </div>
 </div>
@@ -853,6 +853,7 @@
 <section class="list flight-list">
   <div class="container">
 
+
     @php
     use Illuminate\Support\Str;
     use Carbon\Carbon;
@@ -862,6 +863,7 @@
     @endphp
     @if(isset($results['searchResult']['tripInfos']['ONWARD']))
     @if(isset($results['searchResult']['tripInfos']['ONWARD']) && count($results['searchResult']['tripInfos']['ONWARD']) > 0)
+
     @foreach($results['searchResult']['tripInfos']['ONWARD'] as $index => $segment)
     @php
     $flightList = $segment['sI'];
@@ -905,49 +907,362 @@
     $priceList = $segment['totalPriceList'] ?? [];
 
     $uniqueId = 'segment_' . $index;
-         $allFares = [];
-        foreach ($priceList as $priceItem) {
-            $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-            $allFares[] = $farePrice;
-        }
-        $minFare = !empty($allFares) ? min($allFares) : 0;
-        $maxFare = !empty($allFares) ? max($allFares) : 0;
-        $fareString = implode(',', $allFares); // for data attribute
+    $allFares = [];
+    foreach ($priceList as $priceItem) {
+    $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+    $allFares[] = $farePrice;
+    }
+    $minFare = !empty($allFares) ? min($allFares) : 0;
+    $maxFare = !empty($allFares) ? max($allFares) : 0;
+    $fareString = implode(',', $allFares); // for data attribute
     @endphp
 
-    <div class="flight-card mb-4 p-3 border rounded shadow-sm bg-white"
-    data-stops="{{ $stopCount }}"
-          data-airline="{{ $airlineName}}-{{$flightNumber }}"
-          data-type="{{ $cabinClass ?? '' }}"
-            data-prices="{{ $fareString }}"
-          data-min-price="{{ $minFare }}"
-          data-max-price="{{ $maxFare }}"
-      >
-      <div class="row align-items-center">
-        <div class="col-md-2 text-center">
-          <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 40px;">
-          <p class="mt-2 mb-0 fw-bold text-dark">{{ $airlineName }}</p>
-          <small>{{ $flightNumber }}</small>
-        </div>
+    <div class="flight-card mb-2 p-3 border rounded shadow-sm bg-white"
+      data-stops="{{ $stopCount }}"
+      data-airline="{{ $airlineName}}-{{$flightNumber }}"
+      data-type="{{ $cabinClass ?? '' }}"
+      data-prices="{{ $fareString }}"
+      data-min-price="{{ $minFare }}"
+      data-max-price="{{ $maxFare }}">
+      <div class="row g-3">
 
-        <div class="col-md-2 text-center">
-          <small class="text-muted">{{ $fromCity }}</small><br>
-          <h5 class="mb-1 fw-bold">{{ $fromTime }}</h5>
-          <small class="text-muted">{{ $fromDate }}</small>
-        </div>
-
-        <div class="col-md-2 text-center">
-          <span class="d-block fw-bold">{{ $hours }}h {{ $minutes }}m</span>
-          <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 6px 0; display: flex; align-items: center; justify-content: end;">
-            <span style="color: orange; font-size: 36px; margin-top: -5px; margin-right: -3px;">→</span>
+        <div class="col-md-6 col-12">
+          <div class="d-flex justify-content-between gap-3">
+            <div class="d-flex gap-0 flex-column">
+              <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+              <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+              <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
+            </div>
+            <div class="d-flex justify-content-between gap-3">
+              <div class="d-flex gap-0 flex-column align-items-end">
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
+                <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
+              </div>
+              <div class="d-flex flex-column align-item-center gap-0">
+                <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
+                <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
+                  <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+                </div>
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
+              </div>
+              <div class="d-flex gap-0 flex-column align-items-start">
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
+                <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
+                <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
+              </div>
+            </div>
           </div>
-          <small class="text-muted">{{ $stopLabel }}</small>
-        </div>
+          <div class="mt-3">
 
-        <div class="col-md-2 text-center">
-          <small class="text-muted">{{ $toCity }}</small><br>
-          <h5 class="mb-1 fw-bold">{{ $toTime }}</h5>
-          <small class="text-muted">{{ $toDate }}</small>
+            <small style="margin-left:6px; color: rgb(255, 138, 5); font-size:11px;">7 Seats Left</small>
+            <br>
+            <!-- Button -->
+            <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails(this)">
+              View Details +
+            </button>
+
+            <!-- Hidden Content: FLIGHT DETAILS -->
+            <div class="flight-details-content mt-2" style="display: none;">
+
+              <!-- TABS -->
+              <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
+                <li class="tab-items mb-0 active px-3 py-2" style="cursor: pointer; font-weight: 400 !important;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')">
+                  <small>Flight Details</small>
+                </li>
+                <li class="tab-items mb-0 px-3 py-2" style="cursor: pointer; font-weight: 400 !important;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')">
+                  <small>Fare Details</small>
+                </li>
+                <li class="tab-items mb-0 px-3 py-2" style="cursor: pointer; font-weight: 400 !important;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')">
+                  <small>Fare Rules</small>
+                </li>
+                <li class="tab-items mb-0 px-3 py-2" style="cursor: pointer; font-weight: 400 !important;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')">
+                  <small>Baggage Info</small>
+                </li>
+
+              </ul>
+
+              <!-- Flight Details Tab -->
+              <div id="flightDetailsOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded" style="position: relative;">
+                <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
+
+                @php
+                $firstSeg = $flightList[0];
+                $lastSeg = end($flightList);
+
+                $fromCity = $firstSeg['da']['city'] ?? '';
+                $fromCode = $firstSeg['da']['code'] ?? '';
+                $toCity = $lastSeg['aa']['city'] ?? '';
+                $toCode = $lastSeg['aa']['code'] ?? '';
+                $departureDateTime = \Carbon\Carbon::parse($firstSeg['dt'])->format('D, d M Y');
+                @endphp
+
+                <div class="mb-4 border-bottom pb-3 d-flex align-items-center">
+                  <h5 class="fw-bold mb-0 text-dark">
+                    {{ $fromCity }} → {{ $toCity }}
+                  </h5>
+                  <small class="text-muted ms-2 mt-0">{{ $departureDateTime }}</small>
+                </div>
+
+                @foreach ($flightList as $segData)
+                @php
+                $airlineCode = $segData['fD']['aI']['code'] ?? 'XX';
+                $fullFlightCode = $segData['fD']['fN'] ?? 'XX-0000';
+                $logoPath = public_path("AirlinesLogo/$airlineCode.png");
+                $logoUrl = file_exists($logoPath) ? asset("AirlinesLogo/$airlineCode.png") : asset("AirlinesLogo/default.png");
+
+                $depTime = \Carbon\Carbon::parse($segData['dt'])->format('d M, D, H:i');
+                $arrTime = \Carbon\Carbon::parse($segData['at'])->format('M d, D, H:i');
+                $depCity = $segData['da']['city'] ?? '';
+                $arrCity = $segData['aa']['city'] ?? '';
+                $depAirportName = $segData['da']['name'] ?? '';
+                $arrAirportName = $segData['aa']['name'] ?? '';
+                $durationMin = \Carbon\Carbon::parse($segData['at'])->diffInMinutes(\Carbon\Carbon::parse($segData['dt']));
+                $durationText = floor($durationMin / 60) . 'h ' . str_pad($durationMin % 60, 2, '0', STR_PAD_LEFT) . 'm';
+                $classCode = $priceData['ADULT']['cc'] ?? 'ECONOMY';
+                $className = \Illuminate\Support\Str::title(strtolower($classCode));
+                @endphp
+
+                <div class="row pb-2">
+
+                  <div class="col-12">
+                    <div class="d-flex justify-content-between gap-3">
+                      <div class="d-flex gap-0 flex-column">
+                        <img src="{{ $logoUrl }}" alt="{{ $airlineCode }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+                        <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $className }}</p>
+                        <small style="font-size: 11px; line-height: 1;">{{ $airlineCode }}-{{ $fullFlightCode }}</small>
+                      </div>
+                      <div class="d-flex justify-content-between gap-3">
+                        <div class="d-flex gap-0 flex-column align-items-end">
+                          <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $depCity }}</small>
+                          <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $depTime }}</h5>
+                          <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $depAirportName }}</small>
+                        </div>
+                        <div class="d-flex flex-column align-item-center gap-0">
+                          <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">Non-stop</span>
+                          <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
+                            <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+                          </div>
+                          <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $durationText }}</small>
+                        </div>
+                        <div class="d-flex gap-0 flex-column align-items-start">
+                          <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $arrCity }}</small>
+                          <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $arrTime }}</h5>
+                          <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $arrAirportName }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                @endforeach
+              </div>
+
+              <!-- Fare Details Tab -->
+              <!-- Fare Details Tab -->
+              <div id="fareDetailsOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
+                <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; border: none; background: none; font-size: 16px; cursor: pointer;">✖</button>
+
+                @php
+                $adultCount = request()->get('adult_count', 1);
+                $childCount = request()->get('child_count', 0);
+                $infantCount = request()->get('infant_count', 0);
+
+                $tripInfos = $results['searchResult']['tripInfos']['ONWARD'] ?? [];
+                $flightData = $tripInfos[0] ?? [];
+                $fare = $flightData['totalPriceList'][0]['fd'] ?? [];
+
+                // Adult fares
+                $adultBase = $fare['ADULT']['fC']['BF'] ?? 0;
+                $adultTax = ($fare['ADULT']['fC']['TF'] ?? 0) - $adultBase;
+                $totalAdultBase = $adultBase * $adultCount;
+                $totalAdultTax = $adultTax * $adultCount;
+
+                // Tax breakdown
+                $adultAfC = $fare['ADULT']['afC']['TAF'] ?? [];
+                $managementFee = ($adultAfC['MF'] ?? 0);
+                $mfTax = ($adultAfC['MFT'] ?? 0);
+                $yq = ($adultAfC['YR'] ?? 0);
+                $otherTaxes = ($adultAfC['OT'] ?? 0);
+
+                // Child fares
+                $childBase = $fare['CHILD']['fC']['BF'] ?? 0;
+                $childTax = ($fare['CHILD']['fC']['TF'] ?? 0) - $childBase;
+                $totalChildBase = $childBase * $childCount;
+                $totalChildTax = $childTax * $childCount;
+
+                // Infant fares
+                $infantBase = $fare['INFANT']['fC']['BF'] ?? 0;
+                $infantTax = ($fare['INFANT']['fC']['TF'] ?? 0) - $infantBase;
+                $totalInfantBase = $infantBase * $infantCount;
+                $totalInfantTax = $infantTax * $infantCount;
+
+                $grandTotal = $totalAdultBase + $totalAdultTax + $totalChildBase + $totalChildTax + $totalInfantBase + $totalInfantTax;
+                @endphp
+
+                <table class="table border-0" style="border-collapse: collapse;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #eee;">
+                      <th class="border-0">TYPE</th>
+                      <th class="border-0">Fare</th>
+                      <th class="border-0">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{-- Adult --}}
+                    @if ($adultCount > 0)
+                    <tr>
+                      <td colspan="3" style="color:#999;">Fare Details for Adult</td>
+                    </tr>
+                    <tr>
+                      <td>Base Price</td>
+                      <td>₹{{ number_format($adultBase, 2) }} x {{ $adultCount }}</td>
+                      <td>₹{{ number_format($totalAdultBase, 2) }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Taxes and fees
+                        <i style="color:orange; font-weight:bold;"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-html="true"
+                          title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
+                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
+                                  YQ: ₹{{ number_format($yq, 2) }}<br>
+                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
+                          i
+                        </i>
+                      </td>
+                      <td>₹{{ number_format($adultTax, 2) }} x {{ $adultCount }}</td>
+                      <td>₹{{ number_format($totalAdultTax, 2) }}</td>
+                    </tr>
+                    @endif
+
+                    {{-- Child --}}
+                    @if ($childCount > 0)
+                    <tr>
+                      <td colspan="3" style="color:#999;">Fare Details for Child</td>
+                    </tr>
+                    <tr>
+                      <td>Base Price</td>
+                      <td>₹{{ number_format($childBase, 2) }} x {{ $childCount }}</td>
+                      <td>₹{{ number_format($totalChildBase, 2) }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Taxes and fees
+                        <i style="color:orange; font-weight:bold;"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-html="true"
+                          title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
+                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
+                                  YQ: ₹{{ number_format($yq, 2) }}<br>
+                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
+                          i
+                        </i>
+                      </td>
+                      <td>₹{{ number_format($childTax, 2) }} x {{ $childCount }}</td>
+                      <td>₹{{ number_format($totalChildTax, 2) }}</td>
+                    </tr>
+                    @endif
+
+                    {{-- Infant --}}
+                    @if ($infantCount > 0)
+                    <tr>
+                      <td colspan="3" style="color:#999;">Fare Details for Infant</td>
+                    </tr>
+                    <tr>
+                      <td>Base Price</td>
+                      <td>₹{{ number_format($infantBase, 2) }} x {{ $infantCount }}</td>
+                      <td>₹{{ number_format($totalInfantBase, 2) }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Taxes and fees
+                        <i style="color:orange; font-weight:bold;"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          data-bs-html="true"
+                          title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
+                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
+                                  YQ: ₹{{ number_format($yq, 2) }}<br>
+                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
+                          i
+                        </i>
+                      </td>
+                      <td>₹{{ number_format($infantTax, 2) }} x {{ $infantCount }}</td>
+                      <td>₹{{ number_format($totalInfantTax, 2) }}</td>
+                    </tr>
+                    @endif
+
+                    {{-- Total --}}
+                    <tr style="border-top: 1px solid #eee;">
+                      <td colspan="2"><strong>Total</strong></td>
+                      <td><strong>₹{{ number_format($grandTotal, 2) }}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+
+              <!-- Fare Rules Tab -->
+              <div id="fareRulesOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
+                <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
+                <p>Tickets are non-refundable. Change fee applicable.</p>
+              </div>
+
+              <!-- Baggage Info Tab -->
+              <div id="baggageInfoOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
+                <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
+
+                @php
+                $firstSeg = $flightList[0] ?? [];
+                $lastSeg = end($flightList) ?? [];
+
+                $from = $firstSeg['da']['code'] ?? 'N/A';
+                $to = $lastSeg['aa']['code'] ?? 'N/A';
+                $sector = "$from-$to";
+
+                $totalPriceList = $price['totalPriceList'] ?? [];
+                @endphp
+
+                <h6 class="mb-3">Baggage Allowance (Sector: {{ $sector }})</h6>
+
+                @if(count($totalPriceList))
+                <table class="table border-0" style="border-collapse: collapse;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #eee;">
+                      <th>Fare Type</th>
+                      <th>Check-in Baggage</th>
+                      <th>Cabin Baggage</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($totalPriceList as $fare)
+                    @php
+                    $fareType = $fare['fareIdentifier'] ?? 'N/A';
+                    $adult = $fare['fd']['ADULT'] ?? [];
+                    $checkIn = $adult['bI']['iB'] ?? '0 Kg';
+                    $cabin = $adult['bI']['cB'] ?? '0 Kg';
+                    @endphp
+                    <tr>
+                      <td>{{ $fareType }}</td>
+                      <td>{{ $checkIn }}</td>
+                      <td>{{ $cabin }}</td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+                @else
+                <p>No baggage information available.</p>
+                @endif
+              </div>
+
+
+
+            </div>
+          </div>
         </div>
 
         @php
@@ -955,7 +1270,7 @@
         $containerId = 'fareBlock_' . $index; // Unique container ID
         $fareCount = count($priceList);
         @endphp
-        <div class="col-md-2 text-start" id="{{ $containerId }}">
+        <div class="col-md-3" id="{{ $containerId }}">
           @foreach($priceList as $loopIndex => $priceItem)
           @php
           $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
@@ -963,9 +1278,10 @@
           $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
           $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw)); // Economy, Business, etc.
           $isHidden = $loopIndex >= 3 ? 'd-none' : '';
-          @endphp
+          $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
+            @endphp
 
-          <div class="mb-2 p-2 more-fare {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
+            <div class="mx-2 py-2 more-fare  position-relative {{ $isNotLast }}  {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
 
             {{-- Fare info --}}
             <div class="d-flex">
@@ -976,557 +1292,77 @@
                 data-fare="{{ $priceItem['fareIdentifier'] ?? '' }}"
                 @if($index===0 && $loopIndex===0) checked @endif>
 
-              <p class="mb-1">₹{{ number_format($totalFare, 2) }}</p>
+              <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
             </div>
             {{-- Tag and Cabin class --}}
-            <div class="d-flex align-items-center justify-content-between">
-              <span class="badge bg-warning text-white text-uppercase">{{ $tag }}</span>
-              <small class="text-muted">{{ $cabinClass }}</small>
+            <div>
+              <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200;">{{ $tag }}</span>
+              <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $cabinClass }}</small>
             </div>
-          </div>
-          @endforeach
-
-          @if($fareCount > 3)
-          <button class="btn p-1" style="border:1px solid #ccc; font-size:12px; color:orange;" onclick="toggleMoreFares('{{ $containerId }}', this)">
-            +More Fares
-          </button>
-          @endif
+            @if($fareCount > 3 && $loopIndex == 2)
+            <button class="btn p-1" style="border:1px solid #000;font-size: 11px;color: #ffffff;background: #000;padding: 4px 8px 3px !important;border-radius: 14px;position: absolute;right: 0;bottom: -10px;" onclick="toggleMoreFares('{{ $containerId }}', this)">
+              +More Fares
+            </button>
+            @endif
         </div>
-
-        <div class="col-md-2 text-center">
-          <button type="button"
-            class="btn btn-sm w-100 text-white book-btn"
-            style="background-color: orange;"
-            data-flight="{{ $index }}">
-            Book
-          </button>
-
-
-        </div>
+        @endforeach
       </div>
 
-      <!-- View Details Button -->
-      <div class="mt-3">
-        <!-- Button -->
-        <button type="button" id="view" class="btn btn-sm" style="background-color: #f5f5f5; color: rgb(255, 138, 5)" onclick="toggleDetails(this)">
-          View Details +
+      <div class="col-md-3 text-center text-md-end">
+        <button type="button"
+          class="btn btn-sm w-100 text-white book-btn"
+          style="background-color: orange; width: fit-content !important;"
+          data-flight="{{ $index }}">
+          Book
         </button>
 
-        <!-- Hidden Content: FLIGHT DETAILS -->
-        <div class="flight-details-content mt-2" style="display: none;">
 
-          <!-- TABS -->
-          <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
-            <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')">
-              <small>Flight Details</small>
-            </li>
-            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')">
-              <small>Fare Details</small>
-            </li>
-            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')">
-              <small>Fare Rules</small>
-            </li>
-            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')">
-              <small>Baggage Info</small>
-            </li>
-
-          </ul>
-
-          <!-- Flight Details Tab -->
-          <div id="flightDetailsOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded" style="position: relative;">
-            <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
-
-            @php
-            $firstSeg = $flightList[0];
-            $lastSeg = end($flightList);
-
-            $fromCity = $firstSeg['da']['city'] ?? '';
-            $fromCode = $firstSeg['da']['code'] ?? '';
-            $toCity = $lastSeg['aa']['city'] ?? '';
-            $toCode = $lastSeg['aa']['code'] ?? '';
-            $departureDateTime = \Carbon\Carbon::parse($firstSeg['dt'])->format('D, d M Y');
-            @endphp
-
-            <div class="mb-4 border-bottom pb-3 d-flex">
-              <h5 class="fw-bold mb-1 text-dark">
-                {{ $fromCity }} → {{ $toCity }}
-              </h5>
-              <small class="text-muted ms-2 mt-1">{{ $departureDateTime }}</small>
-            </div>
-
-            @foreach ($flightList as $segData)
-            @php
-            $airlineCode = $segData['fD']['aI']['code'] ?? 'XX';
-            $fullFlightCode = $segData['fD']['fN'] ?? 'XX-0000';
-            $logoPath = public_path("AirlinesLogo/$airlineCode.png");
-            $logoUrl = file_exists($logoPath) ? asset("AirlinesLogo/$airlineCode.png") : asset("AirlinesLogo/default.png");
-
-            $depTime = \Carbon\Carbon::parse($segData['dt'])->format('d M, D, H:i');
-            $arrTime = \Carbon\Carbon::parse($segData['at'])->format('M d, D, H:i');
-            $depCity = $segData['da']['city'] ?? '';
-            $arrCity = $segData['aa']['city'] ?? '';
-            $depAirportName = $segData['da']['name'] ?? '';
-            $arrAirportName = $segData['aa']['name'] ?? '';
-            $durationMin = \Carbon\Carbon::parse($segData['at'])->diffInMinutes(\Carbon\Carbon::parse($segData['dt']));
-            $durationText = floor($durationMin / 60) . 'h ' . str_pad($durationMin % 60, 2, '0', STR_PAD_LEFT) . 'm';
-            $classCode = $priceData['ADULT']['cc'] ?? 'ECONOMY';
-            $className = \Illuminate\Support\Str::title(strtolower($classCode));
-            @endphp
-
-            <div class="row mb-3 border-bottom pb-2 align-items-center">
-              <div class="col-md-3 d-flex align-items-center justify-content-center">
-                <img src="{{ $logoUrl }}" alt="{{ $airlineCode }}" style="max-height: 24px;" class="me-2">
-                <div class="mt-2">
-                  <small class="text-muted text-dark">{{ $airlineCode }}-{{ $fullFlightCode }}</small>
-                  <p class="text-muted">{{ $className }}</p>
-                </div>
-              </div>
-
-              <div class="col-md-3 text-center">
-                <small class="fw-bold">{{ $depTime }}</small><br>
-                <small>{{ $depCity }}</small><br>
-                <small class="text-muted">{{ $depAirportName }}</small>
-              </div>
-
-              <div class="col-md-2 text-center">
-                <small class="text-muted">Non-stop</small>
-                <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 6px 0;">
-                  <span style="position: absolute; right: -8px; top: -6px; color: orange; font-size: 18px;">→</span>
-                </div>
-                <div class="my-1 text-muted small">{{ $durationText }}</div>
-              </div>
-
-              <div class="col-md-3 text-center">
-                <small class="fw-bold">{{ $arrTime }}</small><br>
-                <small>{{ $arrCity }}</small><br>
-                <small class="text-muted">{{ $arrAirportName }}</small>
-              </div>
-            </div>
-            @endforeach
-          </div>
-
-          <!-- Fare Details Tab -->
-          <!-- Fare Details Tab -->
-          <div id="fareDetailsOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
-            <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; border: none; background: none; font-size: 16px; cursor: pointer;">✖</button>
-
-            @php
-            $adultCount = request()->get('adult_count', 1);
-            $childCount = request()->get('child_count', 0);
-            $infantCount = request()->get('infant_count', 0);
-
-            $tripInfos = $results['searchResult']['tripInfos']['ONWARD'] ?? [];
-            $flightData = $tripInfos[0] ?? [];
-            $fare = $flightData['totalPriceList'][0]['fd'] ?? [];
-
-            // Adult fares
-            $adultBase = $fare['ADULT']['fC']['BF'] ?? 0;
-            $adultTax = ($fare['ADULT']['fC']['TF'] ?? 0) - $adultBase;
-            $totalAdultBase = $adultBase * $adultCount;
-            $totalAdultTax = $adultTax * $adultCount;
-
-            // Tax breakdown
-            $adultAfC = $fare['ADULT']['afC']['TAF'] ?? [];
-            $managementFee = ($adultAfC['MF'] ?? 0);
-            $mfTax = ($adultAfC['MFT'] ?? 0);
-            $yq = ($adultAfC['YR'] ?? 0);
-            $otherTaxes = ($adultAfC['OT'] ?? 0);
-
-            // Child fares
-            $childBase = $fare['CHILD']['fC']['BF'] ?? 0;
-            $childTax = ($fare['CHILD']['fC']['TF'] ?? 0) - $childBase;
-            $totalChildBase = $childBase * $childCount;
-            $totalChildTax = $childTax * $childCount;
-
-            // Infant fares
-            $infantBase = $fare['INFANT']['fC']['BF'] ?? 0;
-            $infantTax = ($fare['INFANT']['fC']['TF'] ?? 0) - $infantBase;
-            $totalInfantBase = $infantBase * $infantCount;
-            $totalInfantTax = $infantTax * $infantCount;
-
-            $grandTotal = $totalAdultBase + $totalAdultTax + $totalChildBase + $totalChildTax + $totalInfantBase + $totalInfantTax;
-            @endphp
-
-            <table class="table border-0" style="border-collapse: collapse;">
-              <thead>
-                <tr style="border-bottom: 1px solid #eee;">
-                  <th class="border-0">TYPE</th>
-                  <th class="border-0">Fare</th>
-                  <th class="border-0">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {{-- Adult --}}
-                @if ($adultCount > 0)
-                <tr>
-                  <td colspan="3" style="color:#999;">Fare Details for Adult</td>
-                </tr>
-                <tr>
-                  <td>Base Price</td>
-                  <td>₹{{ number_format($adultBase, 2) }} x {{ $adultCount }}</td>
-                  <td>₹{{ number_format($totalAdultBase, 2) }}</td>
-                </tr>
-                <tr>
-                  <td>
-                    Taxes and fees
-                    <i style="color:orange; font-weight:bold;"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      data-bs-html="true"
-                      title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
-                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
-                                  YQ: ₹{{ number_format($yq, 2) }}<br>
-                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
-                      i
-                    </i>
-                  </td>
-                  <td>₹{{ number_format($adultTax, 2) }} x {{ $adultCount }}</td>
-                  <td>₹{{ number_format($totalAdultTax, 2) }}</td>
-                </tr>
-                @endif
-
-                {{-- Child --}}
-                @if ($childCount > 0)
-                <tr>
-                  <td colspan="3" style="color:#999;">Fare Details for Child</td>
-                </tr>
-                <tr>
-                  <td>Base Price</td>
-                  <td>₹{{ number_format($childBase, 2) }} x {{ $childCount }}</td>
-                  <td>₹{{ number_format($totalChildBase, 2) }}</td>
-                </tr>
-                <tr>
-                  <td>
-                    Taxes and fees
-                    <i style="color:orange; font-weight:bold;"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      data-bs-html="true"
-                      title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
-                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
-                                  YQ: ₹{{ number_format($yq, 2) }}<br>
-                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
-                      i
-                    </i>
-                  </td>
-                  <td>₹{{ number_format($childTax, 2) }} x {{ $childCount }}</td>
-                  <td>₹{{ number_format($totalChildTax, 2) }}</td>
-                </tr>
-                @endif
-
-                {{-- Infant --}}
-                @if ($infantCount > 0)
-                <tr>
-                  <td colspan="3" style="color:#999;">Fare Details for Infant</td>
-                </tr>
-                <tr>
-                  <td>Base Price</td>
-                  <td>₹{{ number_format($infantBase, 2) }} x {{ $infantCount }}</td>
-                  <td>₹{{ number_format($totalInfantBase, 2) }}</td>
-                </tr>
-                <tr>
-                  <td>
-                    Taxes and fees
-                    <i style="color:orange; font-weight:bold;"
-                      data-bs-toggle="tooltip"
-                      data-bs-placement="top"
-                      data-bs-html="true"
-                      title="Management Fee: ₹{{ number_format($managementFee, 2) }}<br>
-                                  Management Fee Tax: ₹{{ number_format($mfTax, 2) }}<br>
-                                  YQ: ₹{{ number_format($yq, 2) }}<br>
-                                  Other Taxes: ₹{{ number_format($otherTaxes, 2) }}">
-                      i
-                    </i>
-                  </td>
-                  <td>₹{{ number_format($infantTax, 2) }} x {{ $infantCount }}</td>
-                  <td>₹{{ number_format($totalInfantTax, 2) }}</td>
-                </tr>
-                @endif
-
-                {{-- Total --}}
-                <tr style="border-top: 1px solid #eee;">
-                  <td colspan="2"><strong>Total</strong></td>
-                  <td><strong>₹{{ number_format($grandTotal, 2) }}</strong></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-
-          <!-- Fare Rules Tab -->
-          <div id="fareRulesOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
-            <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
-            <p>Tickets are non-refundable. Change fee applicable.</p>
-          </div>
-
-          <!-- Baggage Info Tab -->
-          <div id="baggageInfoOneway_{{ $uniqueId }}" class="tab-subcontent bg-white p-3 shadow-sm rounded d-none" style="position: relative;">
-            <button onclick="closeDetails(this)" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 16px;">✖</button>
-
-            @php
-            $firstSeg = $flightList[0] ?? [];
-            $lastSeg = end($flightList) ?? [];
-
-            $from = $firstSeg['da']['code'] ?? 'N/A';
-            $to = $lastSeg['aa']['code'] ?? 'N/A';
-            $sector = "$from-$to";
-
-            $totalPriceList = $price['totalPriceList'] ?? [];
-            @endphp
-
-            <h6 class="mb-3">Baggage Allowance (Sector: {{ $sector }})</h6>
-
-            @if(count($totalPriceList))
-            <table class="table border-0" style="border-collapse: collapse;">
-              <thead>
-                <tr style="border-bottom: 1px solid #eee;">
-                  <th>Fare Type</th>
-                  <th>Check-in Baggage</th>
-                  <th>Cabin Baggage</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($totalPriceList as $fare)
-                @php
-                $fareType = $fare['fareIdentifier'] ?? 'N/A';
-                $adult = $fare['fd']['ADULT'] ?? [];
-                $checkIn = $adult['bI']['iB'] ?? '0 Kg';
-                $cabin = $adult['bI']['cB'] ?? '0 Kg';
-                @endphp
-                <tr>
-                  <td>{{ $fareType }}</td>
-                  <td>{{ $checkIn }}</td>
-                  <td>{{ $cabin }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-            @else
-            <p>No baggage information available.</p>
-            @endif
-          </div>
-
-
-
-        </div>
-
-        <!-- SEAT INFO -->
-        <br>
-        <span style="margin-left:20px; color: rgb(255, 138, 5); font-size:12px;">7 Seats Left</span>
       </div>
-
-
     </div>
-    @endforeach
 
-    @else
-    <p>No flights found.</p>
-    @endif
-    @endif
-
-    {{-- roundtrip --}}
-    @php
-    $onwardFlights = $resultsRound['searchResult']['tripInfos']['ONWARD'] ?? [];
-    $returnFlights = $resultsRound['searchResult']['tripInfos']['RETURN'] ?? [];
-
-    $maxPairs = min(count($onwardFlights), count($returnFlights)); // Pair onward & return flights
-    $segments = $result['segments'] ?? [];
-    $priceData = $result['price']['fd'] ?? [];
-    $firstOnwardFlight = $onwardFlights[0]['sI'][0] ?? null;
-
-    $depCity = $firstOnwardFlight['da']['city'] ?? '';
-    $arrCity = $firstOnwardFlight['aa']['city'] ?? '';
-    $departureDate = isset($firstOnwardFlight['dt']) ? Carbon::parse($firstOnwardFlight['dt'])->format('D, d M y') : '';
-    @endphp
+    <!-- View Details Button -->
 
 
-    <div class="row g-2">
-      <div class="col-lg-6">
-        <div class="d-flex">
-          <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5>
-          <p class="ms-2"> {{ $departureDate }}</p>
+  </div>
+  @endforeach
 
-        </div>
-        @if(isset($resultsRound['searchResult']['tripInfos']['ONWARD']) && count($resultsRound['searchResult']['tripInfos']['ONWARD']) > 0)
-        @foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $index => $segment)
-        @php
-        $flightList = $segment['sI'];
-        $firstFlight = $flightList[0];
-        $lastFlight = end($flightList);
+  @else
+  <p>No flights found.</p>
+  @endif
+  @endif
 
-        $departureTime = Carbon::parse($firstFlight['dt']);
-        $arrivalTime = Carbon::parse($lastFlight['at']);
-        $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
-        $hours = intdiv($durationMinutes, 60);
-        $minutes = $durationMinutes % 60;
+  {{-- roundtrip --}}
+  @php
+  $onwardFlights = $resultsRound['searchResult']['tripInfos']['ONWARD'] ?? [];
+  $returnFlights = $resultsRound['searchResult']['tripInfos']['RETURN'] ?? [];
 
-        $stopovers = [];
-        foreach ($flightList as $leg) {
-        if (($leg['sN'] ?? 0) === 1) {
-        $stopovers[] = $leg['da'];
-        }
-        }
+  $maxPairs = min(count($onwardFlights), count($returnFlights)); // Pair onward & return flights
+  $segments = $result['segments'] ?? [];
+  $priceData = $result['price']['fd'] ?? [];
+  $firstOnwardFlight = $onwardFlights[0]['sI'][0] ?? null;
 
-        $stopCount = count($stopovers);
-        $stopLabel = $stopCount === 0 ? 'Non-stop' : "{$stopCount} stop" . ($stopCount > 1 ? 's' : '');
-
-        $airlineCode = $firstFlight['fD']['aI']['code'] ?? 'XX';
-        $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
-        $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
-
-        $fromCity = $firstFlight['da']['city'] ?? '';
-        $toCity = $lastFlight['aa']['city'] ?? '';
-        $fromTime = $departureTime->format('H:i');
-        $toTime = $arrivalTime->format('H:i');
-        $fromDate = $departureTime->format('d M');
-        $toDate = $arrivalTime->format('d M');
-
-        $logoPath = public_path("AirlinesLogo/{$airlineCode}.png");
-        $logoUrl = file_exists($logoPath)
-        ? asset("AirlinesLogo/{$airlineCode}.png")
-        : asset("AirlinesLogo/default.png");
-
-        $priceList = $segment['totalPriceList'] ?? [];
-        $uniqueId = 'segment_' . $index;
-        $allFares = [];
-        foreach ($priceList as $priceItem) {
-            $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-            $allFares[] = $farePrice;
-        }
-        $minFare = !empty($allFares) ? min($allFares) : 0;
-        $maxFare = !empty($allFares) ? max($allFares) : 0;
-        $fareString = implode(',', $allFares); // for data attribute
-        @endphp
+  $depCity = $firstOnwardFlight['da']['city'] ?? '';
+  $arrCity = $firstOnwardFlight['aa']['city'] ?? '';
+  $departureDate = isset($firstOnwardFlight['dt']) ? Carbon::parse($firstOnwardFlight['dt'])->format('D, d M y') : '';
+  @endphp
 
 
-        <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white"
-          data-stops="{{ $stopCount }}"
-          data-airline="{{ $airlineName}}-{{$flightNumber }}"
-          data-type="{{ $cabinClass ?? '' }}"
-            data-prices="{{ $fareString }}"
-          data-min-price="{{ $minFare }}"
-          data-max-price="{{ $maxFare }}">
-          <div class="row g-3 inner-flight-card">
-
-            <div class="col-md-6 col-12">
-              <div class="d-flex flex-column justify-content-start gap-3">
-                <div class="d-flex justify-content-between gap-3">
-                  <div class="d-flex gap-0 flex-column">
-                    <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
-                    <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
-                    <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
-                  </div>
-                  <div class="d-flex justify-content-between gap-3">
-                    <div class="d-flex gap-0 flex-column align-items-end">
-                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
-                      <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
-                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
-                    </div>
-                    <div class="d-flex flex-column align-item-center gap-0">
-                      <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
-                      <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
-                        <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
-                      </div>
-                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
-                    </div>
-                    <div class="d-flex gap-0 flex-column align-items-start">
-                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
-                      <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
-                      <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
-                    </div>
-                  </div>
-                </div>
-                <div class="d-flex flex-column gap-2">
-                  <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails($uniqueId)" data-details-id="flight-details-content-{{ $uniqueId }}">View Details +</button>
-                  <span style="color: rgb(255, 138, 5); font-size:11px; line-height: 1; margin-left: 6px">7 Seats Left</span>
-                </div>
-              </div>
-            </div>
-            @php
-            $containerId = 'fareBlock_' . $index;
-            $fareCount = count($priceList);
-            $count = 1
-            @endphp
-            <div class="col-md-6 col-12" id="{{ $containerId }}">
-              @foreach($priceList as $loopIndex => $priceItem)
-              @php
-              $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-              $tag = $priceItem['fareIdentifier'] ?? 'Standard';
-              $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
-              $cabinClass = Str::title(strtolower($cabinClassRaw));
-              $isHidden = $loopIndex >= 3 ? 'd-none' : '';
-              $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
-                @endphp
-
-                <div class="mx-2 py-2  more-fare  position-relative {{ $isNotLast }} {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
-                <div class="d-flex">
-                  <!-- Onward Fare Radio Button -->
-                  <input type="radio"
-                    name="onward_fare"
-                    value="onward_{{ $index }}_{{ $loopIndex }}"
-                    data-price-id="{{ $priceItem['id'] }}"
-                    data-fare-identifier="{{ $priceItem['fareIdentifier'] }}"
-                    {{ $index === 0 && $loopIndex === 0 ? 'checked' : '' }}>
-
-                  <!-- Hidden inputs for Onward Fare -->
-                  <input type="hidden" id="onward_fare_id" name="onward_fare_id" value="">
-                  <input type="hidden" id="onward_fare_detail" name="onward_fare_detail" value="">
-
-                  <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
-                </div>
-                <div class="">
-                  <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200;">{{ $tag }}</span>
-                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $cabinClass }}</small>
-                </div>
-                @if($fareCount > 3 && $loopIndex == 2)
-                <button class="btn p-1" style="border:1px solid #000;font-size: 11px;color: #ffffff;background: #000;padding: 4px 8px 3px !important;border-radius: 14px;position: absolute;right: 0;bottom: -10px;" onclick="toggleMoreFares('{{ $containerId }}', this)">+More Fares</button>
-                @endif
-            </div>
-            @endforeach
-
-          </div>
-          <div class="col-12">
-            <div class="flight-details-content mt-2 card" id="flight-details-content-{{ $uniqueId }}" style="display: none;">
-
-              <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
-                <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')"><small>Flight Details</small></li>
-                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')"><small>Fare Details</small></li>
-                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')"><small>Fare Rules <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="View Fare Rules"></i></small></li> <!-- Added "i" icon -->
-                <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')"><small>Baggage Info <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Baggage Allowance Info"></i></small></li> <!-- Added "i" icon -->
-              </ul>
-
-              <!-- Include your Details Tabs Here -->
-              {{-- @include('partials.flight-details-tab', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceData])
-                      @include('partials.fare-details-tab', ['results' => $results, 'uniqueId' => $uniqueId])
-                      @include('partials.fare-rules-tab', ['uniqueId' => $uniqueId])
-                      @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
-            </div>
-          </div>
-        </div>
-      </div>
-      @endforeach
-      @endif
-    </div>
+  <div class="row g-2">
     <div class="col-lg-6">
-      @php
-      $lastOnwardFlight = $returnFlights[0]['sI'][0] ?? null;
-      $depCity = $lastOnwardFlight['da']['city'] ?? '';
-      $arrCity = $lastOnwardFlight['aa']['city'] ?? '';
-      $arrivalDate = isset($lastOnwardFlight['at']) ? Carbon::parse($lastOnwardFlight['at'])->format('D, d M y') : '';
-      @endphp
       <div class="d-flex">
         <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5>
-        <p class="ms-2"> {{ $arrivalDate }}</p>
+        <p class="ms-2"> {{ $departureDate }}</p>
+
       </div>
-      @if(isset($resultsRound['searchResult']['tripInfos']['RETURN']) && count($resultsRound['searchResult']['tripInfos']['RETURN']) > 0)
-      @foreach($resultsRound['searchResult']['tripInfos']['RETURN'] as $index => $segment)
+      @if(isset($resultsRound['searchResult']['tripInfos']['ONWARD']) && count($resultsRound['searchResult']['tripInfos']['ONWARD']) > 0)
+      @foreach($resultsRound['searchResult']['tripInfos']['ONWARD'] as $index => $segment)
       @php
       $flightList = $segment['sI'];
       $firstFlight = $flightList[0];
       $lastFlight = end($flightList);
 
-      $departureTime = \Carbon\Carbon::parse($firstFlight['dt']);
-      $arrivalTime = \Carbon\Carbon::parse($lastFlight['at']);
+      $departureTime = Carbon::parse($firstFlight['dt']);
+      $arrivalTime = Carbon::parse($lastFlight['at']);
       $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
       $hours = intdiv($durationMinutes, 60);
       $minutes = $durationMinutes % 60;
@@ -1558,25 +1394,27 @@
       : asset("AirlinesLogo/default.png");
 
       $priceList = $segment['totalPriceList'] ?? [];
-      $uniqueId = 'return_segment_' . $index;
+      $uniqueId = 'segment_' . $index;
       $allFares = [];
       foreach ($priceList as $priceItem) {
-          $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-          $allFares[] = $farePrice;
+      $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      $allFares[] = $farePrice;
       }
       $minFare = !empty($allFares) ? min($allFares) : 0;
       $maxFare = !empty($allFares) ? max($allFares) : 0;
       $fareString = implode(',', $allFares); // for data attribute
       @endphp
 
+
       <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white"
         data-stops="{{ $stopCount }}"
         data-airline="{{ $airlineName}}-{{$flightNumber }}"
         data-type="{{ $cabinClass ?? '' }}"
         data-prices="{{ $fareString }}"
-          data-min-price="{{ $minFare }}"
-          data-max-price="{{ $maxFare }}">
+        data-min-price="{{ $minFare }}"
+        data-max-price="{{ $maxFare }}">
         <div class="row g-3 inner-flight-card">
+
           <div class="col-md-6 col-12">
             <div class="d-flex flex-column justify-content-start gap-3">
               <div class="d-flex justify-content-between gap-3">
@@ -1611,36 +1449,35 @@
               </div>
             </div>
           </div>
-
           @php
-          $containerId = 'return_fareBlock_' . $index;
+          $containerId = 'fareBlock_' . $index;
           $fareCount = count($priceList);
+          $count = 1
           @endphp
-          <div class="col-md-6 col-12 text-start" id="{{ $containerId }}">
+          <div class="col-md-6 col-12" id="{{ $containerId }}">
             @foreach($priceList as $loopIndex => $priceItem)
             @php
             $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
             $tag = $priceItem['fareIdentifier'] ?? 'Standard';
             $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
-            $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw));
+            $cabinClass = Str::title(strtolower($cabinClassRaw));
             $isHidden = $loopIndex >= 3 ? 'd-none' : '';
             $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
               @endphp
 
               <div class="mx-2 py-2  more-fare  position-relative {{ $isNotLast }} {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
               <div class="d-flex">
-                <!-- Return Fare Radio Button -->
-                <!-- Return Fare Radio Button -->
+                <!-- Onward Fare Radio Button -->
                 <input type="radio"
-                  name="return_fare"
-                  value="return_{{ $index }}_{{ $loopIndex }}"
+                  name="onward_fare"
+                  value="onward_{{ $index }}_{{ $loopIndex }}"
                   data-price-id="{{ $priceItem['id'] }}"
                   data-fare-identifier="{{ $priceItem['fareIdentifier'] }}"
                   {{ $index === 0 && $loopIndex === 0 ? 'checked' : '' }}>
 
-                <!-- Hidden inputs for Return Fare -->
-                <input type="hidden" id="return_fare_id" name="return_fare_id" value="">
-                <input type="hidden" id="return_fare_detail" name="return_fare_detail" value="">
+                <!-- Hidden inputs for Onward Fare -->
+                <input type="hidden" id="onward_fare_id" name="onward_fare_id" value="">
+                <input type="hidden" id="onward_fare_detail" name="onward_fare_detail" value="">
 
                 <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
               </div>
@@ -1653,8 +1490,8 @@
               @endif
           </div>
           @endforeach
-        </div>
 
+        </div>
         <div class="col-12">
           <div class="flight-details-content mt-2 card" id="flight-details-content-{{ $uniqueId }}" style="display: none;">
 
@@ -1672,12 +1509,182 @@
                       @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
           </div>
         </div>
-
       </div>
-
     </div>
     @endforeach
     @endif
+  </div>
+  <div class="col-lg-6">
+    @php
+    $lastOnwardFlight = $returnFlights[0]['sI'][0] ?? null;
+    $depCity = $lastOnwardFlight['da']['city'] ?? '';
+    $arrCity = $lastOnwardFlight['aa']['city'] ?? '';
+    $arrivalDate = isset($lastOnwardFlight['at']) ? Carbon::parse($lastOnwardFlight['at'])->format('D, d M y') : '';
+    @endphp
+    <div class="d-flex">
+      <h5>{{ucfirst($depCity)}} to {{ucfirst($arrCity)}}</h5>
+      <p class="ms-2"> {{ $arrivalDate }}</p>
+    </div>
+    @if(isset($resultsRound['searchResult']['tripInfos']['RETURN']) && count($resultsRound['searchResult']['tripInfos']['RETURN']) > 0)
+    @foreach($resultsRound['searchResult']['tripInfos']['RETURN'] as $index => $segment)
+    @php
+    $flightList = $segment['sI'];
+    $firstFlight = $flightList[0];
+    $lastFlight = end($flightList);
+
+    $departureTime = \Carbon\Carbon::parse($firstFlight['dt']);
+    $arrivalTime = \Carbon\Carbon::parse($lastFlight['at']);
+    $durationMinutes = abs($arrivalTime->diffInMinutes($departureTime));
+    $hours = intdiv($durationMinutes, 60);
+    $minutes = $durationMinutes % 60;
+
+    $stopovers = [];
+    foreach ($flightList as $leg) {
+    if (($leg['sN'] ?? 0) === 1) {
+    $stopovers[] = $leg['da'];
+    }
+    }
+
+    $stopCount = count($stopovers);
+    $stopLabel = $stopCount === 0 ? 'Non-stop' : "{$stopCount} stop" . ($stopCount > 1 ? 's' : '');
+
+    $airlineCode = $firstFlight['fD']['aI']['code'] ?? 'XX';
+    $airlineName = $firstFlight['fD']['aI']['name'] ?? 'Unknown Airline';
+    $flightNumber = $firstFlight['fD']['fN'] ?? 'XXX';
+
+    $fromCity = $firstFlight['da']['city'] ?? '';
+    $toCity = $lastFlight['aa']['city'] ?? '';
+    $fromTime = $departureTime->format('H:i');
+    $toTime = $arrivalTime->format('H:i');
+    $fromDate = $departureTime->format('d M');
+    $toDate = $arrivalTime->format('d M');
+
+    $logoPath = public_path("AirlinesLogo/{$airlineCode}.png");
+    $logoUrl = file_exists($logoPath)
+    ? asset("AirlinesLogo/{$airlineCode}.png")
+    : asset("AirlinesLogo/default.png");
+
+    $priceList = $segment['totalPriceList'] ?? [];
+    $uniqueId = 'return_segment_' . $index;
+    $allFares = [];
+    foreach ($priceList as $priceItem) {
+    $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+    $allFares[] = $farePrice;
+    }
+    $minFare = !empty($allFares) ? min($allFares) : 0;
+    $maxFare = !empty($allFares) ? max($allFares) : 0;
+    $fareString = implode(',', $allFares); // for data attribute
+    @endphp
+
+    <div class="flight-card mb-2 p-3 pb-2 border rounded shadow-sm bg-white"
+      data-stops="{{ $stopCount }}"
+      data-airline="{{ $airlineName}}-{{$flightNumber }}"
+      data-type="{{ $cabinClass ?? '' }}"
+      data-prices="{{ $fareString }}"
+      data-min-price="{{ $minFare }}"
+      data-max-price="{{ $maxFare }}">
+      <div class="row g-3 inner-flight-card">
+        <div class="col-md-6 col-12">
+          <div class="d-flex flex-column justify-content-start gap-3">
+            <div class="d-flex justify-content-between gap-3">
+              <div class="d-flex gap-0 flex-column">
+                <img src="{{ $logoUrl }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+                <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+                <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
+              </div>
+              <div class="d-flex justify-content-between gap-3">
+                <div class="d-flex gap-0 flex-column align-items-end">
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
+                  <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
+                </div>
+                <div class="d-flex flex-column align-item-center gap-0">
+                  <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
+                  <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
+                    <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+                  </div>
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
+                </div>
+                <div class="d-flex gap-0 flex-column align-items-start">
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
+                  <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
+                  <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column gap-2">
+              <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails($uniqueId)" data-details-id="flight-details-content-{{ $uniqueId }}">View Details +</button>
+              <span style="color: rgb(255, 138, 5); font-size:11px; line-height: 1; margin-left: 6px">7 Seats Left</span>
+            </div>
+          </div>
+        </div>
+
+        @php
+        $containerId = 'return_fareBlock_' . $index;
+        $fareCount = count($priceList);
+        @endphp
+        <div class="col-md-6 col-12 text-start" id="{{ $containerId }}">
+          @foreach($priceList as $loopIndex => $priceItem)
+          @php
+          $totalFare = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+          $tag = $priceItem['fareIdentifier'] ?? 'Standard';
+          $cabinClassRaw = $priceItem['fd']['ADULT']['cc'] ?? 'N/A';
+          $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw));
+          $isHidden = $loopIndex >= 3 ? 'd-none' : '';
+          $isNotLast = $loopIndex < count($priceList) - 1 ? 'border-bottom' : '' ;
+            @endphp
+
+            <div class="mx-2 py-2  more-fare  position-relative {{ $isNotLast }} {{ $isHidden }}" data-fare-index="{{ $loopIndex }}">
+            <div class="d-flex">
+              <!-- Return Fare Radio Button -->
+              <!-- Return Fare Radio Button -->
+              <input type="radio"
+                name="return_fare"
+                value="return_{{ $index }}_{{ $loopIndex }}"
+                data-price-id="{{ $priceItem['id'] }}"
+                data-fare-identifier="{{ $priceItem['fareIdentifier'] }}"
+                {{ $index === 0 && $loopIndex === 0 ? 'checked' : '' }}>
+
+              <!-- Hidden inputs for Return Fare -->
+              <input type="hidden" id="return_fare_id" name="return_fare_id" value="">
+              <input type="hidden" id="return_fare_detail" name="return_fare_detail" value="">
+
+              <p class="mb-0 ms-2 fw-semibold" style="font-size: 14px;">₹{{ number_format($totalFare, 2) }}</p>
+            </div>
+            <div class="">
+              <span class="badge bg-warning text-white text-uppercase" style="font-size: 11px; padding: 4px 8px 3px; border-radius: 4px; font-weight: 200;">{{ $tag }}</span>
+              <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $cabinClass }}</small>
+            </div>
+            @if($fareCount > 3 && $loopIndex == 2)
+            <button class="btn p-1" style="border:1px solid #000;font-size: 11px;color: #ffffff;background: #000;padding: 4px 8px 3px !important;border-radius: 14px;position: absolute;right: 0;bottom: -10px;" onclick="toggleMoreFares('{{ $containerId }}', this)">+More Fares</button>
+            @endif
+        </div>
+        @endforeach
+      </div>
+
+      <div class="col-12">
+        <div class="flight-details-content mt-2 card" id="flight-details-content-{{ $uniqueId }}" style="display: none;">
+
+          <ul class="segment-subtabs d-flex list-unstyled mb-0 border-bottom">
+            <li class="tab-items active px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'flightDetailsOneway_{{ $uniqueId }}')"><small>Flight Details</small></li>
+            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareDetailsOneway_{{ $uniqueId }}')"><small>Fare Details</small></li>
+            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'fareRulesOneway_{{ $uniqueId }}')"><small>Fare Rules <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="View Fare Rules"></i></small></li> <!-- Added "i" icon -->
+            <li class="tab-items px-3 py-2" style="cursor: pointer;" onclick="switchFlightTab(this, 'baggageInfoOneway_{{ $uniqueId }}')"><small>Baggage Info <i class="bi bi-info-circle" data-bs-toggle="tooltip" title="Baggage Allowance Info"></i></small></li> <!-- Added "i" icon -->
+          </ul>
+
+          <!-- Include your Details Tabs Here -->
+          {{-- @include('partials.flight-details-tab', ['flightList' => $flightList, 'uniqueId' => $uniqueId, 'priceData' => $priceData])
+                      @include('partials.fare-details-tab', ['results' => $results, 'uniqueId' => $uniqueId])
+                      @include('partials.fare-rules-tab', ['uniqueId' => $uniqueId])
+                      @include('partials.baggage-info-tab', ['price' => $segment['totalPriceList'][0] ?? [], 'uniqueId' => $uniqueId, 'flightList' => $flightList]) --}}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  @endforeach
+  @endif
   </div>
   </div>
 
@@ -1768,35 +1775,70 @@
       $class = strtoupper($priceData['ADULT']['cc'] ?? 'ECONOMY');
       $refundable = ($priceData['ADULT']['rT'] ?? 0) == 1 ? 'Refundable' : 'Non-refundable';
       $passengerTypes = ['ADULT' => 'Adult', 'CHILD' => 'Child', 'INFANT' => 'Infant'];
-        $allFares = [];
-            foreach ($combo['totalPriceList'] ?? [] as $priceItem) {
-                $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
-                if ($farePrice > 0) {
-                    $allFares[] = $farePrice;
-                }
-            }
-            $minFare = !empty($allFares) ? min($allFares) : 0;
-            $maxFare = !empty($allFares) ? max($allFares) : 0;
-            $fareString = implode(',', $allFares);
+      $allFares = [];
+      foreach ($combo['totalPriceList'] ?? [] as $priceItem) {
+      $farePrice = $priceItem['fd']['ADULT']['fC']['TF'] ?? 0;
+      if ($farePrice > 0) {
+      $allFares[] = $farePrice;
+      }
+      }
+      $minFare = !empty($allFares) ? min($allFares) : 0;
+      $maxFare = !empty($allFares) ? max($allFares) : 0;
+      $fareString = implode(',', $allFares);
 
-            // Airline
-            $airlineName = $airline['name'] ?? 'Unknown Airline';
-            $flightNumber = $firstSeg['fD']['fN'] ?? 'XXX';
+      // Airline
+      $airlineName = $airline['name'] ?? 'Unknown Airline';
+      $flightNumber = $firstSeg['fD']['fN'] ?? 'XXX';
 
-            // Cabin class
-            $cabinClassRaw = $priceData['ADULT']['cc'] ?? 'N/A';
-            $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw));
-            @endphp
+      // Cabin class
+      $cabinClassRaw = $priceData['ADULT']['cc'] ?? 'N/A';
+      $cabinClass = \Illuminate\Support\Str::title(strtolower($cabinClassRaw));
+      @endphp
 
       {{-- Keep frontend from your flight-card or flight-multicity structure --}}
-     <div class="flight-multicity border rounded shadow-sm mb-4 p-3 bg-white"
-            data-stops="{{ $stopCount }}"
-            data-airline="{{ $airlineName }}-{{ $flightNumber }}"
-            data-type="{{ $cabinClass }}"
-            data-prices="{{ $fareString }}"
-            data-min-price="{{ $minFare }}"
-            data-max-price="{{ $maxFare }}">
-        <div class="row align-items-center border-bottom py-3">
+      <div class="flight-multicity border rounded shadow-sm mb-4 p-3 bg-white"
+        data-stops="{{ $stopCount }}"
+        data-airline="{{ $airlineName }}-{{ $flightNumber }}"
+        data-type="{{ $cabinClass }}"
+        data-prices="{{ $fareString }}"
+        data-min-price="{{ $minFare }}"
+        data-max-price="{{ $maxFare }}">
+        <div class="row g-3">
+          <!-- <div class="col-md-6 col-12">
+            <div class="d-flex flex-column justify-content-start gap-3">
+              <div class="d-flex justify-content-between gap-3">
+                <div class="d-flex gap-0 flex-column">
+                  <img src="{{ $logoUrl }}" alt="{{ $airline['name'] }}" class="img-fluid" style="max-height: 30px; max-width: 30px;">
+                  <p class="mb-0 fw-semibold text-dark" style="font-size: 14px;">{{ $airlineName }}</p>
+                  <small style="font-size: 11px; line-height: 1;">{{ $flightNumber }}</small>
+                </div>
+                <div class="d-flex justify-content-between gap-3">
+                  <div class="d-flex gap-0 flex-column align-items-end">
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromCity }}</small>
+                    <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $fromTime }}</h5>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $fromDate }}</small>
+                  </div>
+                  <div class="d-flex flex-column align-item-center gap-0">
+                    <span class="d-block fw-semibold" style="font-size: 14px; line-height: 1.3;">{{ $hours }}h {{ $minutes }}m</span>
+                    <div style="width: 100%; height: 2px; background-color: orange; position: relative; margin: 9px 0; display: flex; align-items: center; justify-content: end;">
+                      <span style="color: orange; font-size: 36px; margin-top: -6px; margin-right: -3px;">→</span>
+                    </div>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $stopLabel }}</small>
+                  </div>
+                  <div class="d-flex gap-0 flex-column align-items-start">
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toCity }}</small>
+                    <h5 class="my-1 fw-semibold" style="font-size: 14px;">{{ $toTime }}</h5>
+                    <small class="text-muted" style="font-size: 11px; line-height: 1;">{{ $toDate }}</small>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex flex-column gap-2">
+                <button type="button" class="btn btn-sm" style="background-color: #f5f5f5;color: rgb(255, 138, 5);width: fit-content;font-size: 11px;padding: 4px 8px 3px;" onclick="toggleDetails($uniqueId)" data-details-id="flight-details-content-{{ $uniqueId }}">View Details +</button>
+                <span style="color: rgb(255, 138, 5); font-size:11px; line-height: 1; margin-left: 6px">7 Seats Left</span>
+              </div>
+            </div>
+          </div> -->
+
           <div class="col-md-2 text-center">
             <div class="d-flex">
               <img src="{{ $logoUrl }}" alt="{{ $airline['name'] }}" class="img-fluid" style="max-height: 20px;">
@@ -2265,7 +2307,7 @@
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
     const filters = document.querySelectorAll(".filter-stop, .filter-airline, .filter-type");
     const flightCards = document.querySelectorAll(".flight-card, .flight-multicity");
 
@@ -2274,68 +2316,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ Init jQuery UI slider
     $("#priceRange").slider({
-        range: true,
-        min: selectedMinPrice,
-        max: selectedMaxPrice,
-        values: [selectedMinPrice, selectedMaxPrice],
-        slide: function (event, ui) {
-            selectedMinPrice = ui.values[0];
-            selectedMaxPrice = ui.values[1];
+      range: true,
+      min: selectedMinPrice,
+      max: selectedMaxPrice,
+      values: [selectedMinPrice, selectedMaxPrice],
+      slide: function(event, ui) {
+        selectedMinPrice = ui.values[0];
+        selectedMaxPrice = ui.values[1];
 
-            document.querySelector(".min-value").innerText = selectedMinPrice.toLocaleString() + " ₹";
-            document.querySelector(".max-value").innerText = selectedMaxPrice.toLocaleString() + " ₹";
+        document.querySelector(".min-value").innerText = selectedMinPrice.toLocaleString() + " ₹";
+        document.querySelector(".max-value").innerText = selectedMaxPrice.toLocaleString() + " ₹";
 
-            applyFilters();
-        }
+        applyFilters();
+      }
     });
 
     function applyFilters() {
-        const selectedStops = Array.from(document.querySelectorAll(".filter-stop:checked")).map(cb => cb.value.toLowerCase());
-        const selectedAirlines = Array.from(document.querySelectorAll(".filter-airline:checked")).map(cb => cb.value.toLowerCase());
-        const selectedTypes = Array.from(document.querySelectorAll(".filter-type:checked")).map(cb => cb.value.toLowerCase());
+      const selectedStops = Array.from(document.querySelectorAll(".filter-stop:checked")).map(cb => cb.value.toLowerCase());
+      const selectedAirlines = Array.from(document.querySelectorAll(".filter-airline:checked")).map(cb => cb.value.toLowerCase());
+      const selectedTypes = Array.from(document.querySelectorAll(".filter-type:checked")).map(cb => cb.value.toLowerCase());
 
-        let anyVisible = false;
+      let anyVisible = false;
 
-        flightCards.forEach(card => {
-            const cardStops = card.getAttribute("data-stops") || "";
-            const cardAirline = card.getAttribute("data-airline")?.toLowerCase() || "";
-            const cardType = card.getAttribute("data-type")?.toLowerCase() || "";
+      flightCards.forEach(card => {
+        const cardStops = card.getAttribute("data-stops") || "";
+        const cardAirline = card.getAttribute("data-airline")?.toLowerCase() || "";
+        const cardType = card.getAttribute("data-type")?.toLowerCase() || "";
 
-            const prices = (card.getAttribute("data-prices") || "")
-                            .split(",")
-                            .map(Number)
-                            .filter(p => !isNaN(p));
-            const priceMatch = prices.some(price => price >= selectedMinPrice && price <= selectedMaxPrice);
+        const prices = (card.getAttribute("data-prices") || "")
+          .split(",")
+          .map(Number)
+          .filter(p => !isNaN(p));
+        const priceMatch = prices.some(price => price >= selectedMinPrice && price <= selectedMaxPrice);
 
-            const stopMatch = selectedStops.length === 0 || selectedStops.includes(cardStops);
-            const airlineMatch = selectedAirlines.length === 0 || selectedAirlines.includes(cardAirline);
-            const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(cardType);
+        const stopMatch = selectedStops.length === 0 || selectedStops.includes(cardStops);
+        const airlineMatch = selectedAirlines.length === 0 || selectedAirlines.includes(cardAirline);
+        const typeMatch = selectedTypes.length === 0 || selectedTypes.includes(cardType);
 
-            if (stopMatch && airlineMatch && typeMatch && priceMatch) {
-                card.style.display = "block";
-                anyVisible = true;
-            } else {
-                card.style.display = "none";
-            }
-        });
-
-        let msg = document.getElementById("noResultsMsg");
-        if (!anyVisible) {
-            if (!msg) {
-                msg = document.createElement("div");
-                msg.id = "noResultsMsg";
-                msg.innerHTML = "<p class='text-center text-danger fw-bold mt-3'>No flights found.</p>";
-                document.querySelector(".flight-list .container").appendChild(msg);
-            }
+        if (stopMatch && airlineMatch && typeMatch && priceMatch) {
+          card.style.display = "block";
+          anyVisible = true;
         } else {
-            if (msg) msg.remove();
+          card.style.display = "none";
         }
+      });
+
+      let msg = document.getElementById("noResultsMsg");
+      if (!anyVisible) {
+        if (!msg) {
+          msg = document.createElement("div");
+          msg.id = "noResultsMsg";
+          msg.innerHTML = "<p class='text-center text-danger fw-bold mt-3'>No flights found.</p>";
+          document.querySelector(".flight-list .container").appendChild(msg);
+        }
+      } else {
+        if (msg) msg.remove();
+      }
     }
 
     filters.forEach(f => f.addEventListener("change", applyFilters));
-});
-
-
+  });
 </script>
 
 

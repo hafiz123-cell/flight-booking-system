@@ -25,6 +25,17 @@ class EasebuzzController extends Controller
         $easebuzz = new \Easebuzz($key, $salt, $env);
 
         $paymentData = Session::get('easebuzz_payment_data');
+          $passengers = $paymentData['passenger'] ?? [];
+
+// Find the first ADULT passenger
+$firstAdult = collect($passengers)->firstWhere('type', 'ADULT');
+
+if ($firstAdult) {
+    $firstName = $firstAdult['first_name'];
+    $fullName  = trim(($firstAdult['title'] ?? '') . ' ' . $firstAdult['first_name'] . ' ' . $firstAdult['last_name']);
+} else {
+    dd('No ADULT passenger found');
+}
 
         if (!$paymentData || empty($paymentData['contact']['email']) || empty($paymentData['contact']['mobile'])) {
             return redirect()->back()->with('error', 'Missing traveller details for payment.');
@@ -38,19 +49,19 @@ class EasebuzzController extends Controller
 
         $priceId = $paymentData['price_id'] ?? 'N/A';
         $priceIdSanitized = preg_replace('/[^a-zA-Z0-9\-_ ]/', '', $priceId);
-
+         
         $productInfo = 'Trip Booking - Price ID ' . $priceIdSanitized;
         $productInfo = substr($productInfo, 0, 100);
 
         $postData = [
             'txnid'       => uniqid(),
             'amount'      => number_format($amount, 2, '.', ''),
-            'firstname'   => $paymentData['passenger']['first_name'] ?? 'Guest',
+            'firstname'   => $fullName ?? 'Guest',
             'email'       => $paymentData['contact']['email'],
             'phone'       => $paymentData['contact']['mobile'],
-            'productinfo' => 'Test',
+            'productinfo' => 'Flight info',
             'surl'        => route('easebuzz.success') . '?bkId=' . $paymentData['bookingId'],
-            'furl'        => route('easebuzz.failure'),
+            'furl'        => route('easebuzz.failure'). '?bkId=' . $paymentData['bookingId'],
         ];
 
         return $easebuzz->initiatePaymentAPI($postData);
@@ -156,7 +167,7 @@ $payment = Payment::create([
             $storedType  = strtoupper($p['type'] ?? 'ADULT');
             $storedTitle = $p['title'] ?? 'Mr';
 
-            // ✅ Handle DOB logic
+            //  Handle DOB logic
             $storedDob = ($storedType === 'CHILD' && empty($p['dob']))
                 ? now()->subYears(10)->format('Y-m-d')
                 : ($p['dob'] ?? '1990-01-01');
@@ -178,7 +189,7 @@ $payment = Payment::create([
         }
     }
 
-    // ✅ Prepare booking payload for TripJack API
+    //  Prepare booking payload for TripJack API
     $bookingPayload = [
         "bookingId" => $bookingId,
         "paymentInfos" => [
@@ -207,7 +218,7 @@ $payment = Payment::create([
 
         $apiResult = json_decode($apiResponse->getBody(), true);
 
-        // ✅ Save for later usage
+        //  Save for later usage
         Session::put('apiResult', $apiResult);
         Session::put('paymentData', $paymentData);
 
@@ -239,6 +250,7 @@ public function final_payment(Request $request)
     // Get flight details for this booking
     $flightDetails = FlightDetail::where('booking_id', $bookingId)->get();
        $flightDetail= FlightDetail::where('booking_id', $bookingId)->first();
+       
     // Get all traveller details for this booking
     $travellerDetails = TravellerDetail::where('booking_id', $bookingId)->get();
 $payment     = Payment::where('raw_response', 'like', '%"bkId":"'.$bookingId.'"%')->first();
@@ -247,8 +259,10 @@ $travellerDetail = TravellerDetail::where('booking_id', $bookingId)->first();
 if (!$payment) {
     return response()->json(['error' => 'Payment not found for bookingId '.$bookingId], 404);
 }
-    $returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
-   
+   // Get return flight(s) related to onward flights
+$returnFlights = FlightReturn::whereIn('onward_flight_id', $flightDetails->pluck('id'))->get();
+$returnFlightIds = $returnFlights->pluck('id')->implode(',');
+
 $bookingStatus     = $payment->status === 'success' ? 'confirmed' : 'cancelled';
 $bookingPayStatus  = $payment->status === 'success' ? 'paid' : 'failed';
 
@@ -257,6 +271,7 @@ $booking = BookingList::create([
     'user_id'             => auth()->id()??38 , // or auth()->id() Session::get('user_id')
     'flight_detail_id'    => $flightDetail['id'] ?? null,
     'traveller_detail_id' => $travellerDetail['id'] ?? null,
+    'return_flight_detail_id'=> $returnFlightIds??null,
     'payment_id'          => $payment->id,
     'status'              => $bookingStatus,    // dynamic
     'payment_status'      => $bookingPayStatus, // dynamic
@@ -397,15 +412,38 @@ public function invoice($bookingId)
 }
 
 
+
    public function failure(Request $request)
 {
     $data = $request->all();
+     
+    $requestBookingId = $request->query('bkId');
+    $bookingId = $requestBookingId;
+
+    // Get flight and traveller details
+    $flightDetail     = FlightDetail::where('booking_id', $bookingId)->first();
+    $travellerDetail  = TravellerDetail::where('booking_id', $bookingId)->first();
+    $returnFlights    = FlightReturn::whereIn('onward_flight_id', [$flightDetail->id ?? 0])->get();
+    $returnFlightIds  = $returnFlights->pluck('id')->implode(',');
+
+    // Save failed booking
+    $booking = BookingList::create([
+        'user_id'                => auth()->id() ?? 38,
+        'flight_detail_id'       => $flightDetail->id ?? null,
+        'traveller_detail_id'    => $travellerDetail->id ?? null,
+        'return_flight_detail_id'=> $returnFlightIds ?? null,
+        'payment_id'             => null,            // payment is null
+        'status'                 => 'cancelled',       // mark as failure
+        'payment_status'         => 'failed',        // optional field
+    ]);
 
     return view('flight.payment_failure', [
-        'amount' => $data['amount'] ?? 0,
-        'txnid'  => $data['txnid'] ?? '',
-        'msg'    => $data['error_Message'] ?? 'Your payment could not be processed.',
+        'amount'     => $data['amount'] ?? 0,
+        'txnid'      => $data['txnid'] ?? '',
+        'msg'        => $data['error_Message'] ?? 'Your payment could not be processed.',
+        'bookingId'  => $booking->id,
     ]);
 }
+
 
 }
